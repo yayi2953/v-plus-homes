@@ -630,7 +630,6 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   background: rgba(255, 255, 255, .96);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
   backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid var(--v8n-line);
   font-family: "Universal Sans Text", "PingFang SC", "Microsoft YaHei", -apple-system, Arial, sans-serif;
 }
 .v8-nav.is-solid {
@@ -738,7 +737,6 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   display: flex; align-items: flex-start;
   width: 100%; padding: 32px 40px;
   background: #fff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
 }
 .v8-nav__group:hover .v8-nav__mega,
 .v8-nav__group:focus-within .v8-nav__mega {
