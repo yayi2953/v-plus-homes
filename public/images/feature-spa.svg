@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="bg7" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E3D2B8"/><stop offset="0.6" stop-color="#BC9D78"/><stop offset="1" stop-color="#6E543B"/>
+    </linearGradient>
+    <radialGradient id="glow7" cx="0.72" cy="0.2" r="0.4">
+      <stop offset="0" stop-color="#FFF3DA" stop-opacity="0.75"/><stop offset="1" stop-color="#FFF3DA" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="g7"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg7)"/>
+  <rect width="1600" height="1000" fill="url(#glow7)"/>
+  <g stroke="#FBF2E2" stroke-opacity="0.6" fill="none" stroke-width="3" stroke-linecap="round">
+    <ellipse cx="800" cy="680" rx="380" ry="120"/>
+    <path d="M620 560 q40 -70 0 -130 M800 560 q40 -70 0 -130 M980 560 q40 -70 0 -130" stroke-opacity="0.5"/>
+    <line x1="1080" y1="300" x2="1080" y2="420"/>
+    <circle cx="1080" cy="446" r="14" fill="#E3B066" stroke="none"/>
+  </g>
+  <g fill="#FBF2E2" fill-opacity="0.3">
+    <circle cx="240" cy="760" r="26"/><circle cx="320" cy="800" r="18"/><circle cx="1360" cy="780" r="22"/>
+  </g>
+  <line x1="0" y1="820" x2="1600" y2="820" stroke="#FBF2E2" stroke-opacity="0.22" stroke-width="2"/>
+  <rect x="40" y="40" width="1520" height="920" fill="none" stroke="#FBF2E2" stroke-opacity="0.16" stroke-width="2"/>
+  <text x="86" y="916" fill="#FBF2E2" fill-opacity="0.82" font-family="monospace" font-size="26" letter-spacing="8">QIJIAN ATELIER · FEATURED VISUAL 03</text>
+  <rect width="1600" height="1000" filter="url(#g7)" opacity="0.10"/>
+</svg>

@@ -1,0 +1,32 @@
+/* ============================================================
+   SmartImage：模糊渐显图片
+   - 未进入加载区（距视口 300px）前不设置 src，仅显示容器主色底
+   - 原图加载：.is-loading 让 opacity 渐显（与 WAAPI blur 20→0、scale 1.04→1 并行，500ms）
+   - .is-loaded 承接终态（清晰/1 倍），动画栈随即释放，hover 缩放等既有 CSS 照常
+   - 轮播 slide 的显隐由 .is-active 规则（特异性更高）接管，预加载不会透出
+   - 图片框尺寸由外层容器（固定比例）决定，加载前后布局零跳动
+   ============================================================ */
+.smart-img {
+  opacity: 0;
+  filter: blur(20px);
+  transform: scale(1.04);
+}
+.smart-img.is-loading {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+.smart-img.is-loaded {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .smart-img,
+  .smart-img.is-loading,
+  .smart-img.is-loaded {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+}

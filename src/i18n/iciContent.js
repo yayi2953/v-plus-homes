@@ -1,0 +1,786 @@
+// hereici 复刻版 · 中英双语内容字典（两语言结构严格对齐）
+
+// 首屏第 1 张内置兜底图：与后台首屏轮播首条同源（Vercel Blob CDN）。
+// /api/content 不可达的极端情况下，内置兜底文案仍搭配当前品牌首图，
+// 避免回退到已下线的旧湖景图（API 恢复后以远程数据为准自动替换）。
+const HERO_HOME_IMG =
+  'https://hqhqwl3jcotwfk9s.public.vercel-storage.com/hero/1790551540990-l0oa8rsd-ulwSEMyvXklbAARHSWXcIySpu325WM.jpeg'
+
+// 浏览器标签页站点标题（中英共用一个 SEO 标题，与 server/lib/siteTextsSeed.mjs SITE_TITLE 保持一致）
+const SITE_TITLE = 'Apartments for Rent in Guangzhou, Guangdong ｜Expat Housing ｜ChinaHomeRent'
+
+const en = {
+  siteName: SITE_TITLE,
+  nav: {
+    logo: 'Viva',
+    menus: [
+      { label: 'Home', href: '#top' },
+      {
+        label: 'Residences',
+        href: '/listings',
+        subs: [
+          { key: 'luxury', event: 'luxury', label: 'Luxury Homes' },
+          { key: 'standard', event: 'standard', label: 'Standard Homes' },
+          { key: 'student', event: 'student', label: 'Student Flats' },
+          { key: 'city', event: 'city', label: 'City Flats' }
+        ]
+      },
+      { label: 'Map Search', href: '/map' },
+      { label: 'Other Services', href: '#extra-services' },
+      { label: 'Renting Guide', href: '/guides' },
+      { label: 'Contact Us', href: '#get-started' }
+    ],
+    cta: 'Enter Society'
+  },
+  dream: {
+    join: 'Join society',
+    view: 'View Residences',
+    slideAria: 'Go to residence {n}',
+    features: [
+      {
+        title: 'Luxury Modern Comfort',
+        text: 'Enjoy elegant interiors, warm lighting, spacious living, and a premium stay designed for rest and relaxation.'
+      },
+      {
+        title: 'Easy Private Booking',
+        text: 'Reserve your apartment in minutes and experience a seamless stay built for comfort, privacy, and convenience.'
+      }
+    ],
+    slides: [
+      {
+        rating: 'Rated 4.9 out of 5',
+        img: HERO_HOME_IMG,
+        titleA: 'A Private Stay',
+        titleB: 'Designed for Pure Peace',
+        desc: 'Escape the noise and settle into a refined lakeside apartment made for slow mornings, stunning views, and unforgettable comfort.',
+        feature: {
+          title: 'Lakefront Views',
+          text: 'Wake up to peaceful water views and a setting that feels calm, private, and beautifully removed from the city rush.'
+        }
+      },
+      {
+        rating: 'Rated 4.8 out of 5',
+        titleA: 'Forest Chalet',
+        titleB: 'A Whole Forest of Your Own',
+        desc: 'As dusk settles over the pines, the timber A-frame glows warm inside — a crackling fire pit, a starlit deck and nothing but mountain air.',
+        feature: {
+          title: 'Wrapped in Pines',
+          text: 'Tall firs and distant peaks frame the cabin. Step onto the deck for the fire pit, the scent of cedar and a sky full of stars.'
+        }
+      },
+      {
+        rating: 'Rated 5.0 out of 5',
+        titleA: 'Lakeshore Lights',
+        titleB: 'Home by the Glowing Water',
+        desc: 'Glide across the dusk in a rowboat as the shoreline villa lights up one by one, gold rippling over the lake — your daily homecoming ritual.',
+        feature: {
+          title: 'Private Dock',
+          text: 'Your own lakeshore and dock sits just beyond the door — misty morning rows by day and lantern-lit reflections by night.'
+        }
+      },
+      {
+        rating: 'Rated 4.9 out of 5',
+        titleA: 'Pool Estate',
+        titleB: 'Every Evening Worth a Toast',
+        desc: 'Stone walls, warm lanterns, a private pool and a glowing fire bowl — a resort-grade estate that turns an ordinary night into a celebration.',
+        feature: {
+          title: 'Private Heated Pool',
+          text: 'The heated pool faces the garden lawn, with loungers and a fire bowl ready for midnight swims and garden parties that are entirely yours.'
+        }
+      },
+      {
+        rating: 'Rated 4.7 out of 5',
+        titleA: 'Ocean House',
+        titleB: 'Fall Asleep to the Waves',
+        desc: 'Raised above the sand at the end of a boardwalk, the beach house glows softly in blue-hour mist, with the tide as your only background music.',
+        feature: {
+          title: 'Absolute Waterfront',
+          text: 'Walk straight from the raised deck onto the sand — unobstructed sea views, the tide below, and sunrises you hear before you see.'
+        }
+      }
+    ]
+  },
+  ui: { from: 'FROM', perMonth: '/mo', view: 'View' },
+  stats: [
+    { value: '5,000+', label: 'RESIDENTS WELCOMED' },
+    { value: '98%', label: 'CLIENT SATISFACTION' },
+    { value: '8', label: 'LANGUAGES SPOKEN' }
+  ],
+  team: {
+    title: 'Questions? Ask Alex & Sophie',
+    sub: 'Real humans, fast replies on WhatsApp.',
+    whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
+  },
+  contactModal: {
+    title: 'How would you like to reach us?',
+    desc: 'Tap a card to copy the contact info — WhatsApp opens the chat directly.',
+    tel: 'Tel',
+    tiktok: 'TikTok',
+    wechat: 'WeChat',
+    email: 'E-mail',
+    whatsapp: 'WhatsApp',
+    openWhatsapp: 'Open chat',
+    unavailable: 'This channel is not available right now. Please pick another one.',
+    cancel: 'Cancel',
+    wechatTitle: 'Add us on WeChat',
+    wechatDesc: 'Scan the QR code, or copy our WeChat ID and search for it in WeChat.',
+    qrAlt: 'VIVA WeChat QR code',
+    scanHint: 'Scan this code with WeChat to add us.',
+    longpressHint: 'Long-press the code, then choose “Recognise QR code”.',
+    copyId: 'Copy ID',
+    copied: 'Copied',
+    pcHint: 'Tip: after copying the ID, open WeChat → Contacts → Add → search and paste.',
+    mobileHint: 'Tip: long-press the code and choose “Recognise QR code”, or copy the ID and search.',
+    back: 'Back'
+  },
+  teamIntro: {
+    overline: 'Meet the Team',
+    titleLead: 'You will be looked after by',
+    titleAccent: 'real people.',
+    desc: 'Not a faceless platform — a small, senior relocation team that speaks your language, inspects every flat in person, and stays on call from your first viewing to your last month in China.',
+    members: [
+      { index: '01', name: 'Alex Novi', role: 'Operations Manager' },
+      { index: '02', name: 'Sophie Xue', role: 'Property Manager' },
+      { index: '03', name: 'Daniel Okafor', role: 'Viewing Specialist' },
+      { index: '04', name: 'Mia Laurent', role: 'Tenancy Consultant' },
+      { index: '05', name: 'Lucas Meyer', role: 'Maintenance Lead' },
+      { index: '06', name: 'Priya Nair', role: 'Client Experience Lead' },
+      { index: '07', name: 'Marco Bellini', role: 'Settlement Advisor' },
+      { index: '08', name: 'Yuki Tanaka', role: 'Community Manager' }
+    ]
+  },
+  discover: {
+    title: 'Discover our selection of homes in Guangzhou',
+    mobileKicker: 'Property Types',
+    mobileTitle: 'From here, start your home journey',
+    mobileSub: 'Select a category to browse featured properties',
+    mobileCount: 'homes',
+    mobileBack: 'Back to types',
+    mobileAll: 'View all homes',
+    mobileAllHide: 'Hide all homes',
+    mobileAllCount: 'all homes',
+    tabs: [
+      { key: 'liwan', label: 'Liwan', desc: '' },
+      { key: 'tianhe', label: 'Tianhe', desc: 'The CBD core around Zhujiang New Town and Tianhe Sports Circle — the top pick for expat families and young professionals.' },
+      { key: 'yuexiu', label: 'Yuexiu', desc: 'Historic city centre dotted with parks and top schools, served by metro Lines 1 and 2 — classic Guangzhou living.' },
+      { key: 'haizhu', label: 'Haizhu', desc: 'Leafy riverside district south of the Pearl River, home to universities and quiet residential compounds.' },
+      { key: 'baiyun', label: 'Baiyun', desc: 'Spacious green belt at the foot of Baiyun Mountain — bigger flats and better value for families.' },
+      { key: 'huangpu', label: 'Huangpu', desc: 'Fast-growing eastern tech hub with modern high-rise compounds and river views.' },
+      { key: 'panyu', label: 'Panyu', desc: 'Southern university and coliving belt on Line 4 — affordable rooms minutes from campus.' },
+      { key: 'zengcheng', label: 'Zengcheng', desc: 'Eastern green belt around the Zengjiang hi-tech corridor — roomy new compounds, lower rents and a direct Line 21 ride to the city centre.' }
+    ],
+    all: 'All Districts',
+    allDesc: 'Browse every hand-picked home across Guangzhou, then narrow by district.',
+    // 住宅类型仅由导航栏菜单切换
+    types: [
+      { key: 'luxury', label: 'Luxury Homes', desc: 'High-end apartments and penthouses with skyline views and premium finishes.' },
+      { key: 'standard', label: 'Standard Homes', desc: 'Spacious family flats in established residential neighbourhoods with easy commutes.' },
+      { key: 'student', label: 'Student Flats', desc: 'Private rooms and shared flats near campuses — furnished with bills included.' },
+      { key: 'city', label: 'City Flats', desc: 'Serviced studios and lofts in the city centre, steps from metro and malls.' }
+    ],
+    // 学生公寓二级院校
+    schools: [
+      { key: 'scut-wushan', label: 'South China University of Technology (Wushan Campus)' },
+      { key: 'scut-intl', label: 'South China University of Technology (International Campus)' },
+      { key: 'scnu-shipai', label: 'South China Normal University (Shipai Campus)' },
+      { key: 'gdut-dongfeng', label: 'Guangdong University of Technology (Dongfeng Road Campus)' },
+      { key: 'jnu-huawen', label: 'Jinan University (Chinese Language & Culture College)' },
+      { key: 'jnu-shipai', label: 'Jinan University (Shipai Campus)' },
+      { key: 'gzmu', label: 'Guangzhou Maritime University' },
+      { key: 'gdufs-baiyun', label: 'Guangdong University of Foreign Studies (Baiyunshan Campus)' }
+    ],
+    schoolPickerTitle: 'Select your campus',
+    schoolPickerSub: 'Pick a campus to browse student flats nearby.',
+    schoolPickerAll: 'All campuses',
+    schoolPickerClose: 'Close campus picker',
+    areaPickerTitle: 'Select area',
+    areaPickerSub: 'Pick an area to browse {type} in that district.',
+    areaPickerAll: 'All areas',
+    areaPickerClose: 'Close area picker',
+    clearType: 'Clear home type filter',
+    empty: 'Homes in this category are coming soon — please check back shortly.',
+    emptyCombo: 'No homes of this type in this district yet — clear the type filter or pick another district.',
+    emptySchool: 'Homes near this campus are coming soon — please check back shortly.'
+  },
+  properties: [
+    { code: 'VIVA-012', br: '4 BR', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Wushan', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
+    { code: 'FLEX-004', br: '5 BR', baths: 2, area: 156, amenities: ['furnished', 'wifi', 'ac', 'workspace', 'elevator', 'gym', 'tv', 'balcony', 'metro'], district: 'Haizhu, Guangzhou', districtKey: 'haizhu', metro: 'Line 8 · Sun Yat-sen Univ.', price: '¥4,150', fx: '$573 / €527', img: '/images/listing-urban2.jpg', categories: ['standard'] },
+    { code: 'VIVA-014', br: '5 BR', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Shipaiqiao', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
+    { code: 'VIVA-009', br: '4 BR', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: 'Huangpu, Guangzhou', districtKey: 'huangpu', metro: 'Line 5 · Dashadong', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
+    { code: 'VIVA-010', br: '4 BR', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: 'Yuexiu, Guangzhou', districtKey: 'yuexiu', metro: 'Line 1/2 · Gongyuanqian', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
+    { code: 'FLEX-026', br: '4 BR', baths: 2, area: 132, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'elevator', 'workspace', 'gym', 'metro'], district: 'Baiyun, Guangzhou', districtKey: 'baiyun', schoolKey: 'gdufs-baiyun', metro: 'Line 2 · Jiangxia', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-urban1.jpg', categories: ['student'] },
+    { code: 'FLEX-006', br: '4 BR', baths: 1, area: 96, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: 'Panyu, Guangzhou', districtKey: 'panyu', schoolKey: 'scut-intl', metro: 'Line 4 · HE Mega Center North', price: '¥4,050', fx: '$559 / €514', img: '/images/listing-student1.jpg', categories: ['student'] },
+    { code: 'FLEX-036', br: '6 BR', baths: 3, area: 185, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Wushan', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-student2.jpg', categories: ['standard'] },
+    { code: 'FLEX-041', br: '3 BR', baths: 1, area: 102, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: 'Zengcheng, Guangzhou', districtKey: 'zengcheng', metro: 'Line 21 · Zengcheng Square', price: '¥2,900', fx: '$400 / €368', img: '/images/listing-zengcheng.jpg', categories: ['standard'] },
+    { code: 'FLEX-048', br: '2 BR', baths: 1, area: 68, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: 'Zengcheng, Guangzhou', districtKey: 'zengcheng', schoolKey: null, metro: 'Line 21 · Fenggang', price: '¥2,200', fx: '$304 / €279', img: '/images/listing-zengcheng2.jpg', categories: ['student'] }
+  ],
+  detail: {
+    back: 'Back to all homes',
+    overview: 'Overview',
+    galleryTitle: 'More photos',
+    aboutTitle: 'About this home',
+    aboutText:
+      'This {br} apartment offers {area} m² of bright, fully furnished living space in {district}. Managed end-to-end by Viva, it arrives move-in ready with modern appliances, stylish décor and every utility arranged — and with {metro} on your doorstep, the city is only minutes away.',
+    aboutTextNoArea:
+      'This {br} apartment in {district} offers bright, fully furnished living space. Managed end-to-end by Viva, it arrives move-in ready with modern appliances, stylish décor and every utility arranged — and with {metro} on your doorstep, the city is only minutes away.',
+    amenitiesTitle: 'What this place offers',
+    locationTitle: 'Location & transport',
+    locationText:
+      'Close to {metro}. Supermarkets, cafés and 24-hour convenience stores are all within easy reach.',
+    mapOpen: 'Open in Google Maps',
+    mapTitle: 'Map of the surrounding area',
+    specs: {
+      beds: 'Bedrooms',
+      baths: 'Bathrooms',
+      area: 'Living area',
+      minStay: 'Minimum stay',
+      available: 'Available'
+    },
+    minStay: '3 months',
+    available: 'Move-in ready',
+    depositLabel: 'Deposit',
+    depositValue: "2 months' rent",
+    leaseLabel: 'Lease',
+    leaseValue: 'Flexible lease',
+    ask: 'WhatsApp ＆ Tel ＆WeChat',
+    amenities: {
+      furnished: { icon: '🛋️', label: 'Fully furnished' },
+      wifi: { icon: '📶', label: 'High-speed Wi-Fi' },
+      ac: { icon: '❄️', label: 'Air conditioning' },
+      heating: { icon: '🔥', label: 'Heating' },
+      kitchen: { icon: '🍳', label: 'Equipped kitchen' },
+      washer: { icon: '🧺', label: 'Washing machine' },
+      workspace: { icon: '💻', label: 'Work desk' },
+      elevator: { icon: '🛗', label: 'Elevator' },
+      gym: { icon: '🏋️', label: 'Gym access' },
+      tv: { icon: '📺', label: 'Smart TV' },
+      balcony: { icon: '🌇', label: 'Balcony' },
+      metro: { icon: '🚇', label: 'Steps from metro' }
+    }
+  },
+  whyHere: {
+    eyebrow: 'WHY VIVA',
+    titleA: 'A ',
+    titleAccent: 'Seamless',
+    titleB: ' Expat Housing Solution.',
+    desc: 'Viva is the trusted leader in China relocation, having welcomed over 5,000+ international clients and students. Our dedicated team anticipates the unique needs of the expat community, streamlining every step from furnishing to ongoing support. We don’t just find you an apartment; we simplify your life in China.',
+    subTitle: 'Expert Verified Services',
+    cards: [
+      { icon: 'globe', title: 'International Team.', desc: 'Our diverse team understands the unique needs of expats from around the world. We speak your language and guide you every step of the way.' },
+      { icon: 'doc', title: 'Flexible Lease Terms.', desc: 'Whether you need a short stay or a long-term home, we offer lease options tailored to fit your plans. Enjoy the freedom to choose what works best for you.' },
+      { icon: 'home', title: 'Furnished Flats.', desc: 'All our apartments managed by Viva come fully furnished with modern essentials and stylish décor. Move in comfortably without worrying about a thing.' },
+      { icon: 'chat', title: 'Ongoing Support.', desc: "Our dedicated support team is here to help throughout your stay. From maintenance to local advice, we've got you covered." }
+    ]
+  },
+  getStarted: {
+    eyebrow: 'GET STARTED',
+    titleA: 'Ready to start your ',
+    titleAccent: 'next chapter',
+    titleB: '?',
+    desc: 'Talk to our relocation experts today or keep exploring our curated city guides — we usually reply within 24 hours.',
+    book: 'Book Now',
+    whatsapp: 'WhatsApp ＆ Tel ＆WeChat',
+    checks: ['No obligation', 'English-speaking team', 'Trusted by 5,000+ expats']
+  },
+  extraServices: {
+    eyebrow: 'More Services',
+    titleA: 'More than rentals — ',
+    titleAccent: 'a full one-stop service.',
+    footnote: 'Some services are paid value-added options. Contact us for details.',
+    moreTitle: 'Need something else?',
+    moreDesc: 'Visa, banking, insurance and daily-life errands — your personal relocation advisor has it covered.',
+    moreCta: 'Talk to an advisor',
+    cards: [
+      { icon: 'video', title: 'Video Viewing Service' },
+      { icon: 'plane', title: 'Airport Pickup Service' },
+      { icon: 'passport', title: 'Accommodation Registration' },
+      { icon: 'broom', title: 'House Cleaning Service' },
+      { icon: 'truck', title: 'Local Moving Service' },
+      { icon: 'briefcase', title: 'Office Rental Service' },
+      { icon: 'house', title: 'Property Buying & Selling' }
+    ]
+  },
+  footer: {
+    desc: 'Move-in-ready homes and full relocation support across China — visa, bank, and everything in between.',
+    email: 'hello@viva.house',
+    phone: '+352 621780307',
+    groups: [
+      { title: 'Our Services.', links: ['Vacation Rentals', 'Serviced Apartments', 'Coliving & Short-Term', 'Relocation Services', 'Office & Retail', 'Property Transactions'] },
+      { title: 'Tools & More.', links: ['Move Planner', 'Relocation Tools', 'Exclusive Deals', 'Internships', 'Become a Partner'] }
+    ],
+    legal: ['Privacy Policy', 'Cookie Policy', 'Terms & Conditions'],
+    copyright: '© 2026 Viva. All rights reserved.',
+    language: 'English'
+  },
+  cookie: {
+    text: '🍪 We use cookies to improve your browsing experience, analyze site traffic and personalize content.',
+    reject: 'Reject',
+    accept: 'Accept all'
+  },
+  // v8 粒子版首页内置文案（后端 site_texts.v8 可深合并覆盖）
+  v8: {
+    hero: {
+      eyebrow: 'Apartments for Rent in Guangzhou – Expat Housing Solutions',
+      lede: 'Move-in-ready apartments, villas and serviced homes across Guangzhou — all verified, fully furnished, and supported by an English-speaking team.',
+      browse: 'Browse Homes',
+      whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
+    },
+    types: {
+      eyebrow: 'FIND BY TYPE',
+      title: 'Choose the home that fits your life',
+      desc: 'Four curated residence types, from single studios to family villas — every listing is personally inspected.',
+      view: 'View homes'
+    },
+    featured: {
+      eyebrow: 'FEATURED LISTING',
+      title: 'Hand-picked this week',
+      desc: 'Our consultants curate the sharpest, best-located homes on the market — real photos, honest prices.',
+      book: 'Book a Viewing',
+      allText: 'All {n} listings',
+      more: 'Show more homes',
+      left: '{n} more',
+      perMonth: '/ month',
+      empty: 'No published listings yet. Please check back soon.',
+      emptyFilter: 'No homes match all these conditions yet. Try a higher budget, more rooms or another district.',
+      subFallback: '{br} · {area} ㎡'
+    },
+    process: {
+      eyebrow: 'HOW IT WORKS',
+      title: 'From inquiry to keys in four steps',
+      steps: [
+        { title: 'Tell us your needs', desc: 'Budget, districts, move-in date and school commute — a 10-minute chat gets us aligned.' },
+        { title: 'Curated shortlist', desc: 'Within 24 hours you receive a hand-picked shortlist with real photos and floor plans.' },
+        { title: 'Viewings & negotiation', desc: 'We schedule viewings around your time, accompany you on site and negotiate rent on your behalf.' },
+        { title: 'Move in & support', desc: 'Contract, payment, registration and move-in checklist handled — plus ongoing aftercare in English.' }
+      ]
+    },
+    finder: {
+      eyebrow: 'FIND YOUR HOME',
+      // 句段数组：普通字符串为文字，district/beds/budget 渲染为可点选胶囊
+      line: ['I want to rent', 'beds', 'in', 'district', 'with a monthly budget of', 'budget', '.'],
+      districtAny: 'Any district',
+      bedsAny: 'Any layout',
+      budgetAny: 'Any budget',
+      beds: [
+        { v: 1, label: 'a 1-bedroom' },
+        { v: 2, label: 'a 2-bedroom' },
+        { v: 3, label: 'a 3-bedroom' },
+        { v: 4, label: 'a 4+ bedroom' }
+      ],
+      budgets: [
+        { v: 6000, label: '¥6,000' },
+        { v: 10000, label: '¥10,000' },
+        { v: 15000, label: '¥15,000' },
+        { v: 25000, label: '¥25,000' },
+        { v: 40000, label: '¥40,000' }
+      ],
+      count: '{n} homes found',
+      clear: 'Clear all',
+      typeAsk: 'Any home type preference?',
+      typeAny: 'Any type',
+      findBtn: 'Find My Home'
+    },
+    listings: {
+      back: 'Back to home',
+      title: 'Homes for you',
+      empty: 'No homes match your filters. Try adjusting your search.'
+    },
+    team: {
+      eyebrow: 'YOUR CONSULTANTS',
+      title: 'The people who have your back',
+      desc: 'Eight multilingual relocation consultants across Guangzhou — averaging 6 years of expat housing experience.'
+    },
+    cta: {
+      footnote: 'Average response time under 2 hours · English / Cantonese / Mandarin'
+    }
+  }
+}
+
+const zh = {
+  siteName: SITE_TITLE,
+  nav: {
+    logo: 'Viva',
+    menus: [
+      { label: '首页', href: '#top' },
+      {
+        label: '房源',
+        href: '/listings',
+        subs: [
+          { key: 'luxury', event: 'luxury', label: '豪华住宅' },
+          { key: 'standard', event: 'standard', label: '普通住宅' },
+          { key: 'student', event: 'student', label: '学生公寓' },
+          { key: 'city', event: 'city', label: '城市公寓' }
+        ]
+      },
+      { label: '地图找房', href: '/map' },
+      { label: '其它服务', href: '#extra-services' },
+      { label: '租房指南', href: '/guides' },
+      { label: '联系我们', href: '#get-started' }
+    ],
+    cta: '加入社群'
+  },
+  dream: {
+    join: '联系我们',
+    view: '查看房源',
+    slideAria: '切换到第 {n} 套房源',
+    features: [
+      {
+        title: '现代奢华舒适',
+        text: '雅致室内、暖色灯光与开阔空间，每一处细节都为休息与放松而设计。'
+      },
+      {
+        title: '私密轻松预订',
+        text: '几分钟即可完成预订，全程顺畅，兼顾舒适、隐私与便利。'
+      }
+    ],
+    slides: [
+      {
+        rating: '',
+        img: HERO_HOME_IMG,
+        titleA: 'VIVA·HOME',
+        titleB: 'Rentals for Expats',
+        desc: '广州市专业外籍租赁服务团队\nLive Globally, Settle Local with Viva',
+        feature: {
+          title: '服务流程',
+          text: '需求沟通→房源推荐→预约看房→房源预订→合同签署→房屋交接→售后支持'
+        }
+      },
+      {
+        rating: '4.8 分（满分 5 分）',
+        titleA: '林间木屋',
+        titleB: '把一整片森林私有化',
+        desc: '暮色漫过松林，整栋原木 A 形屋灯火通明——门前篝火噼啪、露台星光相伴，呼吸间尽是山间清冽空气。',
+        feature: {
+          title: '森林环抱',
+          text: '高松与远山把小屋温柔围住，推门即见篝火与雪松香气，夜里整片星空都只为你点亮。'
+        }
+      },
+      {
+        rating: '5.0 分（满分 5 分）',
+        titleA: '归舟湖畔',
+        titleB: '灯火倒映的回家路',
+        desc: '一叶扁舟划过暮色，岸边庄园灯火渐次亮起，把湖面铺成碎金——这是专属于你的归家仪式。',
+        feature: {
+          title: '私家湖岸码头',
+          text: '出门就是私家湖岸与码头：清晨在薄雾中泛舟，入夜看灯火在水面随波轻晃。'
+        }
+      },
+      {
+        rating: '4.9 分（满分 5 分）',
+        titleA: '泳池庄园',
+        titleB: '每个夜晚都值得举杯',
+        desc: '石墙暖灯、私家泳池与篝火盆——暮色里的度假级庄园，把寻常夜晚过成值得庆祝的时刻。',
+        feature: {
+          title: '私享恒温泳池',
+          text: '恒温泳池正对庄园草坪，躺椅与篝火随时就位，深夜游泳和庭院派对都只属于你。'
+        }
+      },
+      {
+        rating: '4.7 分（满分 5 分）',
+        titleA: '听海而居',
+        titleB: '枕着浪声入睡的家',
+        desc: '沙岸之上、木栈道尽头，一栋架空的海之屋在雾蓝暮色里亮着暖灯，潮声是这里唯一的背景音。',
+        feature: {
+          title: '一线海岸',
+          text: '从架空露台一步踏上沙滩，无遮挡海景尽收眼底：枕浪而眠，迎海而起。'
+        }
+      }
+    ]
+  },
+  ui: { from: '月租', perMonth: ' 起', view: '查看详情' },
+  stats: [
+    { value: '5,000+', label: '已服务住户' },
+    { value: '98%', label: '客户满意度' },
+    { value: '8', label: '服务语言' }
+  ],
+  team: {
+    title: '有疑问？咨询 VIVA',
+    sub: '真人团队，WhatsApp & 微信快速回复',
+    whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
+  },
+  contactModal: {
+    title: '请选择咨询方式',
+    desc: '点击卡片即可复制联系方式；WhatsApp 将直接跳转到对话。',
+    tel: '电话',
+    tiktok: 'TikTok',
+    wechat: '微信',
+    email: '邮箱',
+    whatsapp: 'WhatsApp',
+    openWhatsapp: '前往咨询',
+    unavailable: '该渠道暂未开通，请选择另一种方式。',
+    cancel: '取消',
+    wechatTitle: '添加 VIVA 微信',
+    wechatDesc: '可扫描下方二维码，或复制微信号后到微信中搜索添加。',
+    qrAlt: 'VIVA 微信二维码',
+    scanHint: '打开微信扫一扫，扫描此二维码即可添加。',
+    longpressHint: '长按二维码图片，选择「识别图中二维码」。',
+    copyId: '复制微信号',
+    copied: '已复制',
+    pcHint: '提示：复制微信号后，打开微信 → 通讯录 → 添加朋友 → 粘贴搜索即可。',
+    mobileHint: '提示：长按二维码图片选择「识别」即可添加，也可复制微信号自行搜索。',
+    back: '返回'
+  },
+  teamIntro: {
+    overline: '团队介绍',
+    titleLead: '照顾你的，始终是',
+    titleAccent: '真实的人。',
+    desc: '不是冷冰冰的平台，而是一支资深而精干的安家团队：用你的语言沟通，亲自验看每一间公寓；从第一次带看到在华居住的最后一个月，随时待命。',
+    members: [
+      { index: '01', name: '亚历克斯·诺维', role: '运营经理' },
+      { index: '02', name: '苏菲·薛', role: '物业经理' },
+      { index: '03', name: '丹尼尔·奥卡福', role: '带看专员' },
+      { index: '04', name: '米娅·洛朗', role: '租约顾问' },
+      { index: '05', name: '卢卡斯·迈耶', role: '维修主管' },
+      { index: '06', name: '普里亚·奈尔', role: '客户体验主管' },
+      { index: '07', name: '马可·贝利尼', role: '安家顾问' },
+      { index: '08', name: '田中由纪', role: '社区经理' }
+    ]
+  },
+  discover: {
+    title: '探索我们精选的广州房源',
+    mobileKicker: '房源类型',
+    mobileTitle: '按类型挑选你的家',
+    mobileSub: '选择一个类别，即刻查看精选房源。',
+    mobileCount: '套精选房源',
+    mobileBack: '返回类型选择',
+    mobileAll: '查看全部房源',
+    mobileAllHide: '收起全部房源',
+    mobileAllCount: '套全部房源',
+    tabs: [
+      { key: 'liwan', label: '荔湾区', desc: '' },
+      { key: 'tianhe', label: '天河区', desc: '珠江新城与天河路商圈所在的 CBD 核心，外籍家庭与城市白领聚居首选。' },
+      { key: 'yuexiu', label: '越秀区', desc: '千年老城中心，公园名校环绕，1/2 号线直达，经典广州市井生活。' },
+      { key: 'haizhu', label: '海珠区', desc: '珠江南岸宜居城区，高校林立，江畔社区安静、生活气息浓厚。' },
+      { key: 'baiyun', label: '白云区', desc: '背靠白云山的生态城区，户型宽敞、性价比高，深受家庭租客欢迎。' },
+      { key: 'huangpu', label: '黄埔区', desc: '东部科技创新高地，高层新社区与江景房源密集，适合长租。' },
+      { key: 'panyu', label: '番禺区', desc: '南部大学城板块，合租单间集中、租金亲民，4 号线通勤便利。' },
+      { key: 'zengcheng', label: '增城区', desc: '东部增城江高新走廊生态城区，新社区户型宽敞、租金更低，21 号线直达市中心。' }
+    ],
+    all: '全部区域',
+    allDesc: '不限区域浏览广州全部精选房源，再按区域逐步收窄。',
+    // 住宅类型仅由导航栏菜单切换
+    types: [
+      { key: 'luxury', label: '豪华住宅', desc: '高端公寓与顶层套房，坐拥城市天际线与精装品质。' },
+      { key: 'standard', label: '普通住宅', desc: '成熟住宅小区的宽敞家庭户型，通勤生活两便利。' },
+      { key: 'student', label: '学生公寓', desc: '高校周边合租单间与公寓，家具齐全、杂费全包。' },
+      { key: 'city', label: '城市公寓', desc: '市中心服务式单间与 LOFT，紧邻地铁与商圈。' }
+    ],
+    // 学生公寓二级院校
+    schools: [
+      { key: 'scut-wushan', label: '华南理工大学（五山校区）' },
+      { key: 'scut-intl', label: '华南理工大学（国际校区）' },
+      { key: 'scnu-shipai', label: '华南师范大学（石牌校区）' },
+      { key: 'gdut-dongfeng', label: '广东工业大学（东风路校区）' },
+      { key: 'jnu-huawen', label: '暨南大学（华文学院）' },
+      { key: 'jnu-shipai', label: '暨南大学（石牌校区）' },
+      { key: 'gzmu', label: '广州航海学院' },
+      { key: 'gdufs-baiyun', label: '广东外语外贸大学（白云山校区）' }
+    ],
+    schoolPickerTitle: '选择校区',
+    schoolPickerSub: '选择你所在或意向的院校，查看周边学生公寓。',
+    schoolPickerAll: '全部校区',
+    schoolPickerClose: '关闭校区选择',
+    areaPickerTitle: '选择区域',
+    areaPickerSub: '选择意向区域，查看该区域的{type}房源。',
+    areaPickerAll: '全部区域',
+    areaPickerClose: '关闭区域选择',
+    clearType: '清除住宅类型筛选',
+    empty: '该板块房源即将上线，敬请期待。',
+    emptyCombo: '当前区域暂无此类房源，可清除类型筛选或切换其他区域。',
+    emptySchool: '该校区周边房源即将上线，敬请期待。'
+  },
+  properties: [
+    { code: 'VIVA-012', br: '4 室', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 五山站', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
+    { code: 'FLEX-004', br: '5 室', baths: 2, area: 156, amenities: ['furnished', 'wifi', 'ac', 'workspace', 'elevator', 'gym', 'tv', 'balcony', 'metro'], district: '广州 · 海珠区', districtKey: 'haizhu', metro: '8 号线 · 中大站', price: '¥4,150', fx: '$573 / €527', img: '/images/listing-urban2.jpg', categories: ['standard'] },
+    { code: 'VIVA-014', br: '5 室', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 石牌桥站', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
+    { code: 'VIVA-009', br: '4 室', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: '广州 · 黄埔区', districtKey: 'huangpu', metro: '5 号线 · 大沙东站', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
+    { code: 'VIVA-010', br: '4 室', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: '广州 · 越秀区', districtKey: 'yuexiu', metro: '1/2 号线 · 公园前站', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
+    { code: 'FLEX-026', br: '4 室', baths: 2, area: 132, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'elevator', 'workspace', 'gym', 'metro'], district: '广州 · 白云区', districtKey: 'baiyun', schoolKey: 'gdufs-baiyun', metro: '2 号线 · 江夏站', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-urban1.jpg', categories: ['student'] },
+    { code: 'FLEX-006', br: '4 室', baths: 1, area: 96, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: '广州 · 番禺区', districtKey: 'panyu', schoolKey: 'scut-intl', metro: '4 号线 · 大学城北站', price: '¥4,050', fx: '$559 / €514', img: '/images/listing-student1.jpg', categories: ['student'] },
+    { code: 'FLEX-036', br: '6 室', baths: 3, area: 185, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 五山站', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-student2.jpg', categories: ['standard'] },
+    { code: 'FLEX-041', br: '3 室', baths: 1, area: 102, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '广州 · 增城区', districtKey: 'zengcheng', metro: '21 号线 · 增城广场站', price: '¥2,900', fx: '$400 / €368', img: '/images/listing-zengcheng.jpg', categories: ['standard'] },
+    { code: 'FLEX-048', br: '2 室', baths: 1, area: 68, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: '广州 · 增城区', districtKey: 'zengcheng', schoolKey: null, metro: '21 号线 · 凤岗站', price: '¥2,200', fx: '$304 / €279', img: '/images/listing-zengcheng2.jpg', categories: ['student'] }
+  ],
+  detail: {
+    back: '返回房源列表',
+    overview: '概览',
+    galleryTitle: '更多照片',
+    aboutTitle: '房源介绍',
+    aboutText:
+      '这套 {br} 公寓位于{district}，建筑面积 {area} m²，采光充足，家具家电齐全，拎包即可入住。由 Viva 全程托管，装潢现代雅致，杂费（含水网）均已安排妥当；临近{metro}，出门即是便利的城市生活。',
+    aboutTextNoArea:
+      '这套 {br} 公寓位于{district}，采光充足，家具家电齐全，拎包即可入住。由 Viva 全程托管，装潢现代雅致，杂费（含水网）均已安排妥当；临近{metro}，出门即是便利的城市生活。',
+    amenitiesTitle: '配套设施',
+    locationTitle: '位置与交通',
+    locationText:
+      '临近{metro}，超市、咖啡馆与 24 小时便利店都在生活圈内，日常采买轻松方便。',
+    mapOpen: '在 Google 地图中查看',
+    mapTitle: '周边位置地图',
+    specs: {
+      beds: '户型',
+      baths: '卫生间',
+      area: '建筑面积',
+      minStay: '最短租期',
+      available: '起租时间'
+    },
+    minStay: '3 个月',
+    available: '随时入住',
+    depositLabel: '押金',
+    depositValue: '2 个月房租',
+    leaseLabel: '租约',
+    leaseValue: '灵活租约',
+    ask: 'WhatsApp ＆ Tel ＆WeChat',
+    amenities: {
+      furnished: { icon: '🛋️', label: '家具齐全' },
+      wifi: { icon: '📶', label: '高速 Wi-Fi' },
+      ac: { icon: '❄️', label: '空调' },
+      heating: { icon: '🔥', label: '暖气' },
+      kitchen: { icon: '🍳', label: '整体厨房' },
+      washer: { icon: '🧺', label: '洗衣机' },
+      workspace: { icon: '💻', label: '办公书桌' },
+      elevator: { icon: '🛗', label: '电梯' },
+      gym: { icon: '🏋️', label: '健身房' },
+      tv: { icon: '📺', label: '智能电视' },
+      balcony: { icon: '🌇', label: '阳台' },
+      metro: { icon: '🚇', label: '近地铁站' }
+    }
+  },
+  whyHere: {
+    eyebrow: '为什么选择 VIVA',
+    titleA: '为外籍人士提供',
+    titleAccent: '无缝安居',
+    titleB: '体验。',
+    desc: 'Viva 是值得信赖的在华安家服务领导者，已迎接超过 5,000 名国际客户与学生。我们专业的团队深谙外籍社群的独特需求，从家具配置到入住后的持续支持，精简每一个环节。我们不只是帮你找公寓，更是让你在中国的生活更简单。',
+    subTitle: '专业认证服务',
+    cards: [
+      { icon: 'globe', title: '国际化团队', desc: '我们多元的团队了解来自世界各地外籍人士的独特需求，用你的语言沟通，全程为你指引。' },
+      { icon: 'doc', title: '灵活租约条款', desc: '无论短住还是长居，我们都能提供契合你计划的租约方案，自由选择最适合你的方式。' },
+      { icon: 'home', title: '家具齐全公寓', desc: '所有由 Viva 托管的公寓均配备现代必需品与时尚装潢，拎包即可舒适入住，无需费心。' },
+      { icon: 'chat', title: '全程持续支持', desc: '专属支持团队在你居住期间随时待命，从维修养护到本地生活建议，我们一应关照。' }
+    ]
+  },
+  getStarted: {
+    eyebrow: '立即开始',
+    titleA: '准备好开启你的',
+    titleAccent: '新篇章',
+    titleB: '了吗？',
+    desc: '立即与我们的安家顾问交流，或继续浏览精心整理的城市指南 —— 我们通常在 24 小时内回复。',
+    book: '立即预订',
+    whatsapp: 'WhatsApp ＆ Tel ＆WeChat',
+    checks: ['无任何强制义务', '英文服务团队', '5,000+ 外籍人士信赖之选']
+  },
+  extraServices: {
+    eyebrow: '其它服务',
+    titleA: '不止租房，',
+    titleAccent: '一站式全套服务.',
+    footnote: '部分内容为增值付费服务，详情请咨询',
+    moreTitle: '还有别的需求？',
+    moreDesc: '签证、银行、保险与各类生活琐事，交给你的专属安家顾问一站办妥。',
+    moreCta: '联系顾问',
+    cards: [
+      { icon: 'video', title: '视频看房服务' },
+      { icon: 'plane', title: '机场接机服务' },
+      { icon: 'passport', title: '住宿登记服务' },
+      { icon: 'broom', title: '房屋保洁服务' },
+      { icon: 'truck', title: '同城搬家服务' },
+      { icon: 'briefcase', title: '办公室租赁服务' },
+      { icon: 'house', title: '房屋买卖服务' }
+    ]
+  },
+  footer: {
+    desc: '覆盖中国主要城市的拎包入住房源与全方位安家服务 —— 签证、银行及生活琐事一站搞定。',
+    email: 'hello@viva.house',
+    phone: '+352 621780307',
+    groups: [
+      { title: '我们的服务', links: ['度假短租', '服务式公寓', '合租与短租', '安家服务', '办公与商铺', '房产交易'] },
+      { title: '工具与更多', links: ['搬家计划', '安家工具', '专属优惠', '实习项目', '成为合作伙伴'] }
+    ],
+    legal: ['隐私政策', 'Cookie 政策', '条款与细则'],
+    copyright: '© 2026 Viva. 保留所有权利。',
+    language: 'English'
+  },
+  cookie: {
+    text: '🍪 我们使用 Cookie 来提升浏览体验、分析网站流量并提供个性化内容。',
+    reject: '拒绝',
+    accept: '全部接受'
+  },
+  // v8 粒子版首页内置文案（后端 site_texts.v8 可深合并覆盖）
+  v8: {
+    hero: {
+      eyebrow: '广州外籍人士安家服务',
+      lede: '覆盖广州全城的精装公寓、别墅与服务式住宅，全部实地核验、拎包入住，由中英双语团队全程服务。',
+      browse: '浏览房源',
+      whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
+    },
+    types: {
+      eyebrow: '按户型找房',
+      title: '找到契合你生活方式的家',
+      desc: '四类精选住宅，从单人开间到家庭别墅，每套房源都由顾问实地核验。',
+      view: '查看房源'
+    },
+    featured: {
+      eyebrow: '本周精选',
+      title: '顾问手工甄选',
+      desc: '我们每周从市场上挑选性价比与位置最出色的房源，真实照片、透明价格。',
+      book: '预约看房',
+      allText: '全部 {n} 套房源',
+      more: '展开更多房源',
+      left: '还有 {n} 套',
+      perMonth: '/ 月',
+      empty: '暂无已发布房源，敬请期待。',
+      emptyFilter: '没有同时满足这些条件的房源，试试放宽预算、增加房间数或换个区域。',
+      subFallback: '{br} · {area} ㎡'
+    },
+    process: {
+      eyebrow: '服务流程',
+      title: '四步完成，从咨询到拿到钥匙',
+      steps: [
+        { title: '说出你的需求', desc: '预算、区域、入住时间与校区通勤，10 分钟沟通即可对齐方向。' },
+        { title: '专属房源清单', desc: '24 小时内收到手工筛选的房源清单，含真实照片与户型信息。' },
+        { title: '看房与议价', desc: '按你的时间安排看房、全程陪同，并代表你与房东议价。' },
+        { title: '入住与售后', desc: '合同、付款、住宿登记与入住验收一站办妥，入住后双语售后持续在线。' }
+      ]
+    },
+    finder: {
+      eyebrow: '一句话找房',
+      // 句段数组：普通字符串为文字，district/beds/budget 渲染为可点选胶囊
+      line: ['我想在', 'district', '租一间', 'beds', '的房子，我的月预算是', 'budget', '。'],
+      districtAny: '全部区域',
+      bedsAny: '不限户型',
+      budgetAny: '不限预算',
+      beds: [
+        { v: 1, label: '一房一厅' },
+        { v: 2, label: '两房一厅' },
+        { v: 3, label: '三房两厅' },
+        { v: 4, label: '四房及以上' }
+      ],
+      budgets: [
+        { v: 6000, label: '¥6,000' },
+        { v: 10000, label: '¥10,000' },
+        { v: 15000, label: '¥15,000' },
+        { v: 25000, label: '¥25,000' },
+        { v: 40000, label: '¥40,000' }
+      ],
+      count: '为你找到 {n} 套房源',
+      clear: '清除条件',
+      typeAsk: '有房型要求吗？',
+      typeAny: '不限房型',
+      findBtn: '帮我找房'
+    },
+    listings: {
+      back: '返回首页',
+      title: '为你找到的房源',
+      empty: '当前条件下暂无房源，试试调整筛选条件。'
+    },
+    team: {
+      eyebrow: '你的安家顾问',
+      title: '全程为你托底的人',
+      desc: '8 位多语安家顾问分布广州各片区，平均拥有 6 年外籍人士租房服务经验。'
+    },
+    cta: {
+      footnote: '平均 2 小时内回复 · 英语 / 粤语 / 普通话'
+    }
+  }
+}
+
+export const iciContent = { en, zh }

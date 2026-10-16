@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="u2bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7A5640"/><stop offset="0.55" stop-color="#B57A4E"/><stop offset="1" stop-color="#3D281B"/>
+    </linearGradient>
+    <radialGradient id="u2g" cx="0.5" cy="0.25" r="0.45">
+      <stop offset="0" stop-color="#FBE3BC" stop-opacity="0.55"/><stop offset="1" stop-color="#FBE3BC" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="u2n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#u2bg)"/>
+  <rect width="1600" height="1000" fill="url(#u2g)"/>
+  <g fill="#241410" fill-opacity="0.6">
+    <rect x="80" y="540" width="130" height="280"/><rect x="250" y="470" width="150" height="350"/><rect x="440" y="520" width="120" height="300"/>
+    <rect x="1020" y="490" width="140" height="330"/><rect x="1200" y="430" width="150" height="390"/><rect x="1390" y="520" width="120" height="300"/>
+  </g>
+  <g fill="#F7C98F">
+    <circle cx="140" cy="590" r="5"/><circle cx="310" cy="520" r="5"/><circle cx="1080" cy="540" r="5"/><circle cx="1260" cy="480" r="5"/>
+  </g>
+  <g stroke="#FBEAD6" stroke-opacity="0.6" fill="none" stroke-width="3">
+    <rect x="620" y="250" width="320" height="470"/>
+    <line x1="620" y1="520" x2="940" y2="520"/>
+  </g>
+  <line x1="0" y1="820" x2="1600" y2="820" stroke="#FBEAD6" stroke-opacity="0.2" stroke-width="2"/>
+  <rect x="40" y="40" width="1520" height="920" fill="none" stroke="#FBEAD6" stroke-opacity="0.14" stroke-width="2"/>
+  <text x="86" y="916" fill="#FBEAD6" fill-opacity="0.8" font-family="monospace" font-size="26" letter-spacing="8">QIJIAN ATELIER · CONCEPT VISUAL 08</text>
+  <rect width="1600" height="1000" filter="url(#u2n)" opacity="0.11"/>
+</svg>
