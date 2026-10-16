@@ -250,6 +250,8 @@ export default function V8Navbar({ solid = false }) {
                 </a>
               )
             )}
+            {/* 下拉菜单激活时的毛玻璃遮罩 */}
+            <span className="v8-nav__overlay" aria-hidden="true" />
           </nav>
 
           {/* 右：图标组 */}

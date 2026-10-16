@@ -746,6 +746,20 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   opacity: 1; visibility: visible; pointer-events: auto;
   transform: translateY(0);
 }
+.v8-nav__overlay {
+  position: fixed;
+  top: 56px; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0; visibility: hidden;
+  transition: opacity .25s ease, visibility .25s;
+  z-index: 98;
+}
+.v8-nav__links:has(.v8-nav__group:hover) .v8-nav__overlay,
+.v8-nav__links:has(.v8-nav__group:focus-within) .v8-nav__overlay {
+  opacity: 1; visibility: visible;
+}
 .v8-nav__group:hover .v8-nav__mega-item,
 .v8-nav__group:focus-within .v8-nav__mega-item {
   opacity: 1; transform: translateY(0);
