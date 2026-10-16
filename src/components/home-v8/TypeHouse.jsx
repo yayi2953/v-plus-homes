@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 
-// 户型索引舞台的 3D 建筑沙盘：四个程序化建筑模型（豪华别墅 / 家庭公寓 / 学生宿舍 / 城市高层）。
-// 悬停/聚焦户型行时，当前模型在原地拆解飞散，再错峰飞来组装成对应户型；无悬停时缓慢自转，可拖拽环视。
-// 进视口才动态加载 three（独立 chunk），reduced-motion 静默化（瞬切不拆解），WebGL 不可用显 SVG 兜底。
+// 户型索引舞台的 3D 室内剖面沙盘：切去屋顶与前墙，露出室内布局、家具与木纹地板。
+// 四种户型各自有不同的平面布局；模拟从左上方射入的暖阳光，环境暗化形成聚光沙盘观感。
+// 悬停/聚焦户型行时切换模型；可拖拽环视。进视口才动态加载 three。
 
-// 每个模型的最佳取景方位角（小弧长切换，各自露出最有辨识度的立面）
-const VIEW_ANGLES = [-0.65, -0.4, 0.12, 0.4]
-const OUT_MS = 340 // 拆解时长
-const IN_MS = 520 // 单部件组装时长
-const DELAY_MAX = 200 // 部件错峰上限
+const VIEW_ANGLES = [-0.5, -0.3, 0.1, 0.35]
+const SWITCH_MS = 420
 
 export default function TypeHouse({ activeIndex }) {
   const mountRef = useRef(null)
@@ -46,44 +43,49 @@ export default function TypeHouse({ activeIndex }) {
 
       let renderer
       try {
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' })
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
       } catch {
         setFailed(true)
         return
       }
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75))
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
       renderer.setSize(w, h)
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
-      // ACES 电影级色调映射：高光不过曝、玻璃反射与暗部层次更接近真实观感
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = 1.05
+      renderer.toneMappingExposure = 1.15
       renderer.domElement.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab'
       mount.appendChild(renderer.domElement)
 
       const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(30, w / h, 0.1, 100)
+      scene.background = new THREE.Color(0x0a0a0c)
+      const camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100)
 
-      // 冷调柔光：半球环境光 + 主向阴影光 + 冷色弱补光（环境贴图在下方纹理工厂中生成）
-      scene.add(new THREE.HemisphereLight(0xffffff, 0xd8dae0, 0.9))
-      const sun = new THREE.DirectionalLight(0xffffff, 1.9)
-      sun.position.set(5, 9, 6)
+      // ---- 光照：暖阳光主光 + 冷弱补光 ----
+      scene.add(new THREE.HemisphereLight(0x3a3d48, 0x141416, 0.35))
+      const sun = new THREE.DirectionalLight(0xffd9a8, 2.4)
+      sun.position.set(-6, 8, 4)
       sun.castShadow = true
-      sun.shadow.mapSize.set(1024, 1024)
-      sun.shadow.camera.left = -4.5
-      sun.shadow.camera.right = 4.5
-      sun.shadow.camera.top = 4.5
-      sun.shadow.camera.bottom = -4.5
+      sun.shadow.mapSize.set(2048, 2048)
+      sun.shadow.camera.left = -6
+      sun.shadow.camera.right = 6
+      sun.shadow.camera.top = 6
+      sun.shadow.camera.bottom = -6
       sun.shadow.camera.near = 1
-      sun.shadow.camera.far = 26
-      sun.shadow.bias = -0.0004
-      sun.shadow.radius = 3 // PCFSoft 阴影边缘柔化，模拟漫射阳光
+      sun.shadow.camera.far = 30
+      sun.shadow.bias = -0.0003
+      sun.shadow.radius = 4
       scene.add(sun)
-      const fill = new THREE.DirectionalLight(0xdfe4ee, 0.5)
-      fill.position.set(-6, 4, -5)
-      scene.add(fill)
+      // 室内补光（模拟漫反射）
+      const bounce = new THREE.DirectionalLight(0x8a92b0, 0.4)
+      bounce.position.set(4, 3, -5)
+      scene.add(bounce)
+      // 顶部弱面光，提亮天花板反射
+      const top = new THREE.PointLight(0xfff0d4, 0.5, 12, 1.5)
+      top.position.set(0, 3.2, 0)
+      scene.add(top)
 
-      // ---- 程序化纹理工厂（Canvas2D 生成，零外部资源）----
+      // ---- 程序化纹理 ----
       const textures = []
       const rnd32 = (seed) => {
         let s = seed >>> 0
@@ -98,7 +100,7 @@ export default function TypeHouse({ activeIndex }) {
         const t = new THREE.CanvasTexture(canvas)
         t.wrapS = t.wrapT = THREE.RepeatWrapping
         if (srgb) t.colorSpace = THREE.SRGBColorSpace
-        t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy())
+        t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy())
         textures.push(t)
         return t
       }
@@ -111,159 +113,113 @@ export default function TypeHouse({ activeIndex }) {
         }
         ctx.putImageData(img, 0, 0)
       }
-      // 哑光建筑表面：基色 + 细颗粒 + 少量云斑，配套灰度粗糙度贴图（光照下有真实微差）
-      const surface = (size, base, amp, seed, clouds = 7) => {
+
+      // 木地板纹理：竖向木板 + 木纹 + 节疤
+      const makeWoodFloor = (seed, baseHue) => {
+        const size = 512
         const c = document.createElement('canvas')
         c.width = c.height = size
         const ctx = c.getContext('2d')
         const rnd = rnd32(seed)
-        ctx.fillStyle = base
+        // 底色
+        ctx.fillStyle = baseHue
         ctx.fillRect(0, 0, size, size)
-        noisy(ctx, size, amp, rnd)
-        for (let k = 0; k < clouds; k++) {
-          const x = rnd() * size, y = rnd() * size, r = size * (0.12 + rnd() * 0.25)
-          const gg = ctx.createRadialGradient(x, y, 0, x, y, r)
-          gg.addColorStop(0, `rgba(255,255,255,${0.04 + rnd() * 0.05})`)
-          gg.addColorStop(1, 'rgba(255,255,255,0)')
-          ctx.fillStyle = gg
-          ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill()
+        // 木板分割线
+        const plankH = size / 8
+        for (let i = 0; i < 8; i++) {
+          const y = i * plankH
+          // 每块木板颜色微变
+          const shade = 0.85 + rnd() * 0.3
+          const r = parseInt(baseHue.slice(1, 3), 16) * shade
+          const g = parseInt(baseHue.slice(3, 5), 16) * shade
+          const b = parseInt(baseHue.slice(5, 7), 16) * shade
+          ctx.fillStyle = `rgb(${r|0},${g|0},${b|0})`
+          ctx.fillRect(0, y, size, plankH)
+          // 木纹（横向细线）
+          for (let k = 0; k < 30; k++) {
+            const yy = y + rnd() * plankH
+            ctx.strokeStyle = `rgba(0,0,0,${0.02 + rnd() * 0.06})`
+            ctx.lineWidth = 0.5 + rnd()
+            ctx.beginPath()
+            ctx.moveTo(0, yy)
+            ctx.bezierCurveTo(size * 0.3, yy + (rnd() - 0.5) * 4, size * 0.7, yy + (rnd() - 0.5) * 4, size, yy)
+            ctx.stroke()
+          }
+          // 节疤
+          if (rnd() > 0.4) {
+            const kx = rnd() * size
+            const ky = y + plankH * (0.2 + rnd() * 0.6)
+            const kr = 3 + rnd() * 8
+            const kg = ctx.createRadialGradient(kx, ky, 0, kx, ky, kr)
+            kg.addColorStop(0, `rgba(60,30,10,${0.3 + rnd() * 0.3})`)
+            kg.addColorStop(1, 'rgba(60,30,10,0)')
+            ctx.fillStyle = kg
+            ctx.beginPath(); ctx.arc(kx, ky, kr, 0, Math.PI * 2); ctx.fill()
+          }
         }
-        const rc = document.createElement('canvas')
-        rc.width = rc.height = size
-        const rctx = rc.getContext('2d')
-        const rimg = rctx.createImageData(size, size)
-        const r2 = rnd32(seed ^ 0x9e3779b9)
-        for (let i = 0; i < rimg.data.length; i += 4) {
-          const v = 226 + (r2() - 0.5) * 30
-          rimg.data[i] = rimg.data[i + 1] = rimg.data[i + 2] = v
-          rimg.data[i + 3] = 255
+        // 板缝
+        for (let i = 1; i < 8; i++) {
+          ctx.fillStyle = 'rgba(0,0,0,0.18)'
+          ctx.fillRect(0, i * plankH - 1, size, 2)
         }
-        rctx.putImageData(rimg, 0, 0)
-        return { map: toTex(c, true), rough: toTex(rc, false) }
-      }
-      const wallS = surface(256, '#eef0f4', 12, 11)
-      const blockS = surface(256, '#d6d9e0', 14, 23)
-      const slabS = surface(256, '#dadde3', 12, 37)
-      const doorS = surface(256, '#3a3d44', 10, 41, 4)
-      const leafS = surface(256, '#f2f3ef', 20, 53, 4)
-      const trunkS = surface(128, '#f0ede4', 18, 59, 3)
-      // 深色镜面玻璃：暗底渐变 + 斜向天空反射亮带 + 细噪，配合 clearcoat 出真实反射层次
-      const glassCanvas = document.createElement('canvas')
-      glassCanvas.width = glassCanvas.height = 256
-      {
-        const gctx = glassCanvas.getContext('2d')
-        const rnd = rnd32(71)
-        const grd = gctx.createLinearGradient(0, 0, 256, 256)
-        grd.addColorStop(0, '#2b2f38'); grd.addColorStop(0.5, '#1d2027'); grd.addColorStop(1, '#15171d')
-        gctx.fillStyle = grd
-        gctx.fillRect(0, 0, 256, 256)
-        gctx.save(); gctx.translate(128, 128); gctx.rotate(-0.42)
-        const band = (x, w2, a) => {
-          const bg = gctx.createLinearGradient(x - w2, 0, x + w2, 0)
-          bg.addColorStop(0, 'rgba(255,255,255,0)')
-          bg.addColorStop(0.5, `rgba(226,234,246,${a})`)
-          bg.addColorStop(1, 'rgba(255,255,255,0)')
-          gctx.fillStyle = bg
-          gctx.fillRect(x - w2, -400, w2 * 2, 800)
+        // 纵向错缝
+        for (let i = 0; i < 8; i++) {
+          if (rnd() > 0.3) {
+            const x = size * (0.2 + rnd() * 0.6)
+            ctx.fillStyle = 'rgba(0,0,0,0.12)'
+            ctx.fillRect(x - 0.5, i * plankH, 1, plankH)
+          }
         }
-        band(-60, 46, 0.17); band(72, 30, 0.1)
-        gctx.restore()
-        noisy(gctx, 256, 7, rnd)
+        noisy(ctx, size, 6, rnd)
+        return toTex(c, true)
       }
-      const glassMap = toTex(glassCanvas, true)
-      // 展台：中心略深、边缘退浅的径向渐变（与舞台底色自然衔接）
-      const plinth = document.createElement('canvas')
-      plinth.width = plinth.height = 512
-      {
-        const pctx = plinth.getContext('2d')
-        const pg = pctx.createRadialGradient(256, 256, 40, 256, 256, 252)
-        pg.addColorStop(0, '#e1e4ea'); pg.addColorStop(0.72, '#e9ebef'); pg.addColorStop(1, '#f0f1f4')
-        pctx.fillStyle = pg
-        pctx.fillRect(0, 0, 512, 512)
-        noisy(pctx, 512, 6, rnd32(83))
-      }
-      const groundMap = toTex(plinth, true)
-      // 建筑脚下柔和接触阴影（假 AO，补充实时阴影的接地感）
-      const contact = document.createElement('canvas')
-      contact.width = contact.height = 256
-      {
-        const sctx = contact.getContext('2d')
-        const sg = sctx.createRadialGradient(128, 128, 6, 128, 128, 126)
-        sg.addColorStop(0, 'rgba(26,28,34,0.34)')
-        sg.addColorStop(0.55, 'rgba(26,28,34,0.13)')
-        sg.addColorStop(1, 'rgba(26,28,34,0)')
-        sctx.fillStyle = sg
-        sctx.fillRect(0, 0, 256, 256)
-      }
-      const contactMap = toTex(contact, false)
-      // 渐变环境贴图：冷白天空 + 地平线微光 + 灰地面，玻璃与金属的反射由此获得方向层次
-      const envCanvas = document.createElement('canvas')
-      envCanvas.width = 512; envCanvas.height = 256
-      {
-        const ectx = envCanvas.getContext('2d')
-        const eg = ectx.createLinearGradient(0, 0, 0, 256)
-        eg.addColorStop(0, '#f7f9fc'); eg.addColorStop(0.32, '#eef2f8'); eg.addColorStop(0.48, '#d9dfea')
-        eg.addColorStop(0.53, '#c3c9d4'); eg.addColorStop(0.62, '#abb1bc'); eg.addColorStop(1, '#8b919c')
-        ectx.fillStyle = eg
-        ectx.fillRect(0, 0, 512, 256)
-        const glow = ectx.createRadialGradient(150, 72, 4, 150, 72, 130)
-        glow.addColorStop(0, 'rgba(255,255,255,0.85)')
-        glow.addColorStop(1, 'rgba(255,255,255,0)')
-        ectx.fillStyle = glow
-        ectx.fillRect(0, 0, 512, 256)
-      }
-      const envTex = new THREE.CanvasTexture(envCanvas)
-      envTex.mapping = THREE.EquirectangularReflectionMapping
-      envTex.colorSpace = THREE.SRGBColorSpace
-      textures.push(envTex)
-      let envRT
-      {
-        const pmrem = new THREE.PMREMGenerator(renderer)
-        envRT = pmrem.fromEquirectangular(envTex)
-        scene.environment = envRT.texture
-        pmrem.dispose()
-      }
+      const floorLuxury = makeWoodFloor(11, '#9a6b3e')
+      const floorStandard = makeWoodFloor(22, '#b07d4e')
+      const floorStudent = makeWoodFloor(33, '#8a7355')
+      const floorCity = makeWoodFloor(44, '#c4a06a')
+      const floors = [floorLuxury, floorStandard, floorStudent, floorCity]
 
-      // 圆形展台（建筑沙盘底座，承接实时阴影，贴图径向渐隐到舞台底色）
-      const ground = new THREE.Mesh(
-        new THREE.CircleGeometry(2.0, 72),
-        new THREE.MeshStandardMaterial({ map: groundMap, roughness: 0.96, metalness: 0, envMapIntensity: 0.15 })
-      )
-      ground.rotation.x = -Math.PI / 2
-      ground.receiveShadow = true
-      scene.add(ground)
-      // 脚下椭圆软阴影：比 shadowMap 更贴地的环境闭塞感
-      const contactShadow = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.9, 2.1),
-        new THREE.MeshBasicMaterial({ map: contactMap, transparent: true, depthWrite: false })
-      )
-      contactShadow.rotation.x = -Math.PI / 2
-      contactShadow.position.y = 0.004
-      contactShadow.renderOrder = 1
-      scene.add(contactShadow)
+      // 墙面材质
+      const wallTex = (() => {
+        const size = 256
+        const c = document.createElement('canvas')
+        c.width = c.height = size
+        const ctx = c.getContext('2d')
+        ctx.fillStyle = '#e8e4dc'
+        ctx.fillRect(0, 0, size, size)
+        noisy(ctx, size, 8, rnd32(77))
+        return toTex(c, true)
+      })()
+      const darkWallTex = (() => {
+        const size = 256
+        const c = document.createElement('canvas')
+        c.width = c.height = size
+        const ctx = c.getContext('2d')
+        ctx.fillStyle = '#3a3530'
+        ctx.fillRect(0, 0, size, size)
+        noisy(ctx, size, 6, rnd32(88))
+        return toTex(c, true)
+      })()
 
-      // ---- 共享材质：哑光混凝土墙面 + 清漆镜面玻璃（部分窗室内暖/冷光内透）+ 拉丝金属 ----
-      const glassBase = {
-        map: glassMap, color: 0xffffff, roughness: 0.09, metalness: 0.08,
-        clearcoat: 1, clearcoatRoughness: 0.07, envMapIntensity: 1.6,
-      }
       const mats = {
-        wall: new THREE.MeshStandardMaterial({ map: wallS.map, roughnessMap: wallS.rough, roughness: 0.95, metalness: 0, envMapIntensity: 0.25 }),
-        block: new THREE.MeshStandardMaterial({ map: blockS.map, roughnessMap: blockS.rough, roughness: 0.92, metalness: 0, envMapIntensity: 0.22 }),
-        slab: new THREE.MeshStandardMaterial({ map: slabS.map, roughnessMap: slabS.rough, roughness: 0.88, metalness: 0, envMapIntensity: 0.22 }),
-        glass: new THREE.MeshPhysicalMaterial(glassBase),
-        glassWarm: new THREE.MeshPhysicalMaterial({ ...glassBase, emissive: 0xffe2bd, emissiveIntensity: 0.3 }),
-        glassCool: new THREE.MeshPhysicalMaterial({ ...glassBase, emissive: 0xdce8ff, emissiveIntensity: 0.22 }),
-        frame: new THREE.MeshStandardMaterial({ color: 0x33363d, roughness: 0.45, metalness: 0.3, envMapIntensity: 0.6 }),
-        dark: new THREE.MeshStandardMaterial({ map: doorS.map, roughness: 0.62, metalness: 0.1, envMapIntensity: 0.3 }),
-        metal: new THREE.MeshStandardMaterial({ color: 0xa8aab2, roughness: 0.28, metalness: 0.9, envMapIntensity: 1.2 }),
-        trunk: new THREE.MeshStandardMaterial({ map: trunkS.map, roughness: 1, metalness: 0, envMapIntensity: 0.15 }),
-        leaf: new THREE.MeshStandardMaterial({ map: leafS.map, color: 0x7c8a74, roughness: 1, metalness: 0, envMapIntensity: 0.18 }),
-        leaf2: new THREE.MeshStandardMaterial({ map: leafS.map, color: 0x909b83, roughness: 1, metalness: 0, envMapIntensity: 0.18 }),
-        bush: new THREE.MeshStandardMaterial({ map: leafS.map, color: 0x85907d, roughness: 1, metalness: 0, envMapIntensity: 0.18 }),
+        floor: (i) => new THREE.MeshStandardMaterial({ map: floors[i], roughness: 0.75, metalness: 0.02, envMapIntensity: 0.3 }),
+        wall: new THREE.MeshStandardMaterial({ map: wallTex, color: 0xefeae0, roughness: 0.9, metalness: 0, envMapIntensity: 0.2 }),
+        wallDark: new THREE.MeshStandardMaterial({ map: darkWallTex, color: 0x4a4238, roughness: 0.85, metalness: 0.02, envMapIntensity: 0.2 }),
+        ceiling: new THREE.MeshStandardMaterial({ color: 0xf5f0e6, roughness: 0.95, metalness: 0 }),
+        wood: new THREE.MeshStandardMaterial({ color: 0x7a5a32, roughness: 0.55, metalness: 0.05, envMapIntensity: 0.4 }),
+        woodDark: new THREE.MeshStandardMaterial({ color: 0x5a3e22, roughness: 0.6, metalness: 0.05, envMapIntensity: 0.4 }),
+        fabric: new THREE.MeshStandardMaterial({ color: 0x6b7a8f, roughness: 0.9, metalness: 0, envMapIntensity: 0.15 }),
+        fabricWarm: new THREE.MeshStandardMaterial({ color: 0xb8825a, roughness: 0.9, metalness: 0, envMapIntensity: 0.15 }),
+        white: new THREE.MeshStandardMaterial({ color: 0xf2efe8, roughness: 0.8, metalness: 0 }),
+        metal: new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: 0.3, metalness: 0.85, envMapIntensity: 1 }),
+        glass: new THREE.MeshPhysicalMaterial({ color: 0xc8d8e8, roughness: 0.08, metalness: 0, transmission: 0.6, thickness: 0.2, envMapIntensity: 0.8 }),
+        bed: new THREE.MeshStandardMaterial({ color: 0xe8ddd0, roughness: 0.85, metalness: 0 }),
+        pillow: new THREE.MeshStandardMaterial({ color: 0xfaf7f2, roughness: 0.85, metalness: 0 }),
+        plant: new THREE.MeshStandardMaterial({ color: 0x4a6741, roughness: 1, metalness: 0 }),
+        plantPot: new THREE.MeshStandardMaterial({ color: 0xc4a882, roughness: 0.7, metalness: 0.05 }),
       }
 
-      // ---- 共享几何库：四个模型反复使用的尺寸缓存，morph 换型只换 Mesh 不重建 Geometry ----
+      // ---- 家具构建辅助 ----
       const boxCache = new Map()
       const boxGeo = (w2, h2, d2) => {
         const key = `${w2}x${h2}x${d2}`
@@ -271,256 +227,306 @@ export default function TypeHouse({ activeIndex }) {
         if (!g) { g = new THREE.BoxGeometry(w2, h2, d2); boxCache.set(key, g) }
         return g
       }
-      const icoCache = new Map()
-      const icoGeo = (r) => {
-        let g = icoCache.get(r)
-        if (!g) { g = new THREE.IcosahedronGeometry(r, 1); icoCache.set(r, g) }
+      const cylCache = new Map()
+      const cylGeo = (rTop, rBot, h, seg = 16) => {
+        const key = `${rTop}x${rBot}x${h}x${seg}`
+        let g = cylCache.get(key)
+        if (!g) { g = new THREE.CylinderGeometry(rTop, rBot, h, seg); cylCache.set(key, g) }
         return g
       }
-      const trunkGeo = new THREE.CylinderGeometry(0.045, 0.06, 0.5, 10)
-
-      // 部件注册：记录组装本位 + 拆解/组装两个飞散向量，供 morph 逐帧驱动
-      const register = (group, parts, mesh) => {
-        mesh.castShadow = true
-        mesh.receiveShadow = true
-        group.add(mesh)
-        const base = mesh.position.clone()
-        let rx = base.x
-        let rz = base.z
-        const hor = Math.hypot(rx, rz)
-        if (hor < 0.02) { rx = 0; rz = 1 } else { rx /= hor; rz /= hor }
-        const spread = 1.0 + Math.random() * 0.7
-        const j = Math.random() * Math.PI * 2
-        const out = new THREE.Vector3(
-          rx * spread + Math.cos(j) * 0.18,
-          0.45 + Math.random() * 0.45,
-          rz * spread + Math.sin(j) * 0.18
-        )
-        const inn = new THREE.Vector3(
-          rx * (0.5 + Math.random() * 0.55) + (Math.random() - 0.5) * 0.25,
-          1.05 + Math.random() * 0.8,
-          rz * (0.5 + Math.random() * 0.55) + (Math.random() - 0.5) * 0.25
-        )
-        mesh.userData = { base, out, inn, spin: (Math.random() - 0.5) * 0.6, delay: Math.random() * DELAY_MAX }
-        parts.push(mesh)
-        return mesh
+      const sphCache = new Map()
+      const sphGeo = (r, seg = 16) => {
+        let g = sphCache.get(r)
+        if (!g) { g = new THREE.SphereGeometry(r, seg, seg); sphCache.set(r, g) }
+        return g
       }
 
-      // 亮窗选择器（确定性种子：同一模型每次 morph 重建，亮窗位置保持一致不闪烁）
-      const glassPicker = (seed, litChance = 0.2) => {
-        const rnd = rnd32(seed)
-        return () => {
-          const r = rnd()
-          if (r < litChance * 0.62) return 'glassWarm'
-          if (r < litChance) return 'glassCool'
-          return 'glass'
-        }
-      }
-      const makeBox = (group, parts, w2, h2, d2, x, y, z, mat) => {
-        // 仅小块窗玻璃按模型种子随机换成室内暖光/冷光窗；整面玻璃带保持暗反射，避免亮成纸板
-        const lit = mat === 'glass' && group.userData.pickGlass && Math.max(w2, h2, d2) < 0.62
-        const key = lit ? group.userData.pickGlass() : mat
-        const m = new THREE.Mesh(boxGeo(w2, h2, d2), mats[key])
+      const addBox = (group, w2, h2, d2, x, y, z, mat, rx = 0, ry = 0, rz = 0) => {
+        const m = new THREE.Mesh(boxGeo(w2, h2, d2), mat)
         m.position.set(x, y, z)
-        return register(group, parts, m)
+        m.rotation.set(rx, ry, rz)
+        m.castShadow = true
+        m.receiveShadow = true
+        group.add(m)
+        return m
       }
-      const makeIco = (group, parts, r, x, y, z, mat) => {
-        const m = new THREE.Mesh(icoGeo(r), mats[mat])
+      const addCyl = (group, rT, rB, h, x, y, z, mat, seg = 16) => {
+        const m = new THREE.Mesh(cylGeo(rT, rB, h, seg), mat)
         m.position.set(x, y, z)
-        return register(group, parts, m)
-      }
-      const makeTrunk = (group, parts, x, z) => {
-        const m = new THREE.Mesh(trunkGeo, mats.trunk)
-        m.position.set(x, 0.25, z)
-        return register(group, parts, m)
+        m.castShadow = true
+        m.receiveShadow = true
+        group.add(m)
+        return m
       }
 
-      // -------- 模型 0：豪华别墅（错层体块 + 近环绕玻璃 + 露台 + 小树）--------
-      const buildVilla = () => {
-        const group = new THREE.Group()
-        const parts = []
-        const b = (...a) => makeBox(group, parts, ...a)
-        group.userData.pickGlass = glassPicker(101, 0.3)
-        // 一层主体、二层错叠体块、挑檐板
-        b(2.5, 0.95, 1.75, 0, 0.475, 0, 'wall')
-        b(1.6, 0.82, 1.45, -0.3, 1.36, -0.08, 'block')
-        b(2.62, 0.09, 1.88, 0, 0.99, 0, 'slab')
-        b(1.86, 0.09, 1.68, -0.3, 1.81, -0.08, 'slab')
-        // 玻璃带（细竖挺）/ 门 / 侧窗 / 台阶
-        b(1.82, 0.56, 0.05, 0.33, 0.52, 0.895, 'glass')
-        b(0.03, 0.58, 0.07, 0.33, 0.52, 0.91, 'frame')
-        b(1.26, 0.52, 0.05, -0.13, 1.37, 0.665, 'glass')
-        b(0.03, 0.54, 0.07, -0.13, 1.37, 0.68, 'frame')
-        b(0.44, 0.7, 0.06, -0.86, 0.35, 0.9, 'dark')
-        b(0.05, 0.5, 0.9, -1.27, 0.55, 0.05, 'glass')
-        b(0.05, 0.44, 1.0, 0.525, 1.36, -0.05, 'glass')
-        b(0.72, 0.07, 0.32, -0.86, 0.035, 1.04, 'slab')
-        // 背面与右侧补窗：四个朝向都有可读的立面细节
-        b(1.3, 0.5, 0.05, 0.15, 0.52, -0.895, 'glass')
-        b(0.03, 0.52, 0.07, 0.15, 0.52, -0.915, 'frame')
-        b(0.92, 0.46, 0.05, -0.3, 1.37, -0.83, 'glass')
-        b(0.03, 0.48, 0.07, -0.3, 1.37, -0.85, 'frame')
-        b(0.05, 0.5, 1.5, 1.275, 0.55, -0.05, 'glass')
-        b(0.07, 0.52, 0.03, 1.29, 0.55, -0.05, 'frame')
-        // 二层右侧露台：底板 + 细栏杆
-        b(0.85, 0.08, 0.85, 0.82, 1.02, 0.28, 'slab')
-        const railY = 1.34
-        for (const [rx, rz] of [[0.5, 0.6], [1.14, 0.6], [0.5, -0.04], [1.14, -0.04]]) {
-          b(0.035, 0.5, 0.035, rx, railY - 0.18, rz, 'metal')
+      // 床
+      const makeBed = (group, x, y, z, rot = 0, fabric = mats.fabric) => {
+        const g = new THREE.Group()
+        g.position.set(x, y, z)
+        g.rotation.y = rot
+        // 床架
+        addBox(g, 1.4, 0.3, 2.0, 0, 0.15, 0, mats.woodDark)
+        // 床垫
+        addBox(g, 1.32, 0.22, 1.92, 0, 0.41, 0, mats.bed)
+        // 被子（半搭）
+        addBox(g, 1.32, 0.1, 1.0, 0, 0.52, -0.45, fabric)
+        // 枕头
+        addBox(g, 0.55, 0.12, 0.38, -0.32, 0.58, 0.7, mats.pillow)
+        addBox(g, 0.55, 0.12, 0.38, 0.32, 0.58, 0.7, mats.pillow)
+        group.add(g)
+      }
+
+      // 沙发
+      const makeSofa = (group, x, y, z, rot = 0, fabric = mats.fabric) => {
+        const g = new THREE.Group()
+        g.position.set(x, y, z)
+        g.rotation.y = rot
+        // 底座
+        addBox(g, 1.8, 0.3, 0.85, 0, 0.2, 0, fabric)
+        // 靠背
+        addBox(g, 1.8, 0.45, 0.18, 0, 0.55, -0.34, fabric)
+        // 扶手
+        addBox(g, 0.18, 0.4, 0.85, -0.81, 0.45, 0, fabric)
+        addBox(g, 0.18, 0.4, 0.85, 0.81, 0.45, 0, fabric)
+        // 靠垫
+        addBox(g, 0.5, 0.3, 0.16, -0.4, 0.58, -0.2, mats.white)
+        addBox(g, 0.5, 0.3, 0.16, 0.4, 0.58, -0.2, mats.white)
+        group.add(g)
+      }
+
+      // 餐桌 + 椅
+      const makeDining = (group, x, y, z, rot = 0) => {
+        const g = new THREE.Group()
+        g.position.set(x, y, z)
+        g.rotation.y = rot
+        // 桌面
+        addBox(g, 1.2, 0.06, 0.8, 0, 0.72, 0, mats.wood)
+        // 桌腿
+        for (const [lx, lz] of [[-0.5, -0.32], [0.5, -0.32], [-0.5, 0.32], [0.5, 0.32]]) {
+          addBox(g, 0.06, 0.7, 0.06, lx, 0.35, lz, mats.woodDark)
         }
-        b(0.7, 0.04, 0.04, 0.82, railY + 0.06, 0.6, 'metal')
-        b(0.04, 0.04, 0.68, 0.5, railY + 0.06, 0.28, 'metal')
-        // 一株小树 + 两丛灌木
-        makeTrunk(group, parts, -1.5, 0.95)
-        makeIco(group, parts, 0.3, -1.5, 0.64, 0.95, 'leaf')
-        makeIco(group, parts, 0.2, -1.4, 0.82, 0.9, 'leaf2')
-        makeIco(group, parts, 0.18, 1.3, 0.14, 0.78, 'bush')
-        makeIco(group, parts, 0.16, 1.18, 0.13, -1.12, 'bush')
-        return { group, parts }
-      }
-
-      // -------- 模型 1：普通家庭住宅（三层板式公寓，规整窗洞 + 朱丽叶阳台栏杆）--------
-      const buildApartment = () => {
-        const group = new THREE.Group()
-        const parts = []
-        const b = (...a) => makeBox(group, parts, ...a)
-        group.userData.pickGlass = glassPicker(202, 0.22)
-        b(2.02, 0.16, 1.36, 0, 0.08, 0, 'block')       // 基座
-        b(1.9, 2.0, 1.25, 0, 1.08, 0, 'wall')          // 三层主体
-        b(2.0, 0.09, 1.35, 0, 2.12, 0, 'slab')         // 顶板
-        b(0.5, 0.32, 0.5, 0.48, 2.32, -0.18, 'block')  // 屋顶楼梯间
-        // 正立面：三行两列窗 + 细阳台栏杆
-        for (const fy of [0.62, 1.22, 1.82]) {
-          for (const fx of [-0.5, 0.5]) {
-            b(0.42, 0.55, 0.05, fx, fy, 0.645, 'glass')
-            b(0.5, 0.04, 0.12, fx, fy - 0.3, 0.69, 'slab')
-            b(0.46, 0.2, 0.025, fx, fy - 0.16, 0.71, 'metal')
+        // 椅子 x4
+        const makeChair = (cx, cz, ry) => {
+          const cg = new THREE.Group()
+          cg.position.set(cx, 0, cz)
+          cg.rotation.y = ry
+          addBox(cg, 0.4, 0.05, 0.4, 0, 0.42, 0, mats.wood)
+          addBox(cg, 0.4, 0.4, 0.05, 0, 0.62, -0.18, mats.woodDark)
+          for (const [llx, llz] of [[-0.16, -0.16], [0.16, -0.16], [-0.16, 0.16], [0.16, 0.16]]) {
+            addBox(cg, 0.04, 0.4, 0.04, llx, 0.2, llz, mats.woodDark)
           }
+          g.add(cg)
         }
-        b(0.4, 0.66, 0.06, 0, 0.33, 0.69, 'dark')      // 单元门（略突出基座，避免共面 z-fighting）
-        b(0.6, 0.06, 0.2, 0, 0.03, 0.74, 'slab')       // 台阶
-        // 侧面与背面窗
-        for (const fy of [0.62, 1.22, 1.82]) {
-          b(0.05, 0.44, 0.5, -0.965, fy, 0.05, 'glass')
-          b(0.05, 0.44, 0.5, 0.965, fy, 0.05, 'glass')
-          b(0.5, 0.44, 0.05, -0.45, fy, -0.645, 'glass')
-          b(0.5, 0.44, 0.05, 0.45, fy, -0.645, 'glass')
-        }
-        makeIco(group, parts, 0.16, 1.28, 0.13, 0.9, 'bush')
-        makeIco(group, parts, 0.15, -1.3, 0.12, -0.85, 'bush')
-        return { group, parts }
+        makeChair(-0.7, 0, Math.PI / 2)
+        makeChair(0.7, 0, -Math.PI / 2)
+        makeChair(0, -0.55, 0)
+        makeChair(0, 0.55, Math.PI)
+        group.add(g)
       }
 
-      // -------- 模型 2：学生公寓（六层瘦高宿舍楼，密集小窗网格 + 屋顶女儿墙 + 天线）--------
-      const buildDorm = () => {
+      // 厨房台面 + 橱柜
+      const makeKitchen = (group, x, y, z, rot = 0) => {
+        const g = new THREE.Group()
+        g.position.set(x, y, z)
+        g.rotation.y = rot
+        // 台面
+        addBox(g, 2.4, 0.06, 0.65, 0, 0.88, 0, mats.white)
+        // 柜体
+        addBox(g, 2.4, 0.85, 0.6, 0, 0.43, 0, mats.wood)
+        // 柜门线
+        addBox(g, 0.02, 0.75, 0.58, -0.6, 0.45, 0.02, mats.woodDark)
+        addBox(g, 0.02, 0.75, 0.58, 0.6, 0.45, 0.02, mats.woodDark)
+        // 水槽
+        addBox(g, 0.5, 0.04, 0.38, -0.5, 0.92, 0, mats.metal)
+        addBox(g, 0.46, 0.12, 0.34, -0.5, 0.86, 0, mats.metal)
+        // 水龙头
+        addCyl(g, 0.02, 0.02, 0.25, -0.5, 1.05, 0.1, mats.metal, 8)
+        // 灶台
+        addBox(g, 0.6, 0.04, 0.4, 0.6, 0.92, 0, mats.metal)
+        group.add(g)
+      }
+
+      // 冰箱
+      const makeFridge = (group, x, y, z) => {
+        const g = new THREE.Group()
+        g.position.set(x, y, z)
+        addBox(g, 0.7, 1.7, 0.7, 0, 0.85, 0, mats.white)
+        addBox(g, 0.66, 0.02, 0.68, 0, 1.1, 0.36, mats.metal)
+        addBox(g, 0.06, 0.2, 0.04, 0.25, 1.3, 0.36, mats.metal)
+        group.add(g)
+      }
+
+      // 盆栽
+      const makePlant = (group, x, y, z, scale = 1) => {
+        const g = new THREE.Group()
+        g.position.set(x, y, z)
+        g.scale.setScalar(scale)
+        addCyl(g, 0.14, 0.11, 0.3, 0, 0.15, 0, mats.plantPot)
+        addBox(g, 0.5, 0.6, 0.5, 0, 0.6, 0, mats.plant)
+        addBox(g, 0.35, 0.4, 0.35, 0.1, 0.9, 0.1, mats.plant)
+        addBox(g, 0.3, 0.35, 0.3, -0.12, 0.85, -0.08, mats.plant)
+        group.add(g)
+      }
+
+      // 灯具（落地灯）
+      const makeFloorLamp = (group, x, y, z) => {
+        const g = new THREE.Group()
+        g.position.set(x, y, z)
+        addCyl(g, 0.02, 0.02, 1.5, 0, 0.75, 0, mats.metal, 8)
+        addCyl(g, 0.2, 0.12, 0.3, 0, 1.65, 0, mats.white, 16)
+        const bulb = new THREE.PointLight(0xffd9a8, 0.8, 4, 2)
+        bulb.position.set(0, 1.6, 0)
+        g.add(bulb)
+        group.add(g)
+      }
+
+      // 卫生间
+      const makeBathroom = (group, x, y, z, rot = 0) => {
+        const g = new THREE.Group()
+        g.position.set(x, y, z)
+        g.rotation.y = rot
+        // 浴缸
+        addBox(g, 0.8, 0.5, 1.6, 0, 0.25, 0, mats.white)
+        addBox(g, 0.7, 0.15, 1.5, 0, 0.45, 0, mats.metal)
+        // 马桶
+        addBox(g, 0.4, 0.4, 0.5, 0.8, 0.2, 0, mats.white)
+        addBox(g, 0.38, 0.15, 0.48, 0.8, 0.48, 0, mats.white)
+        // 洗手台
+        addBox(g, 0.6, 0.8, 0.45, -0.8, 0.4, 0.3, mats.white)
+        addBox(g, 0.5, 0.05, 0.38, -0.8, 0.83, 0.3, mats.metal)
+        group.add(g)
+      }
+
+      // ---- 四种户型的室内剖面布局 ----
+      // 坐标约定：地面 y=0，前墙 z 正方向为观察者方向（切掉前墙和屋顶）
+
+      const buildLuxury = () => {
         const group = new THREE.Group()
-        const parts = []
-        const b = (...a) => makeBox(group, parts, ...a)
-        group.userData.pickGlass = glassPicker(103, 0.18)
-        b(1.55, 0.16, 1.2, 0, 0.08, 0, 'block')
-        b(1.4, 2.55, 1.05, 0, 1.355, 0, 'wall')
-        b(1.5, 0.08, 1.15, 0, 2.67, 0, 'slab')
-        // 女儿墙四沿
-        b(1.5, 0.2, 0.05, 0, 2.82, 0.57, 'wall')
-        b(1.5, 0.2, 0.05, 0, 2.82, -0.57, 'wall')
-        b(0.05, 0.2, 1.15, -0.73, 2.82, 0, 'wall')
-        b(0.05, 0.2, 1.15, 0.73, 2.82, 0, 'wall')
-        b(0.38, 0.3, 0.38, -0.35, 2.97, -0.2, 'block') // 屋顶机房
-        b(0.025, 0.5, 0.025, 0.35, 3.15, 0.2, 'metal')  // 天线
-        // 正背立面 6×3 小窗网格
-        for (let r2 = 0; r2 < 6; r2++) {
-          const fy = 0.43 + r2 * 0.38
-          for (const fx of [-0.42, 0, 0.42]) {
-            b(0.28, 0.28, 0.05, fx, fy, 0.545, 'glass')
-            b(0.28, 0.28, 0.05, fx, fy, -0.545, 'glass')
-          }
-          b(0.05, 0.28, 0.28, -0.715, fy, 0.18, 'glass')
-          b(0.05, 0.28, 0.28, 0.715, fy, -0.18, 'glass')
-        }
-        b(0.36, 0.62, 0.06, 0, 0.31, 0.55, 'dark')
-        b(0.54, 0.06, 0.18, 0, 0.03, 0.63, 'slab')
-        makeIco(group, parts, 0.15, 1.05, 0.12, 0.92, 'bush')
-        makeIco(group, parts, 0.15, -1.08, 0.12, 0.85, 'bush')
-        return { group, parts }
+        // 地板
+        addBox(group, 5, 0.08, 4, 0, 0.04, 0, mats.floor(0))
+        // 三面墙（左、右、后），前墙和天花板切掉
+        addBox(group, 0.12, 2.6, 4, -2.5, 1.3, 0, mats.wall)       // 左墙
+        addBox(group, 0.12, 2.6, 4, 2.5, 1.3, 0, mats.wallDark)   // 右墙（深色背景墙）
+        addBox(group, 5, 2.6, 0.12, 0, 1.3, -2, mats.wall)        // 后墙
+        // 分区隔墙
+        addBox(group, 0.08, 2.6, 1.6, -0.8, 1.3, 1.2, mats.wall)   // 卧/客隔墙
+        addBox(group, 0.08, 2.6, 1.2, 1.2, 1.3, -0.6, mats.wall)   // 厨/卫隔墙
+        // 卧室区
+        makeBed(group, -1.6, 0, 0.5, 0, mats.fabricWarm)
+        makePlant(group, -2.2, 0, 1.5, 0.8)
+        // 客厅区
+        makeSofa(group, 0.3, 0, -0.8, 0, mats.fabric)
+        makeDining(group, 0.3, 0, 0.6, 0)
+        makeFloorLamp(group, 1.8, 0, -1.2)
+        // 厨房
+        makeKitchen(group, 1.8, 0, 0.5, Math.PI / 2)
+        makeFridge(group, 2.0, 0, -1.3)
+        // 卫生间
+        makeBathroom(group, 1.8, 0, 1.5, Math.PI / 2)
+        return group
       }
 
-      // -------- 模型 3：城市公寓（冷灰高层塔楼，横向玻璃带 + 退台顶层）--------
-      const buildTower = () => {
+      const buildStandard = () => {
         const group = new THREE.Group()
-        const parts = []
-        const b = (...a) => makeBox(group, parts, ...a)
-        group.userData.pickGlass = glassPicker(104, 0.25)
-        b(1.62, 0.16, 1.4, 0, 0.08, 0, 'block')
-        b(1.5, 2.4, 1.25, 0, 1.32, 0, 'block')         // 冷灰塔楼主体
-        b(1.62, 0.09, 1.37, 0, 2.56, 0, 'slab')
-        b(0.95, 0.42, 0.85, 0, 2.8, 0, 'wall')          // 退台顶层
-        b(1.07, 0.08, 0.97, 0, 3.05, 0, 'slab')
-        // 首层大堂玻璃 + 入口
-        b(1.1, 0.75, 0.06, 0, 0.45, 0.65, 'glass')
-        b(0.34, 0.7, 0.08, 0, 0.38, 0.68, 'dark')
-        // 四层横向玻璃带 + 层间挑线 + 侧/背窗
-        for (const fy of [1.05, 1.42, 1.79, 2.16]) {
-          b(1.15, 0.26, 0.05, 0, fy, 0.645, 'glass')
-          b(0.03, 0.28, 0.07, 0, fy, 0.67, 'frame')
-          b(1.52, 0.04, 0.06, 0, fy - 0.22, 0.65, 'slab')
-          b(1.0, 0.26, 0.05, 0, fy, -0.645, 'glass')
-          b(0.05, 0.26, 0.8, -0.765, fy, 0.05, 'glass')
-          b(0.05, 0.26, 0.8, 0.765, fy, 0.05, 'glass')
-        }
-        b(0.7, 0.24, 0.05, 0, 2.82, 0.445, 'glass')
-        makeIco(group, parts, 0.16, 1.15, 0.13, 0.95, 'bush')
-        makeIco(group, parts, 0.15, -1.2, 0.12, -0.9, 'bush')
-        return { group, parts }
+        addBox(group, 5, 0.08, 4, 0, 0.04, 0, mats.floor(1))
+        addBox(group, 0.12, 2.6, 4, -2.5, 1.3, 0, mats.wall)
+        addBox(group, 0.12, 2.6, 4, 2.5, 1.3, 0, mats.wall)
+        addBox(group, 5, 2.6, 0.12, 0, 1.3, -2, mats.wall)
+        // 隔墙
+        addBox(group, 0.08, 2.6, 2.0, 0, 1.3, 1, mats.wall)
+        // 主卧
+        makeBed(group, -1.3, 0, 0.5, 0, mats.fabric)
+        // 次卧/儿童房
+        makeBed(group, -1.3, 0, -1.2, 0, mats.fabricWarm)
+        // 客厅餐厅
+        makeSofa(group, 1.2, 0, -0.5, 0, mats.fabric)
+        makeDining(group, 1.2, 0, 1.0, 0)
+        makeKitchen(group, 2.0, 0, -1.2, Math.PI / 2)
+        makePlant(group, -2.2, 0, -1.5, 0.7)
+        makeFloorLamp(group, 0.2, 0, 1.6)
+        return group
       }
 
-      const builders = [buildVilla, buildApartment, buildDorm, buildTower]
+      const buildStudent = () => {
+        const group = new THREE.Group()
+        addBox(group, 4, 0.08, 3.5, 0, 0.04, 0, mats.floor(2))
+        addBox(group, 0.12, 2.6, 3.5, -2, 1.3, 0, mats.wall)
+        addBox(group, 0.12, 2.6, 3.5, 2, 1.3, 0, mats.wallDark)
+        addBox(group, 4, 2.6, 0.12, 0, 1.3, -1.75, mats.wall)
+        // 单人床
+        makeBed(group, -1.0, 0, 0.3, 0, mats.fabric)
+        // 书桌
+        addBox(group, 1.0, 0.06, 0.55, 1.0, 0.75, -1.0, mats.wood)
+        addBox(group, 0.05, 0.7, 0.5, 0.52, 0.38, -1.0, mats.woodDark)
+        addBox(group, 0.05, 0.7, 0.5, 1.48, 0.38, -1.0, mats.woodDark)
+        // 书桌椅
+        addBox(group, 0.4, 0.05, 0.4, 1.0, 0.42, -0.5, mats.fabricWarm)
+        addBox(group, 0.04, 0.4, 0.04, 0.82, 0.2, -0.32, mats.woodDark)
+        addBox(group, 0.04, 0.4, 0.04, 1.18, 0.2, -0.32, mats.woodDark)
+        addBox(group, 0.04, 0.4, 0.04, 0.82, 0.2, -0.68, mats.woodDark)
+        addBox(group, 0.04, 0.4, 0.04, 1.18, 0.2, -0.68, mats.woodDark)
+        // 书架
+        addBox(group, 0.8, 1.8, 0.3, -1.7, 0.9, -1.4, mats.woodDark)
+        addBox(group, 0.76, 0.02, 0.28, -1.7, 0.5, -1.4, mats.wood)
+        addBox(group, 0.76, 0.02, 0.28, -1.7, 1.0, -1.4, mats.wood)
+        addBox(group, 0.76, 0.02, 0.28, -1.7, 1.5, -1.4, mats.wood)
+        // 小厨房
+        makeKitchen(group, 1.5, 0, 1.0, Math.PI)
+        makePlant(group, 1.7, 0, 0.2, 0.6)
+        return group
+      }
 
-      // 模型容器：入场缩放在 world 上，模型拆换在其内部
+      const buildCity = () => {
+        const group = new THREE.Group()
+        addBox(group, 4, 0.08, 3.5, 0, 0.04, 0, mats.floor(3))
+        addBox(group, 0.12, 2.6, 3.5, -2, 1.3, 0, mats.wallDark)
+        addBox(group, 0.12, 2.6, 3.5, 2, 1.3, 0, mats.wall)
+        addBox(group, 4, 2.6, 0.12, 0, 1.3, -1.75, mats.wall)
+        // LOFT 风格：大开间
+        // 大床
+        makeBed(group, -1.1, 0, 0.8, 0, mats.fabricWarm)
+        // 沙发
+        makeSofa(group, 0.8, 0, -0.6, 0, mats.fabric)
+        // 小餐桌
+        addBox(group, 0.8, 0.06, 0.8, 0.8, 0.6, 0.8, mats.wood)
+        for (const [lx, lz] of [[-0.32, -0.32], [0.32, -0.32], [-0.32, 0.32], [0.32, 0.32]]) {
+          addBox(group, 0.05, 0.58, 0.05, lx, 0.3, lz, mats.woodDark)
+        }
+        // 开放式厨房
+        makeKitchen(group, 1.5, 0, -0.8, Math.PI / 2)
+        makeFridge(group, 1.6, 0, 0.8)
+        makePlant(group, -1.7, 0, -1.2, 0.9)
+        makeFloorLamp(group, 0, 0, -1.3)
+        return group
+      }
+
+      const builders = [buildLuxury, buildStandard, buildStudent, buildCity]
+
+      // 模型容器
       const world = new THREE.Group()
       scene.add(world)
       let currentIdx = 0
       let model = builders[0]()
-      world.add(model.group)
+      world.add(model)
 
-      const easeOutBack = (k) => {
-        const c1 = 1.4
-        const c3 = c1 + 1
-        return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2)
-      }
-      const poseOut = (m2, k) => {
-        const u = m2.userData
-        const e = k * k
-        m2.position.copy(u.base).addScaledVector(u.out, e)
-        m2.scale.setScalar(Math.max(0.04, 1 - 0.96 * e))
-        m2.rotation.y = u.spin * k
-      }
-      const poseIn = (m2, k) => {
-        const u = m2.userData
-        const settle = 1 - Math.pow(1 - k, 3)
-        m2.position.copy(u.base).addScaledVector(u.inn, 1 - settle)
-        m2.scale.setScalar(0.05 + 0.95 * easeOutBack(k))
-        m2.rotation.y = u.spin * (1 - k)
-      }
-
-      // 拆解/组装状态机：out 全部飞散 → 换模型 → in 错峰飞来组装；快速划过行时用 queued 兜底到最后目标
+      // 切换动画
       let morph = null
       const startMorph = (idx) => {
         if (idx === currentIdx) return
         if (morph) { morph.queued = idx; return }
-        morph = { phase: 'out', t: 0, to: idx, queued: null }
+        morph = { t: 0, to: idx, queued: null }
       }
 
-      // ---- 视角控制：自研最小轨道（azimuth/polar + 阻尼），不引 OrbitControls ----
-      const R = 9.0
+      // 轨道控制
+      const R = 8.2
       let az = VIEW_ANGLES[0]
-      let polar = 1.27
+      let polar = 1.15
       let target = az
       let dragging = false
       let lastX = 0
       let lastY = 0
       let hovered = activeRef.current
       let visible = true
-      let intro = reduce ? 1 : 0
 
       const snapFor = (idx) => {
         const base = VIEW_ANGLES[idx]
@@ -530,16 +536,16 @@ export default function TypeHouse({ activeIndex }) {
         if (idx == null || dragging) return
         target = snapFor(idx)
         if (reduce) {
-          // 减弱动态：模型瞬切、视角瞬到
-          world.remove(model.group)
+          world.remove(model)
           currentIdx = idx
           model = builders[idx]()
-          world.add(model.group)
+          world.add(model)
           az = target
         } else {
           startMorph(idx)
         }
       }
+
       const dom = renderer.domElement
       const onDown = (e) => {
         dragging = true
@@ -550,8 +556,8 @@ export default function TypeHouse({ activeIndex }) {
       }
       const onMove = (e) => {
         if (!dragging) return
-        az -= (e.clientX - lastX) * 0.007
-        polar = Math.min(1.42, Math.max(0.6, polar + (e.clientY - lastY) * 0.005))
+        az -= (e.clientX - lastX) * 0.006
+        polar = Math.min(1.35, Math.max(0.55, polar + (e.clientY - lastY) * 0.004))
         target = az
         lastX = e.clientX
         lastY = e.clientY
@@ -605,28 +611,31 @@ export default function TypeHouse({ activeIndex }) {
           gotoType(cur)
         }
 
-        // morph 推进
+        // morph 推进：淡出 → 换模型 → 淡入
         if (morph) {
           morph.t += dt * 1000
-          if (morph.phase === 'out') {
-            const k = Math.min(1, morph.t / OUT_MS)
-            for (const m2 of model.parts) poseOut(m2, k)
-            if (k >= 1) {
-              world.remove(model.group)
-              currentIdx = morph.to
-              model = builders[currentIdx]()
-              world.add(model.group)
-              for (const m2 of model.parts) poseIn(m2, 0)
-              morph.phase = 'in'
-              morph.t = 0
-            }
+          const k = Math.min(1, morph.t / (SWITCH_MS / 2))
+          if (k < 1) {
+            // 淡出 + 缩小
+            const s = 1 - k * 0.3
+            world.scale.setScalar(s)
+            world.rotation.y = k * 0.3
+            world.position.y = -k * 0.2
           } else {
-            for (const m2 of model.parts) {
-              const k = Math.min(1, Math.max(0, (morph.t - m2.userData.delay) / IN_MS))
-              poseIn(m2, k)
-            }
-            if (morph.t >= IN_MS + DELAY_MAX) {
-              for (const m2 of model.parts) poseIn(m2, 1)
+            // 切换
+            world.remove(model)
+            currentIdx = morph.to
+            model = builders[currentIdx]()
+            world.add(model)
+            const k2 = Math.min(1, (morph.t - SWITCH_MS / 2) / (SWITCH_MS / 2))
+            const s = 0.7 + k2 * 0.3
+            world.scale.setScalar(s)
+            world.rotation.y = (1 - k2) * 0.3
+            world.position.y = -(1 - k2) * 0.2
+            if (k2 >= 1) {
+              world.scale.setScalar(1)
+              world.rotation.y = 0
+              world.position.y = 0
               const next = morph.queued
               morph = null
               if (next != null && next !== currentIdx) startMorph(next)
@@ -635,24 +644,15 @@ export default function TypeHouse({ activeIndex }) {
         }
 
         if (!dragging) {
-          // 拆解/组装期间停住自转，相机仍阻尼转到该户型取景角
-          if (hovered == null && !morph && !reduce) target += dt * 0.22
-          az += (target - az) * (1 - Math.exp(-dt * 5))
+          if (hovered == null && !morph && !reduce) target += dt * 0.15
+          az += (target - az) * (1 - Math.exp(-dt * 4.5))
         }
         camera.position.set(
           R * Math.sin(polar) * Math.sin(az),
           R * Math.cos(polar),
           R * Math.sin(polar) * Math.cos(az)
         )
-        camera.lookAt(0, 0.85, 0)
-
-        if (intro < 1) {
-          // 入场轻抬升落定
-          intro = Math.min(1, intro + dt / 0.9)
-          const k = 1 - Math.pow(1 - intro, 3)
-          world.scale.setScalar(0.92 + 0.08 * k)
-          world.position.y = (1 - k) * 0.14
-        }
+        camera.lookAt(0, 0.6, 0)
         renderer.render(scene, camera)
       }
       raf = requestAnimationFrame(frame)
@@ -667,25 +667,20 @@ export default function TypeHouse({ activeIndex }) {
         dom.removeEventListener('pointerup', onUp)
         dom.removeEventListener('pointercancel', onUp)
         dom.removeEventListener('webglcontextlost', onLost)
-        // 共享几何/材质去重后各释放一次
         const geos = new Set(boxCache.values())
-        geos.add(trunkGeo)
-        icoCache.forEach((g) => geos.add(g))
-        geos.add(ground.geometry)
-        geos.add(contactShadow.geometry)
+        cylCache.forEach((g) => geos.add(g))
+        sphCache.forEach((g) => geos.add(g))
         geos.forEach((g) => g.dispose())
-        const matsAll = new Set(Object.values(mats))
-        matsAll.add(ground.material)
-        matsAll.add(contactShadow.material)
-        matsAll.forEach((m2) => m2.dispose())
+        Object.values(mats).forEach((m) => {
+          if (Array.isArray(m)) m.forEach((mm) => mm.dispose())
+          else m.dispose()
+        })
         textures.forEach((t) => t.dispose())
-        envRT?.dispose()
         renderer.dispose()
         if (dom.parentNode === mount) mount.removeChild(dom)
       }
     }
 
-    // 进视口前不加载 three（约 192KB gzip）
     if ('IntersectionObserver' in window) {
       io = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
@@ -708,16 +703,7 @@ export default function TypeHouse({ activeIndex }) {
   return (
     <div className="v8-type-house" ref={mountRef}>
       {failed && (
-        <svg className="v8-type-house-fb" viewBox="0 0 120 120" aria-hidden="true">
-          <ellipse cx="60" cy="94" rx="40" ry="9" fill="#e7e8ec" />
-          <g fill="none" stroke="#b6b8c0" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round">
-            <path d="M32 62h44v28H32z" fill="#eef0f3" />
-            <path d="M52 48l26 14H46z" fill="#e2e4e9" />
-            <path d="M76 58h14v32H76z" fill="#e6e8ed" />
-            <path d="M50 90V78h10v12" />
-            <path d="M38 70h8v8h-8zM80 66h6v8h-6z" />
-          </g>
-        </svg>
+        <div className="v8-type-house-fb" style={{ color: '#666', textAlign: 'center', padding: 40 }}>3D 不可用</div>
       )}
     </div>
   )
