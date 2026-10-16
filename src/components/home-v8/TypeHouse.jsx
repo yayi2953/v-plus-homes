@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // 户型舞台：自动播放本地实拍视频（静音循环），每个户型对应不同室内视频。
 
@@ -11,9 +11,11 @@ const VIDEOS = [
 
 export default function TypeHouse({ activeIndex }) {
   const videoRef = useRef(null)
+  const [playing, setPlaying] = useState(false)
   const idx = activeIndex ?? 0
 
   useEffect(() => {
+    setPlaying(false)
     const v = videoRef.current
     if (!v) return
     v.load()
@@ -33,7 +35,13 @@ export default function TypeHouse({ activeIndex }) {
         muted
         playsInline
         preload="auto"
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        onPlaying={() => setPlaying(true)}
+        style={{
+          position: 'absolute', inset: 0, width: '100%', height: '100%',
+          objectFit: 'cover', display: 'block',
+          opacity: playing ? 1 : 0,
+          transition: 'opacity 120ms ease',
+        }}
       >
         您的浏览器不支持视频播放。
       </video>
