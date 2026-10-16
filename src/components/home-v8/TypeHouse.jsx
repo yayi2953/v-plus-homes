@@ -23,7 +23,7 @@ export default function TypeHouse({ activeIndex }) {
   const v = VIDEOS[idx] || VIDEOS[0]
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', borderRadius: 12, background: '#000' }}>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', borderRadius: 4, background: '#000' }}>
       <video
         ref={videoRef}
         key={idx}
@@ -34,7 +34,7 @@ export default function TypeHouse({ activeIndex }) {
         muted
         playsInline
         preload="auto"
-        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
       >
         您的浏览器不支持视频播放。
       </video>
