@@ -140,7 +140,7 @@ export default function V8Navbar({ solid = false }) {
               runOnHome(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
             }}
           >
-            VIVA HOMES
+            V PLUS HOMES
           </a>
 
           <nav className="v8-nav__links" aria-label="primary">
@@ -299,7 +299,7 @@ export default function V8Navbar({ solid = false }) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="v8-drawer__head">
-                <span className="v8-wordmark">VIVA HOMES</span>
+                <span className="v8-wordmark">V PLUS HOMES</span>
                 <button type="button" className="v8-drawer__close" onClick={closeMenu} aria-label="close">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <path d="M6 6l12 12M18 6 6 18" />

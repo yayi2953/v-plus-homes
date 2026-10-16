@@ -1,5 +1,5 @@
 /* ============================================================
-   VIVA v8 首页样式：全部规则限定在 .home-v8 作用域内，
+   V PLUS v8 首页样式：全部规则限定在 .home-v8 作用域内，
    随 HomeV8 lazy chunk 注入，不影响经典版任何页面。
    ============================================================ */
 .home-v8 {
@@ -653,7 +653,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   font-size: 15.5px; font-weight: 700; letter-spacing: .16em;
   color: var(--v8n-ink); text-decoration: none; white-space: nowrap;
 }
-/* 官方 Viva 屋顶标识（原图带米色底） */
+/* 官方 V Plus 屋顶标识（原图带米色底） */
 .v8-logo { display: block; height: 36px; width: auto; }
 .v8-logo--drawer { height: 30px; }
 .v8-logo--footer { height: 42px; }

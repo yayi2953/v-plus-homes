@@ -276,11 +276,11 @@ function DetailPanel({ active, closeProperty }) {
     const description = rawText
       ? rawText.slice(0, 155)
       : lang === 'zh'
-        ? `广州${p.district || ''}${p.br}出租，${p.metro || ''}，精装修随时入住。Viva 外籍人士租房服务。`
-        : `${p.br} for rent in ${p.district || 'Guangzhou'}, near ${p.metro || 'metro'}. Furnished and move-in ready — Viva apartments for expats in Guangzhou.`
+        ? `广州${p.district || ''}${p.br}出租，${p.metro || ''}，精装修随时入住。V Plus 外籍人士租房服务。`
+        : `${p.br} for rent in ${p.district || 'Guangzhou'}, near ${p.metro || 'metro'}. Furnished and move-in ready — V Plus apartments for expats in Guangzhou.`
     const title = lang === 'zh'
-      ? `${p.code} ${p.br}出租·${p.district} | 广州租房 Viva`
-      : `${p.code} ${p.br} for Rent in ${p.district}, Guangzhou | Viva`
+      ? `${p.code} ${p.br}出租·${p.district} | 广州租房 V Plus`
+      : `${p.code} ${p.br} for Rent in ${p.district}, Guangzhou | V Plus`
     const jsonLd = {
       '@context': 'https://schema.org',
       '@type': 'Apartment',
@@ -329,7 +329,7 @@ function DetailPanel({ active, closeProperty }) {
   // 组装当前房源的纯文本详情，随当前界面语言生成，供一键复制后粘贴给顾问/朋友
   const buildShareText = () => {
     const L = []
-    L.push(`VIVA Homes · ${p.code}`)
+    L.push(`V PLUS Homes · ${p.code}`)
     L.push(p.district)
     L.push(p.metro)
     if (p.address) L.push(p.address)

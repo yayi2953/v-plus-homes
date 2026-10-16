@@ -7,7 +7,7 @@
 
 import { currentLangPrefix } from './router.mjs'
 
-export const SITE_ORIGIN = 'https://www.vivagz.com'
+export const SITE_ORIGIN = 'https://www.vplushomes.com'
 const LANG_PREFIX_RE = /^\/(zh|en)(?=\/|$)/
 
 let defaultTitle = document.title

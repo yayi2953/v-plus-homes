@@ -5,7 +5,7 @@ import { Component } from 'react'
    不处理会整页白屏。策略：首次失败自动刷新一次（拿到新 HTML），
    同一会话再次失败则降级渲染备用内容（经典首页），杜绝打不开。 */
 
-const RETRY_KEY = 'viva-v8-chunk-retry'
+const RETRY_KEY = 'v-plus-v8-chunk-retry'
 
 export default class ChunkBoundary extends Component {
   constructor(props) {

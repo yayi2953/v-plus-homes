@@ -12,7 +12,7 @@ const SITE_TITLE = 'Apartments for Rent in Guangzhou, Guangdong ｜Expat Housing
 const en = {
   siteName: SITE_TITLE,
   nav: {
-    logo: 'Viva',
+    logo: 'V Plus',
     menus: [
       { label: 'Home', href: '#top' },
       {
@@ -124,7 +124,7 @@ const en = {
     cancel: 'Cancel',
     wechatTitle: 'Add us on WeChat',
     wechatDesc: 'Scan the QR code, or copy our WeChat ID and search for it in WeChat.',
-    qrAlt: 'VIVA WeChat QR code',
+    qrAlt: 'V PLUS WeChat QR code',
     scanHint: 'Scan this code with WeChat to add us.',
     longpressHint: 'Long-press the code, then choose “Recognise QR code”.',
     copyId: 'Copy ID',
@@ -203,11 +203,11 @@ const en = {
     emptySchool: 'Homes near this campus are coming soon — please check back shortly.'
   },
   properties: [
-    { code: 'VIVA-012', br: '4 BR', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Wushan', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
+    { code: 'V PLUS-012', br: '4 BR', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Wushan', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
     { code: 'FLEX-004', br: '5 BR', baths: 2, area: 156, amenities: ['furnished', 'wifi', 'ac', 'workspace', 'elevator', 'gym', 'tv', 'balcony', 'metro'], district: 'Haizhu, Guangzhou', districtKey: 'haizhu', metro: 'Line 8 · Sun Yat-sen Univ.', price: '¥4,150', fx: '$573 / €527', img: '/images/listing-urban2.jpg', categories: ['standard'] },
-    { code: 'VIVA-014', br: '5 BR', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Shipaiqiao', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
-    { code: 'VIVA-009', br: '4 BR', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: 'Huangpu, Guangzhou', districtKey: 'huangpu', metro: 'Line 5 · Dashadong', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
-    { code: 'VIVA-010', br: '4 BR', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: 'Yuexiu, Guangzhou', districtKey: 'yuexiu', metro: 'Line 1/2 · Gongyuanqian', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
+    { code: 'V PLUS-014', br: '5 BR', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Shipaiqiao', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
+    { code: 'V PLUS-009', br: '4 BR', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: 'Huangpu, Guangzhou', districtKey: 'huangpu', metro: 'Line 5 · Dashadong', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
+    { code: 'V PLUS-010', br: '4 BR', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: 'Yuexiu, Guangzhou', districtKey: 'yuexiu', metro: 'Line 1/2 · Gongyuanqian', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
     { code: 'FLEX-026', br: '4 BR', baths: 2, area: 132, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'elevator', 'workspace', 'gym', 'metro'], district: 'Baiyun, Guangzhou', districtKey: 'baiyun', schoolKey: 'gdufs-baiyun', metro: 'Line 2 · Jiangxia', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-urban1.jpg', categories: ['student'] },
     { code: 'FLEX-006', br: '4 BR', baths: 1, area: 96, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: 'Panyu, Guangzhou', districtKey: 'panyu', schoolKey: 'scut-intl', metro: 'Line 4 · HE Mega Center North', price: '¥4,050', fx: '$559 / €514', img: '/images/listing-student1.jpg', categories: ['student'] },
     { code: 'FLEX-036', br: '6 BR', baths: 3, area: 185, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Wushan', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-student2.jpg', categories: ['standard'] },
@@ -220,9 +220,9 @@ const en = {
     galleryTitle: 'More photos',
     aboutTitle: 'About this home',
     aboutText:
-      'This {br} apartment offers {area} m² of bright, fully furnished living space in {district}. Managed end-to-end by Viva, it arrives move-in ready with modern appliances, stylish décor and every utility arranged — and with {metro} on your doorstep, the city is only minutes away.',
+      'This {br} apartment offers {area} m² of bright, fully furnished living space in {district}. Managed end-to-end by V Plus, it arrives move-in ready with modern appliances, stylish décor and every utility arranged — and with {metro} on your doorstep, the city is only minutes away.',
     aboutTextNoArea:
-      'This {br} apartment in {district} offers bright, fully furnished living space. Managed end-to-end by Viva, it arrives move-in ready with modern appliances, stylish décor and every utility arranged — and with {metro} on your doorstep, the city is only minutes away.',
+      'This {br} apartment in {district} offers bright, fully furnished living space. Managed end-to-end by V Plus, it arrives move-in ready with modern appliances, stylish décor and every utility arranged — and with {metro} on your doorstep, the city is only minutes away.',
     amenitiesTitle: 'What this place offers',
     locationTitle: 'Location & transport',
     locationText:
@@ -259,16 +259,16 @@ const en = {
     }
   },
   whyHere: {
-    eyebrow: 'WHY VIVA',
+    eyebrow: 'WHY V PLUS',
     titleA: 'A ',
     titleAccent: 'Seamless',
     titleB: ' Expat Housing Solution.',
-    desc: 'Viva is the trusted leader in China relocation, having welcomed over 5,000+ international clients and students. Our dedicated team anticipates the unique needs of the expat community, streamlining every step from furnishing to ongoing support. We don’t just find you an apartment; we simplify your life in China.',
+    desc: 'V Plus is the trusted leader in China relocation, having welcomed over 5,000+ international clients and students. Our dedicated team anticipates the unique needs of the expat community, streamlining every step from furnishing to ongoing support. We don’t just find you an apartment; we simplify your life in China.',
     subTitle: 'Expert Verified Services',
     cards: [
       { icon: 'globe', title: 'International Team.', desc: 'Our diverse team understands the unique needs of expats from around the world. We speak your language and guide you every step of the way.' },
       { icon: 'doc', title: 'Flexible Lease Terms.', desc: 'Whether you need a short stay or a long-term home, we offer lease options tailored to fit your plans. Enjoy the freedom to choose what works best for you.' },
-      { icon: 'home', title: 'Furnished Flats.', desc: 'All our apartments managed by Viva come fully furnished with modern essentials and stylish décor. Move in comfortably without worrying about a thing.' },
+      { icon: 'home', title: 'Furnished Flats.', desc: 'All our apartments managed by V Plus come fully furnished with modern essentials and stylish décor. Move in comfortably without worrying about a thing.' },
       { icon: 'chat', title: 'Ongoing Support.', desc: "Our dedicated support team is here to help throughout your stay. From maintenance to local advice, we've got you covered." }
     ]
   },
@@ -302,14 +302,14 @@ const en = {
   },
   footer: {
     desc: 'Move-in-ready homes and full relocation support across China — visa, bank, and everything in between.',
-    email: 'hello@viva.house',
+    email: 'hello@v-plus.house',
     phone: '+352 621780307',
     groups: [
       { title: 'Our Services.', links: ['Vacation Rentals', 'Serviced Apartments', 'Coliving & Short-Term', 'Relocation Services', 'Office & Retail', 'Property Transactions'] },
       { title: 'Tools & More.', links: ['Move Planner', 'Relocation Tools', 'Exclusive Deals', 'Internships', 'Become a Partner'] }
     ],
     legal: ['Privacy Policy', 'Cookie Policy', 'Terms & Conditions'],
-    copyright: '© 2026 Viva. All rights reserved.',
+    copyright: '© 2026 V Plus. All rights reserved.',
     language: 'English'
   },
   cookie: {
@@ -399,7 +399,7 @@ const en = {
 const zh = {
   siteName: SITE_TITLE,
   nav: {
-    logo: 'Viva',
+    logo: 'V Plus',
     menus: [
       { label: '首页', href: '#top' },
       {
@@ -437,9 +437,9 @@ const zh = {
       {
         rating: '',
         img: HERO_HOME_IMG,
-        titleA: 'VIVA·HOME',
+        titleA: 'V PLUS·HOME',
         titleB: 'Rentals for Expats',
-        desc: '广州市专业外籍租赁服务团队\nLive Globally, Settle Local with Viva',
+        desc: '广州市专业外籍租赁服务团队\nLive Globally, Settle Local with V Plus',
         feature: {
           title: '服务流程',
           text: '需求沟通→房源推荐→预约看房→房源预订→合同签署→房屋交接→售后支持'
@@ -494,7 +494,7 @@ const zh = {
     { value: '8', label: '服务语言' }
   ],
   team: {
-    title: '有疑问？咨询 VIVA',
+    title: '有疑问？咨询 V PLUS',
     sub: '真人团队，WhatsApp & 微信快速回复',
     whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
   },
@@ -509,9 +509,9 @@ const zh = {
     openWhatsapp: '前往咨询',
     unavailable: '该渠道暂未开通，请选择另一种方式。',
     cancel: '取消',
-    wechatTitle: '添加 VIVA 微信',
+    wechatTitle: '添加 V PLUS 微信',
     wechatDesc: '可扫描下方二维码，或复制微信号后到微信中搜索添加。',
-    qrAlt: 'VIVA 微信二维码',
+    qrAlt: 'V PLUS 微信二维码',
     scanHint: '打开微信扫一扫，扫描此二维码即可添加。',
     longpressHint: '长按二维码图片，选择「识别图中二维码」。',
     copyId: '复制微信号',
@@ -590,11 +590,11 @@ const zh = {
     emptySchool: '该校区周边房源即将上线，敬请期待。'
   },
   properties: [
-    { code: 'VIVA-012', br: '4 室', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 五山站', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
+    { code: 'V PLUS-012', br: '4 室', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 五山站', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
     { code: 'FLEX-004', br: '5 室', baths: 2, area: 156, amenities: ['furnished', 'wifi', 'ac', 'workspace', 'elevator', 'gym', 'tv', 'balcony', 'metro'], district: '广州 · 海珠区', districtKey: 'haizhu', metro: '8 号线 · 中大站', price: '¥4,150', fx: '$573 / €527', img: '/images/listing-urban2.jpg', categories: ['standard'] },
-    { code: 'VIVA-014', br: '5 室', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 石牌桥站', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
-    { code: 'VIVA-009', br: '4 室', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: '广州 · 黄埔区', districtKey: 'huangpu', metro: '5 号线 · 大沙东站', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
-    { code: 'VIVA-010', br: '4 室', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: '广州 · 越秀区', districtKey: 'yuexiu', metro: '1/2 号线 · 公园前站', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
+    { code: 'V PLUS-014', br: '5 室', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 石牌桥站', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
+    { code: 'V PLUS-009', br: '4 室', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: '广州 · 黄埔区', districtKey: 'huangpu', metro: '5 号线 · 大沙东站', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
+    { code: 'V PLUS-010', br: '4 室', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: '广州 · 越秀区', districtKey: 'yuexiu', metro: '1/2 号线 · 公园前站', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
     { code: 'FLEX-026', br: '4 室', baths: 2, area: 132, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'elevator', 'workspace', 'gym', 'metro'], district: '广州 · 白云区', districtKey: 'baiyun', schoolKey: 'gdufs-baiyun', metro: '2 号线 · 江夏站', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-urban1.jpg', categories: ['student'] },
     { code: 'FLEX-006', br: '4 室', baths: 1, area: 96, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: '广州 · 番禺区', districtKey: 'panyu', schoolKey: 'scut-intl', metro: '4 号线 · 大学城北站', price: '¥4,050', fx: '$559 / €514', img: '/images/listing-student1.jpg', categories: ['student'] },
     { code: 'FLEX-036', br: '6 室', baths: 3, area: 185, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 五山站', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-student2.jpg', categories: ['standard'] },
@@ -607,9 +607,9 @@ const zh = {
     galleryTitle: '更多照片',
     aboutTitle: '房源介绍',
     aboutText:
-      '这套 {br} 公寓位于{district}，建筑面积 {area} m²，采光充足，家具家电齐全，拎包即可入住。由 Viva 全程托管，装潢现代雅致，杂费（含水网）均已安排妥当；临近{metro}，出门即是便利的城市生活。',
+      '这套 {br} 公寓位于{district}，建筑面积 {area} m²，采光充足，家具家电齐全，拎包即可入住。由 V Plus 全程托管，装潢现代雅致，杂费（含水网）均已安排妥当；临近{metro}，出门即是便利的城市生活。',
     aboutTextNoArea:
-      '这套 {br} 公寓位于{district}，采光充足，家具家电齐全，拎包即可入住。由 Viva 全程托管，装潢现代雅致，杂费（含水网）均已安排妥当；临近{metro}，出门即是便利的城市生活。',
+      '这套 {br} 公寓位于{district}，采光充足，家具家电齐全，拎包即可入住。由 V Plus 全程托管，装潢现代雅致，杂费（含水网）均已安排妥当；临近{metro}，出门即是便利的城市生活。',
     amenitiesTitle: '配套设施',
     locationTitle: '位置与交通',
     locationText:
@@ -646,16 +646,16 @@ const zh = {
     }
   },
   whyHere: {
-    eyebrow: '为什么选择 VIVA',
+    eyebrow: '为什么选择 V PLUS',
     titleA: '为外籍人士提供',
     titleAccent: '无缝安居',
     titleB: '体验。',
-    desc: 'Viva 是值得信赖的在华安家服务领导者，已迎接超过 5,000 名国际客户与学生。我们专业的团队深谙外籍社群的独特需求，从家具配置到入住后的持续支持，精简每一个环节。我们不只是帮你找公寓，更是让你在中国的生活更简单。',
+    desc: 'V Plus 是值得信赖的在华安家服务领导者，已迎接超过 5,000 名国际客户与学生。我们专业的团队深谙外籍社群的独特需求，从家具配置到入住后的持续支持，精简每一个环节。我们不只是帮你找公寓，更是让你在中国的生活更简单。',
     subTitle: '专业认证服务',
     cards: [
       { icon: 'globe', title: '国际化团队', desc: '我们多元的团队了解来自世界各地外籍人士的独特需求，用你的语言沟通，全程为你指引。' },
       { icon: 'doc', title: '灵活租约条款', desc: '无论短住还是长居，我们都能提供契合你计划的租约方案，自由选择最适合你的方式。' },
-      { icon: 'home', title: '家具齐全公寓', desc: '所有由 Viva 托管的公寓均配备现代必需品与时尚装潢，拎包即可舒适入住，无需费心。' },
+      { icon: 'home', title: '家具齐全公寓', desc: '所有由 V Plus 托管的公寓均配备现代必需品与时尚装潢，拎包即可舒适入住，无需费心。' },
       { icon: 'chat', title: '全程持续支持', desc: '专属支持团队在你居住期间随时待命，从维修养护到本地生活建议，我们一应关照。' }
     ]
   },
@@ -689,14 +689,14 @@ const zh = {
   },
   footer: {
     desc: '覆盖中国主要城市的拎包入住房源与全方位安家服务 —— 签证、银行及生活琐事一站搞定。',
-    email: 'hello@viva.house',
+    email: 'hello@v-plus.house',
     phone: '+352 621780307',
     groups: [
       { title: '我们的服务', links: ['度假短租', '服务式公寓', '合租与短租', '安家服务', '办公与商铺', '房产交易'] },
       { title: '工具与更多', links: ['搬家计划', '安家工具', '专属优惠', '实习项目', '成为合作伙伴'] }
     ],
     legal: ['隐私政策', 'Cookie 政策', '条款与细则'],
-    copyright: '© 2026 Viva. 保留所有权利。',
+    copyright: '© 2026 V Plus. 保留所有权利。',
     language: 'English'
   },
   cookie: {

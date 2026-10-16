@@ -1,5 +1,5 @@
 // 页脚法务文档正文（中英双语）
-// 品牌：Viva（广州长租 / 短住住宿服务）
+// 品牌：V Plus（广州长租 / 短住住宿服务）
 // 更新日期：2026-10-07。联系方式由组件注入页脚邮箱 / 电话，避免文案内写死。
 
 export const LEGAL_UPDATED = '2026-10-07'
@@ -11,7 +11,7 @@ export const legalContent = {
     privacy: {
       title: '隐私政策',
       intro:
-        'Viva（以下简称“我们”）尊重并保护每一位访客与租客的个人信息。本政策说明我们在您使用本网站及住宿服务时，如何收集、使用、存储与保护您的信息。使用本网站即表示您同意本政策所述做法。',
+        'V Plus（以下简称“我们”）尊重并保护每一位访客与租客的个人信息。本政策说明我们在您使用本网站及住宿服务时，如何收集、使用、存储与保护您的信息。使用本网站即表示您同意本政策所述做法。',
       sections: [
         {
           h: '一、我们收集的信息',
@@ -91,12 +91,12 @@ export const legalContent = {
     terms: {
       title: '条款与细则',
       intro:
-        '以下条款适用于您通过本网站了解、咨询及预订 Viva 提供的房源与住宿服务。提交咨询或预订即视为您已阅读并同意本条款。',
+        '以下条款适用于您通过本网站了解、咨询及预订 V Plus 提供的房源与住宿服务。提交咨询或预订即视为您已阅读并同意本条款。',
       sections: [
         {
           h: '一、服务说明',
           body: [
-            'Viva 提供广州地区的房源信息展示、咨询对接、带看、签约及入住相关服务。网站上的房源图片、价格与配置以实际签约确认为准，我们尽力保持信息及时更新，但不对无遗漏或零差错作绝对保证。'
+            'V Plus 提供广州地区的房源信息展示、咨询对接、带看、签约及入住相关服务。网站上的房源图片、价格与配置以实际签约确认为准，我们尽力保持信息及时更新，但不对无遗漏或零差错作绝对保证。'
           ]
         },
         {
@@ -145,7 +145,7 @@ export const legalContent = {
     privacy: {
       title: 'Privacy Policy',
       intro:
-        'Viva (“we”, “us”) respects and protects the personal information of every visitor and tenant. This policy explains how we collect, use, store and protect your information when you use this website and our accommodation services. By using this website, you agree to the practices described below.',
+        'V Plus (“we”, “us”) respects and protects the personal information of every visitor and tenant. This policy explains how we collect, use, store and protect your information when you use this website and our accommodation services. By using this website, you agree to the practices described below.',
       sections: [
         {
           h: '1. Information We Collect',
@@ -164,7 +164,7 @@ export const legalContent = {
         {
           h: '3. Information Sharing',
           body: [
-            'We do not sell your personal information. We may share it only when necessary: with service partners who need limited information to perform check-in, cleaning or maintenance; where required by law or competent authorities; or where necessary to protect the lawful rights of Viva, our tenants or the public.'
+            'We do not sell your personal information. We may share it only when necessary: with service partners who need limited information to perform check-in, cleaning or maintenance; where required by law or competent authorities; or where necessary to protect the lawful rights of V Plus, our tenants or the public.'
           ]
         },
         {
@@ -225,12 +225,12 @@ export const legalContent = {
     terms: {
       title: 'Terms & Conditions',
       intro:
-        'These terms apply when you browse, enquire about or book properties and accommodation services provided by Viva through this website. Submitting an enquiry or booking means you have read and agreed to these terms.',
+        'These terms apply when you browse, enquire about or book properties and accommodation services provided by V Plus through this website. Submitting an enquiry or booking means you have read and agreed to these terms.',
       sections: [
         {
           h: '1. The Service',
           body: [
-            'Viva presents properties in Guangzhou and provides enquiry coordination, viewings, contracting and check-in support. Photos, prices and configurations are subject to the final signed agreement. We keep information up to date but do not guarantee it is always complete or error-free.'
+            'V Plus presents properties in Guangzhou and provides enquiry coordination, viewings, contracting and check-in support. Photos, prices and configurations are subject to the final signed agreement. We keep information up to date but do not guarantee it is always complete or error-free.'
           ]
         },
         {

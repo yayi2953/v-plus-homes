@@ -55,7 +55,7 @@ export default function V8Footer() {
               e.preventDefault()
               window.scrollTo({ top: 0, behavior: 'smooth' })
             }}>
-              {c.nav?.logo || c.siteName || 'VIVA'}
+              {c.nav?.logo || c.siteName || 'V PLUS'}
             </a>
             <p>{f.desc}</p>
             <p style={{ marginTop: 14 }}>
