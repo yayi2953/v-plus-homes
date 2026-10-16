@@ -3,10 +3,10 @@ import { useEffect, useRef } from 'react'
 // 户型舞台：自动播放本地实拍视频（静音循环），每个户型对应不同室内视频。
 
 const VIDEOS = [
-  { src: '/videos/luxury.mp4', poster: '/images/listing-penthouse.jpg' },
-  { src: '/videos/standard.mp4', poster: '/images/listing-family.jpg' },
-  { src: '/videos/student.mp4', poster: '/images/listing-student1.jpg' },
-  { src: '/videos/city.mp4', poster: '/images/listing-urban1.jpg' },
+  { src: '/videos/luxury.mp4' },
+  { src: '/videos/standard.mp4' },
+  { src: '/videos/student.mp4' },
+  { src: '/videos/city.mp4' },
 ]
 
 export default function TypeHouse({ activeIndex }) {
@@ -28,7 +28,6 @@ export default function TypeHouse({ activeIndex }) {
         ref={videoRef}
         key={idx}
         src={v.src}
-        poster={v.poster}
         autoPlay
         loop
         muted
