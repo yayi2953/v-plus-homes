@@ -1,35 +1,37 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
-import { ChevronDown } from '../ici/Icons.jsx'
 import { navigate, switchLang } from '../../lib/router.mjs'
 import { useContact } from '../ici/contactContext.jsx'
 import './home-v8.css'
 
-/* v8 粒子版专属导航：极简文字 wordmark + 毛玻璃悬浮头 + 黑色胶囊 CTA。
-   菜单数据、锚点/路由跳转、类型切换、校区选择逻辑与经典版 Navbar 完全同源，
-   仅替换视觉皮肤；桌面下拉与移动抽屉中学生公寓校区平铺，功能不缩水。 */
+/* 特斯拉风格导航：左 Logo + 居中菜单 + 右侧图标组 + 房源巨型下拉菜单。
+   菜单数据、锚点/路由跳转、类型切换逻辑与经典版同源，仅替换视觉皮肤。 */
 
 const EASE_OUT = [0.22, 1, 0.36, 1]
+
+// 房源类型 → 展示图映射（巨型菜单用）
+const TYPE_IMAGES = {
+  luxury: '/images/listing-penthouse.jpg',
+  standard: '/images/listing-family.jpg',
+  student: '/images/listing-student1.jpg',
+  city: '/images/listing-studio.jpg'
+}
 
 export default function V8Navbar({ solid = false }) {
   const { c, lang } = useIciI18n()
   const { openContact } = useContact()
   const { nav } = c
-  // 房源类型子菜单由后台分类（residence_types）驱动，标签/顺序/停用实时生效
   const residenceTypes = c.discover.types ?? []
   const menus = nav.menus.map((m) =>
-    m.subs ? { ...m, subs: residenceTypes.map((t) => ({ key: t.key, event: t.key, label: t.label })) } : m
+    m.subs ? { ...m, subs: residenceTypes.map((t) => ({ key: t.key, event: t.key, label: t.label, img: TYPE_IMAGES[t.key], desc: t.desc })) } : m
   )
-  // 学生公寓校区与移动端 TypePicker 同源
   const campusOptions = c.discover.schools ?? []
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
-  // 导航栏语言下拉（替代旧版强制语言弹窗）
   const [langOpen, setLangOpen] = useState(false)
   const langRef = useRef(null)
 
-  /* 语言下拉：点击外部 / Esc 关闭 */
   useEffect(() => {
     if (!langOpen) return undefined
     const onDown = (e) => {
@@ -48,7 +50,6 @@ export default function V8Navbar({ solid = false }) {
     }
   }, [langOpen])
 
-  /* 滚动超过首屏后导航切换为毛玻璃白底 */
   useEffect(() => {
     let ticking = false
     const update = () => {
@@ -66,7 +67,6 @@ export default function V8Navbar({ solid = false }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  /* 抽屉打开期间锁定背景滚动 */
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => {
@@ -76,12 +76,9 @@ export default function V8Navbar({ solid = false }) {
 
   const closeMenu = () => setOpen(false)
 
-  // 在首页执行锚点滚动/类型切换；若当前位于地图/指南页，先回 v8 首页，
-  // 等区块（含懒加载 chunk）挂载后再执行，避免事件丢失、锚点不存在
   const runOnHome = (fn) => {
     if (window.location.pathname !== '/') {
       navigate('/')
-      // v8 首页是懒加载独立分包，比经典版多留一个 chunk 加载节拍
       window.setTimeout(fn, 350)
     } else {
       fn()
@@ -90,7 +87,6 @@ export default function V8Navbar({ solid = false }) {
 
   const go = (m, e) => {
     e?.preventDefault()
-    // 站内真实路径（/map、/guides）：SPA History 跳转
     if (m.href && m.href.startsWith('/')) {
       navigate(m.href)
       closeMenu()
@@ -100,7 +96,6 @@ export default function V8Navbar({ solid = false }) {
       if (m.event) {
         window.dispatchEvent(new CustomEvent('ici:switch-tab', { detail: m.event }))
       }
-      // 首页锚点（#top/#listings/#extra-services/#get-started）
       if (m.href && m.href.startsWith('#') && m.href.length > 1) {
         document.querySelector(m.href)?.scrollIntoView({ behavior: 'smooth' })
       }
@@ -108,14 +103,12 @@ export default function V8Navbar({ solid = false }) {
     closeMenu()
   }
 
-  // 房源子项：跳转到 /listings 结果页并带上类型/校区筛选参数
   const pickSub = (s, e) => {
     e?.preventDefault()
     const params = new URLSearchParams()
     if (s.event) params.set('type', s.event)
     if (s.key && s.key.startsWith('student')) params.set('type', 'student')
     if (s.key && !s.key.startsWith('student') && s.key !== 'student-all') {
-      // 具体校区：type=student + school=key
       params.set('type', 'student')
       params.set('school', s.key)
     }
@@ -132,6 +125,7 @@ export default function V8Navbar({ solid = false }) {
     <>
       <header className={`v8-nav${solid || scrolled ? ' is-solid' : ''}${solid ? ' v8-nav--solid-page' : ''}`}>
         <div className="v8-nav__in">
+          {/* 左：Logo */}
           <a
             className="v8-wordmark"
             href="#top"
@@ -140,56 +134,35 @@ export default function V8Navbar({ solid = false }) {
               runOnHome(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
             }}
           >
-            V PLUS HOMES
+            V&nbsp;PLUS
           </a>
 
+          {/* 中：居中导航 */}
           <nav className="v8-nav__links" aria-label="primary">
             {menus.map((m) =>
               m.subs ? (
                 <span className="v8-nav__group" key={m.label}>
                   <a className="v8-nav__link" href={m.href} onClick={(e) => go(m, e)} aria-haspopup="true">
                     {m.label}
-                    <ChevronDown size={12} />
                   </a>
-                  <span className="v8-nav__drop" role="menu">
-                    <span className="v8-nav__drop-card">
-                    {m.subs.map((s) => (
-                      <span className="v8-nav__dropgroup" key={s.key}>
-                        <a
-                          className="v8-nav__dropitem v8-nav__dropitem--parent"
-                          role="menuitem"
-                          href="#listings"
-                          onClick={(e) => pickSub(s, e)}
-                        >
-                          {s.label}
-                        </a>
-                        {s.key === 'student' && (
-                          <span className="v8-nav__schools">
-                            <span className="v8-nav__schools-in">
-                              <a
-                                className="v8-nav__dropitem v8-nav__dropitem--school"
-                                role="menuitem"
-                                href="#listings"
-                                onClick={(e) => pickSub({ key: 'student-all', event: 'student' }, e)}
-                              >
-                                {c.discover.schoolPickerAll}
-                              </a>
-                              {campusOptions.map((sc) => (
-                                <a
-                                  key={sc.key}
-                                  className="v8-nav__dropitem v8-nav__dropitem--school"
-                                  role="menuitem"
-                                  href="#listings"
-                                  onClick={(e) => pickSub({ key: sc.key }, e)}
-                                >
-                                  {sc.label}
-                                </a>
-                              ))}
+                  {/* 特斯拉式巨型下拉菜单 */}
+                  <span className="v8-nav__mega" role="menu">
+                    <span className="v8-nav__mega-card">
+                      <span className="v8-nav__mega-grid">
+                        {m.subs.map((s) => (
+                          <a
+                            className="v8-nav__mega-item"
+                            key={s.key}
+                            href="#listings"
+                            onClick={(e) => pickSub(s, e)}
+                          >
+                            <span className="v8-nav__mega-img">
+                              <img src={s.img} alt={s.label} loading="lazy" />
                             </span>
-                          </span>
-                        )}
+                            <span className="v8-nav__mega-name">{s.label}</span>
+                          </a>
+                        ))}
                       </span>
-                    ))}
                     </span>
                   </span>
                 </span>
@@ -207,6 +180,7 @@ export default function V8Navbar({ solid = false }) {
             )}
           </nav>
 
+          {/* 右：图标组 */}
           <div className="v8-nav__right">
             <div className="v8-lang" ref={langRef}>
               <button
@@ -217,13 +191,11 @@ export default function V8Navbar({ solid = false }) {
                 aria-expanded={langOpen}
                 aria-label="Language"
               >
-                <svg className="v8-lang__globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <svg className="v8-lang__globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" />
                   <path d="M3 12h18" />
                   <path d="M12 3c2.5 2.6 2.5 15.4 0 18-2.5-2.6-2.5-15.4 0-18Z" />
                 </svg>
-                <span className="v8-lang__label">{lang === 'zh' ? '中文' : 'English'}</span>
-                <span className="v8-lang__chev"><ChevronDown size={12} /></span>
               </button>
               <AnimatePresence>
                 {langOpen && (
@@ -246,7 +218,6 @@ export default function V8Navbar({ solid = false }) {
                         lang={l.key === 'zh' ? 'zh-CN' : 'en'}
                         className={`v8-lang__item${lang === l.key ? ' is-active' : ''}`}
                         onClick={() => {
-                          // 切换语言走独立语言 URL（/zh ↔ /en），由 popstate 统一更新语言状态
                           switchLang(l.key)
                           setLangOpen(false)
                         }}
@@ -261,9 +232,19 @@ export default function V8Navbar({ solid = false }) {
                 )}
               </AnimatePresence>
             </div>
-            <button type="button" className="v8-btn v8-btn--dark v8-nav__book" onClick={book}>
-              {c.getStarted?.book || nav.cta}
+
+            <button
+              type="button"
+              className="v8-nav__iconbtn"
+              onClick={book}
+              aria-label="Account"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
             </button>
+
             <button
               type="button"
               className={`v8-nav__burger${open ? ' is-open' : ''}`}
@@ -278,6 +259,7 @@ export default function V8Navbar({ solid = false }) {
         </div>
       </header>
 
+      {/* 移动端抽屉 */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -299,7 +281,7 @@ export default function V8Navbar({ solid = false }) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="v8-drawer__head">
-                <span className="v8-wordmark">V PLUS HOMES</span>
+                <span className="v8-wordmark">V&nbsp;PLUS</span>
                 <button type="button" className="v8-drawer__close" onClick={closeMenu} aria-label="close">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <path d="M6 6l12 12M18 6 6 18" />
