@@ -755,8 +755,8 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 .v8-nav__mega-item:hover { background: #f5f5f5; }
 .v8-nav__mega-img {
-  width: 100%; aspect-ratio: 16 / 10; overflow: hidden;
-  border-radius: 10px; background: #f0f0f0;
+  width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+  border-radius: 8px; background: #f0f0f0;
 }
 .v8-nav__mega-img img {
   width: 100%; height: 100%; object-fit: cover;
@@ -777,17 +777,25 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   color: var(--v8n-ink); border-bottom-color: var(--v8n-ink);
 }
 .v8-nav__mega-side {
-  width: 200px; flex: none; margin-left: 32px;
+  width: 220px; flex: none; margin-left: 40px;
   padding-left: 32px; border-left: 1px solid var(--v8n-line);
-  display: flex; flex-direction: column; gap: 12px;
+  display: flex; flex-direction: column; gap: 20px;
 }
 .v8-nav__mega-sidelink {
-  font-size: 14px; color: var(--v8n-ink-2); text-decoration: none;
-  padding: 8px 0; border-bottom: 1px solid transparent;
-  transition: color .15s, border-color .15s;
+  display: flex; flex-direction: column; gap: 4px;
+  color: var(--v8n-ink); text-decoration: none;
 }
-.v8-nav__mega-sidelink:hover {
-  color: var(--v8n-ink); border-bottom-color: var(--v8n-line);
+.v8-nav__mega-sidetitle {
+  font-size: 15px; font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s;
+  align-self: flex-start;
+}
+.v8-nav__mega-sidedesc {
+  font-size: 13px; color: var(--v8n-muted);
+}
+.v8-nav__mega-sidelink:hover .v8-nav__mega-sidetitle {
+  border-bottom-color: var(--v8n-ink);
 }
 
 /* 汉堡（桌面隐藏） */

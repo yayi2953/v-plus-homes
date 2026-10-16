@@ -168,13 +168,16 @@ export default function V8Navbar({ solid = false }) {
                       </span>
                       <span className="v8-nav__mega-side">
                         <a className="v8-nav__mega-sidelink" href="#listings" onClick={(e) => go({ href: '/listings' }, e)}>
-                          {lang === 'zh' ? '查看全部房源' : 'View All Listings'}
+                          <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '全部房源' : 'All Listings'}</span>
+                          <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '浏览广州全部精选房源' : 'Browse all curated homes'}</span>
                         </a>
                         <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
-                          {lang === 'zh' ? '预约看房' : 'Book a Viewing'}
+                          <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '预约看房' : 'Book a Viewing'}</span>
+                          <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '专属顾问带你实地看房' : 'Dedicated consultant on-site'}</span>
                         </a>
                         <a className="v8-nav__mega-sidelink" href="#extra-services" onClick={(e) => go({ href: '#extra-services' }, e)}>
-                          {lang === 'zh' ? '安家服务' : 'Relocation Services'}
+                          <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '安家服务' : 'Relocation Services'}</span>
+                          <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '签证、银行、保洁一站式' : 'Visa, banking, cleaning'}</span>
                         </a>
                       </span>
                     </span>
