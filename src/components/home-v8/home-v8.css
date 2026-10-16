@@ -660,11 +660,13 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 @media (max-width: 680px) {
   .v8-logo { height: 30px; }
 }
-/* 居中导航 */
+/* 居中导航（不能用 transform，否则 fixed 子菜单会被限制宽度） */
 .v8-nav__links {
-  position: absolute; left: 50%; transform: translateX(-50%);
-  display: flex; align-items: center; gap: 4px;
+  position: absolute; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  pointer-events: none;
 }
+.v8-nav__links > * { pointer-events: auto; }
 .v8-nav__link {
   display: inline-flex; align-items: center;
   font-size: 14px; font-weight: 500; color: var(--v8n-ink);
