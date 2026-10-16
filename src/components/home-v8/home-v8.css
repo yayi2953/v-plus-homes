@@ -760,6 +760,11 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-nav__mega-img img {
   width: 100%; height: 100%; object-fit: cover;
 }
+.v8-nav__mega-icon {
+  width: 100%; height: 100%; display: flex;
+  align-items: center; justify-content: center;
+  color: #171a20; background: #f5f5f5;
+}
 .v8-nav__mega-name {
   margin-top: 14px; font-size: 16px; font-weight: 500;
   text-align: left;

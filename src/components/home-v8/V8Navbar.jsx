@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate, switchLang } from '../../lib/router.mjs'
 import { useContact } from '../ici/contactContext.jsx'
+import { Mail, Phone, WhatsApp, WeChat } from '../ici/Icons.jsx'
 import './home-v8.css'
 
 /* 特斯拉风格导航：左 Logo + 居中菜单 + 右侧图标组 + 房源巨型下拉菜单。
@@ -18,13 +19,15 @@ const TYPE_IMAGES = {
   city: '/images/listing-studio.jpg'
 }
 
+const ICON_MAP = { mail: Mail, phone: Phone, whatsapp: WhatsApp, wechat: WeChat }
+
 export default function V8Navbar({ solid = false }) {
   const { c, lang } = useIciI18n()
   const { openContact } = useContact()
   const { nav } = c
   const residenceTypes = c.discover.types ?? []
   const menus = nav.menus.map((m) =>
-    m.subs && !m.subs[0]?.img
+    m.subs && m.subs[0]?.event
       ? { ...m, subs: residenceTypes.map((t) => ({ key: t.key, event: t.key, label: t.label, img: TYPE_IMAGES[t.key], desc: t.desc })) }
       : m
   )
@@ -88,6 +91,11 @@ export default function V8Navbar({ solid = false }) {
   }
 
   const go = (m, e) => {
+    // 外部链接（mailto / tel / http）不拦截，让浏览器默认处理
+    if (m.href && !m.href.startsWith('/') && !m.href.startsWith('#')) {
+      closeMenu()
+      return
+    }
     e?.preventDefault()
     if (m.href && m.href.startsWith('/')) {
       navigate(m.href)
@@ -151,23 +159,33 @@ export default function V8Navbar({ solid = false }) {
                   <span className="v8-nav__mega" role="menu">
                     <span className="v8-nav__mega-card">
                       <span className="v8-nav__mega-main">
-                        {m.subs.map((s) => (
-                          <a
-                            className="v8-nav__mega-item"
-                            key={s.key}
-                            href={s.event ? '#listings' : (s.href || m.href)}
-                            onClick={(e) => s.event ? pickSub(s, e) : go({ href: s.href || m.href }, e)}
-                          >
-                            <span className="v8-nav__mega-img">
-                              <img src={s.img} alt={s.label} loading="lazy" />
-                            </span>
-                            <span className="v8-nav__mega-name">{s.label}</span>
-                            {s.desc && <span className="v8-nav__mega-desc">{s.desc}</span>}
-                            <span className="v8-nav__mega-actions">
-                              <span className="v8-nav__mega-action">{lang === 'zh' ? '了解' : 'Learn'}</span>
-                            </span>
-                          </a>
-                        ))}
+                        {m.subs.map((s) => {
+                          const Icon = s.icon ? ICON_MAP[s.icon] : null
+                          const external = s.href && !s.href.startsWith('#') && !s.href.startsWith('/')
+                          return (
+                            <a
+                              className="v8-nav__mega-item"
+                              key={s.key}
+                              href={s.event ? '#listings' : (s.href || m.href)}
+                              target={external ? '_blank' : undefined}
+                              rel={external ? 'noopener noreferrer' : undefined}
+                              onClick={(e) => s.event ? pickSub(s, e) : go({ href: s.href || m.href }, e)}
+                            >
+                              <span className="v8-nav__mega-img">
+                                {Icon ? (
+                                  <span className="v8-nav__mega-icon"><Icon size={32} /></span>
+                                ) : (
+                                  <img src={s.img} alt={s.label} loading="lazy" />
+                                )}
+                              </span>
+                              <span className="v8-nav__mega-name">{s.label}</span>
+                              {(s.desc || s.value) && <span className="v8-nav__mega-desc">{s.desc || s.value}</span>}
+                              <span className="v8-nav__mega-actions">
+                                <span className="v8-nav__mega-action">{lang === 'zh' ? '了解' : 'Learn'}</span>
+                              </span>
+                            </a>
+                          )
+                        })}
                       </span>
                       <span className="v8-nav__mega-side">
                         {m.subs[0]?.event ? (
@@ -179,6 +197,21 @@ export default function V8Navbar({ solid = false }) {
                             <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
                               <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '预约看房' : 'Book a Viewing'}</span>
                               <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '专属顾问带你实地看房' : 'Dedicated consultant on-site'}</span>
+                            </a>
+                            <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
+                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '安家服务' : 'Relocation Services'}</span>
+                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '签证、银行、保洁一站式' : 'Visa, banking, cleaning'}</span>
+                            </a>
+                          </>
+                        ) : m.subs[0]?.icon ? (
+                          <>
+                            <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
+                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '预约咨询' : 'Book a Consultation'}</span>
+                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '根据需求定制服务方案' : 'Tailored service to your needs'}</span>
+                            </a>
+                            <a className="v8-nav__mega-sidelink" href="#listings" onClick={(e) => go({ href: '/listings' }, e)}>
+                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '浏览房源' : 'Browse Listings'}</span>
+                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '查看精选在售房源' : 'Explore curated homes'}</span>
                             </a>
                             <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
                               <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '安家服务' : 'Relocation Services'}</span>

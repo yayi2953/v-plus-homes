@@ -40,7 +40,16 @@ const en = {
         ]
       },
       { label: 'Renting Guide', href: '/guides' },
-      { label: 'Contact Us', href: '#get-started' }
+      {
+        label: 'Contact Us',
+        href: '#get-started',
+        subs: [
+          { key: 'email', icon: 'mail', label: 'Email', value: 'hello@v-plus.house', href: 'mailto:hello@v-plus.house' },
+          { key: 'phone', icon: 'phone', label: 'Phone', value: '+352 621780307', href: 'tel:+352621780307' },
+          { key: 'whatsapp', icon: 'whatsapp', label: 'WhatsApp', value: '+352 621780307', href: 'https://wa.me/352621780307' },
+          { key: 'wechat', icon: 'wechat', label: 'WeChat', value: 'vplus-relocation' }
+        ]
+      }
     ],
     cta: 'Enter Society'
   },
@@ -439,7 +448,16 @@ const zh = {
         ]
       },
       { label: '租房指南', href: '/guides' },
-      { label: '联系我们', href: '#get-started' }
+      {
+        label: '联系我们',
+        href: '#get-started',
+        subs: [
+          { key: 'email', icon: 'mail', label: '邮箱', value: 'hello@v-plus.house', href: 'mailto:hello@v-plus.house' },
+          { key: 'phone', icon: 'phone', label: '电话', value: '+352 621780307', href: 'tel:+352621780307' },
+          { key: 'whatsapp', icon: 'whatsapp', label: 'WhatsApp', value: '+352 621780307', href: 'https://wa.me/352621780307' },
+          { key: 'wechat', icon: 'wechat', label: '微信', value: 'vplus-relocation' }
+        ]
+      }
     ],
     cta: '加入社群'
   },
