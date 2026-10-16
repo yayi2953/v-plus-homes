@@ -669,9 +669,10 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-nav__links > * { pointer-events: auto; }
 .v8-nav__link {
   display: inline-flex; align-items: center;
+  height: 56px; padding: 0 14px;
   font-size: 14px; font-weight: 500; color: var(--v8n-ink);
   text-decoration: none; white-space: nowrap;
-  padding: 6px 14px; border-radius: 6px;
+  border-radius: 0;
   transition: background-color .2s;
 }
 .v8-nav__link:hover { background: rgba(0, 0, 0, .05); }
@@ -726,17 +727,16 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-lang__check { width: 14px; height: 14px; flex: none; opacity: 0; color: var(--v8n-ink); }
 .v8-lang__item.is-active .v8-lang__check { opacity: 1; }
 
-/* ---------- 特斯拉式巨型下拉菜单（全宽） ---------- */
+/* ---------- 特斯拉式巨型下拉菜单（全宽，贴顶无缝） ---------- */
 .v8-nav__mega {
   position: fixed; top: 56px; left: 0; right: 0;
-  padding-top: 10px;
   opacity: 0; visibility: hidden; pointer-events: none;
-  transition: opacity .2s, visibility .2s;
+  transition: opacity .15s, visibility .15s;
   z-index: 99;
 }
 .v8-nav__mega-card {
   display: flex; align-items: flex-start;
-  max-width: 1400px; margin: 0 auto; padding: 32px 40px;
+  width: 100%; padding: 32px 40px;
   background: #fff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
 }
