@@ -24,7 +24,9 @@ export default function V8Navbar({ solid = false }) {
   const { nav } = c
   const residenceTypes = c.discover.types ?? []
   const menus = nav.menus.map((m) =>
-    m.subs ? { ...m, subs: residenceTypes.map((t) => ({ key: t.key, event: t.key, label: t.label, img: TYPE_IMAGES[t.key], desc: t.desc })) } : m
+    m.subs && !m.subs[0]?.img
+      ? { ...m, subs: residenceTypes.map((t) => ({ key: t.key, event: t.key, label: t.label, img: TYPE_IMAGES[t.key], desc: t.desc })) }
+      : m
   )
   const campusOptions = c.discover.schools ?? []
   const [scrolled, setScrolled] = useState(false)
