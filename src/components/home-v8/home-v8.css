@@ -756,8 +756,8 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   transition: opacity .25s ease, visibility .25s;
   z-index: 98;
 }
-.v8-nav__links:has(.v8-nav__group:hover) .v8-nav__overlay,
-.v8-nav__links:has(.v8-nav__group:focus-within) .v8-nav__overlay {
+.v8-nav:has(.v8-nav__group:hover) ~ .v8-nav__overlay,
+.v8-nav:has(.v8-nav__group:focus-within) ~ .v8-nav__overlay {
   opacity: 1; visibility: visible;
 }
 .v8-nav__group:hover .v8-nav__mega-item,

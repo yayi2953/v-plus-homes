@@ -250,10 +250,7 @@ export default function V8Navbar({ solid = false }) {
                 </a>
               )
             )}
-            {/* 下拉菜单激活时的毛玻璃遮罩 */}
-            <span className="v8-nav__overlay" aria-hidden="true" />
           </nav>
-
           {/* 右：图标组 */}
           <div className="v8-nav__right">
             <div className="v8-lang" ref={langRef}>
@@ -332,6 +329,9 @@ export default function V8Navbar({ solid = false }) {
           </div>
         </div>
       </header>
+
+      {/* 下拉菜单激活时的毛玻璃遮罩（置于 header 外，避免 backdrop-filter 创建包含块） */}
+      <span className="v8-nav__overlay" aria-hidden="true" />
 
       {/* 移动端抽屉 */}
       <AnimatePresence>
