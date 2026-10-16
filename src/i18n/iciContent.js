@@ -30,13 +30,13 @@ const en = {
         label: 'Other Services',
         href: '#get-started',
         subs: [
-          { key: 'video', label: 'Video Viewing', img: '/images/extras/video.jpg', desc: 'Remote live property tours' },
-          { key: 'plane', label: 'Airport Pickup', img: '/images/extras/plane.jpg', desc: 'Pickup & transfer to your home' },
-          { key: 'passport', label: 'Accommodation Registration', img: '/images/extras/passport.jpg', desc: 'Temporary residence registration' },
-          { key: 'broom', label: 'House Cleaning', img: '/images/extras/broom.jpg', desc: 'Move-in & move-out deep clean' },
-          { key: 'truck', label: 'Local Moving', img: '/images/extras/truck.jpg', desc: 'Stress-free local relocation' },
-          { key: 'briefcase', label: 'Office Rental', img: '/images/extras/briefcase.jpg', desc: 'Workspace sourcing & leasing' },
-          { key: 'house', label: 'Property Buying & Selling', img: '/images/extras/house.jpg', desc: 'End-to-end property transactions' }
+          { key: 'video', label: 'Video Viewing Service', img: '/images/extras/video.jpg' },
+          { key: 'plane', label: 'Airport Pickup Service', img: '/images/extras/plane.jpg' },
+          { key: 'passport', label: 'Accommodation Registration', img: '/images/extras/passport.jpg' },
+          { key: 'broom', label: 'House Cleaning Service', img: '/images/extras/broom.jpg' },
+          { key: 'truck', label: 'Local Moving Service', img: '/images/extras/truck.jpg' },
+          { key: 'briefcase', label: 'Office Rental Service', img: '/images/extras/briefcase.jpg' },
+          { key: 'house', label: 'Property Buying & Selling', img: '/images/extras/house.jpg' }
         ]
       },
       { label: 'Renting Guide', href: '/guides' },
@@ -429,13 +429,13 @@ const zh = {
         label: '其它服务',
         href: '#get-started',
         subs: [
-          { key: 'video', label: '视频看房服务', img: '/images/extras/video.jpg', desc: '远程实景看房，省时高效' },
-          { key: 'plane', label: '机场接机服务', img: '/images/extras/plane.jpg', desc: '专人接机，直达住所' },
-          { key: 'passport', label: '住宿登记服务', img: '/images/extras/passport.jpg', desc: '协助办理临时住宿登记' },
-          { key: 'broom', label: '房屋保洁服务', img: '/images/extras/broom.jpg', desc: '入住前后深度清洁' },
-          { key: 'truck', label: '同城搬家服务', img: '/images/extras/truck.jpg', desc: '省心搬家，全程搬运' },
-          { key: 'briefcase', label: '办公室租赁', img: '/images/extras/briefcase.jpg', desc: '办公空间选址与租赁' },
-          { key: 'house', label: '房屋买卖服务', img: '/images/extras/house.jpg', desc: '房产买卖全流程服务' }
+          { key: 'video', label: '视频看房服务', img: '/images/extras/video.jpg' },
+          { key: 'plane', label: '机场接机服务', img: '/images/extras/plane.jpg' },
+          { key: 'passport', label: '住宿登记服务', img: '/images/extras/passport.jpg' },
+          { key: 'broom', label: '房屋保洁服务', img: '/images/extras/broom.jpg' },
+          { key: 'truck', label: '同城搬家服务', img: '/images/extras/truck.jpg' },
+          { key: 'briefcase', label: '办公室租赁服务', img: '/images/extras/briefcase.jpg' },
+          { key: 'house', label: '房屋买卖服务', img: '/images/extras/house.jpg' }
         ]
       },
       { label: '租房指南', href: '/guides' },
