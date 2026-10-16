@@ -140,7 +140,7 @@ export default function V8Navbar({ solid = false }) {
           {/* 中：居中导航 */}
           <nav className="v8-nav__links" aria-label="primary">
             {menus.map((m) =>
-              m.subs ? (
+              m.subs && !m.simple ? (
                 <span className="v8-nav__group" key={m.label}>
                   <a className="v8-nav__link" href={m.href} onClick={(e) => go(m, e)} aria-haspopup="true">
                     {m.label}
@@ -175,12 +175,30 @@ export default function V8Navbar({ solid = false }) {
                           <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '预约看房' : 'Book a Viewing'}</span>
                           <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '专属顾问带你实地看房' : 'Dedicated consultant on-site'}</span>
                         </a>
-                        <a className="v8-nav__mega-sidelink" href="#extra-services" onClick={(e) => go({ href: '#extra-services' }, e)}>
+                        <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
                           <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '安家服务' : 'Relocation Services'}</span>
                           <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '签证、银行、保洁一站式' : 'Visa, banking, cleaning'}</span>
                         </a>
                       </span>
                     </span>
+                  </span>
+                </span>
+              ) : m.subs && m.simple ? (
+                <span className="v8-nav__group v8-nav__group--simple" key={m.label}>
+                  <a className="v8-nav__link" href={m.href} onClick={(e) => go(m, e)} aria-haspopup="true">
+                    {m.label}
+                  </a>
+                  <span className="v8-nav__simple" role="menu">
+                    {m.subs.map((s) => (
+                      <a
+                        className="v8-nav__simple-item"
+                        key={s.label}
+                        href={s.href || m.href}
+                        onClick={(e) => go({ href: s.href || m.href }, e)}
+                      >
+                        {s.label}
+                      </a>
+                    ))}
                   </span>
                 </span>
               ) : (
@@ -320,10 +338,10 @@ export default function V8Navbar({ solid = false }) {
                       <span className="v8-drawer__subs">
                         {m.subs.map((s) => (
                           <a
-                            key={s.key}
+                            key={s.key || s.label}
                             className="v8-drawer__link v8-drawer__link--sub"
-                            href="#listings"
-                            onClick={(e) => pickSub(s, e)}
+                            href={s.href || m.href}
+                            onClick={(e) => m.simple ? go({ href: s.href || m.href }, e) : pickSub(s, e)}
                           >
                             {s.label}
                           </a>

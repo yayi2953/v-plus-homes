@@ -1,5 +1,4 @@
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
-import ExtraServices from '../ici/ExtraServices.jsx'
 import './home-v8.css'
 import { useRise } from './useRise.mjs'
 import V8Hero from './V8Hero.jsx'
@@ -25,7 +24,6 @@ export default function HomeV8() {
         <V8Stats />
         {sections.types !== false && <V8Types />}
         {sections.why !== false && <V8Process />}
-        {sections.extras !== false && <ExtraServices />}
         {sections.getstarted !== false && <V8CTA />}
         <V8Footer />
         <PreviewBadge />

@@ -26,7 +26,20 @@ const en = {
         ]
       },
       { label: 'Map Search', href: '/map' },
-      { label: 'Other Services', href: '#extra-services' },
+      {
+        label: 'Other Services',
+        href: '#get-started',
+        simple: true,
+        subs: [
+          { label: 'Video Viewing Service', href: '#get-started' },
+          { label: 'Airport Pickup Service', href: '#get-started' },
+          { label: 'Accommodation Registration', href: '#get-started' },
+          { label: 'House Cleaning Service', href: '#get-started' },
+          { label: 'Local Moving Service', href: '#get-started' },
+          { label: 'Office Rental Service', href: '#get-started' },
+          { label: 'Property Buying & Selling', href: '#get-started' }
+        ]
+      },
       { label: 'Renting Guide', href: '/guides' },
       { label: 'Contact Us', href: '#get-started' }
     ],
@@ -413,7 +426,20 @@ const zh = {
         ]
       },
       { label: '地图找房', href: '/map' },
-      { label: '其它服务', href: '#extra-services' },
+      {
+        label: '其它服务',
+        href: '#get-started',
+        simple: true,
+        subs: [
+          { label: '视频看房服务', href: '#get-started' },
+          { label: '机场接机服务', href: '#get-started' },
+          { label: '住宿登记服务', href: '#get-started' },
+          { label: '房屋保洁服务', href: '#get-started' },
+          { label: '同城搬家服务', href: '#get-started' },
+          { label: '办公室租赁服务', href: '#get-started' },
+          { label: '房屋买卖服务', href: '#get-started' }
+        ]
+      },
       { label: '租房指南', href: '/guides' },
       { label: '联系我们', href: '#get-started' }
     ],
