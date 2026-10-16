@@ -724,46 +724,68 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-lang__check { width: 14px; height: 14px; flex: none; opacity: 0; color: var(--v8n-ink); }
 .v8-lang__item.is-active .v8-lang__check { opacity: 1; }
 
-/* ---------- 特斯拉式巨型下拉菜单 ---------- */
+/* ---------- 特斯拉式巨型下拉菜单（全宽） ---------- */
 .v8-nav__mega {
-  position: absolute; top: 100%; left: 50%;
-  transform: translateX(-50%) translateY(8px);
-  padding-top: 8px;
+  position: fixed; top: 56px; left: 0; right: 0;
+  padding-top: 10px;
   opacity: 0; visibility: hidden; pointer-events: none;
-  transition: opacity .2s, transform .2s, visibility .2s;
+  transition: opacity .2s, visibility .2s;
+  z-index: 99;
 }
 .v8-nav__mega-card {
-  display: block; padding: 20px 24px;
+  display: flex; align-items: flex-start;
+  max-width: 1400px; margin: 0 auto; padding: 32px 40px;
   background: #fff;
-  border: 1px solid var(--v8n-line); border-radius: 14px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, .1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
 }
 .v8-nav__group:hover .v8-nav__mega,
 .v8-nav__group:focus-within .v8-nav__mega {
   opacity: 1; visibility: visible; pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
 }
-.v8-nav__mega-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-  min-width: 560px;
+.v8-nav__mega-main {
+  flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
 }
 .v8-nav__mega-item {
-  display: flex; flex-direction: column; align-items: center;
-  padding: 12px; border-radius: 10px;
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 16px; border-radius: 12px;
   text-decoration: none; color: var(--v8n-ink);
   transition: background-color .15s;
 }
-.v8-nav__mega-item:hover { background: rgba(0, 0, 0, .04); }
+.v8-nav__mega-item:hover { background: #f5f5f5; }
 .v8-nav__mega-img {
-  width: 100%; aspect-ratio: 4 / 3; overflow: hidden;
-  border-radius: 8px; background: #f5f5f5;
+  width: 100%; aspect-ratio: 16 / 10; overflow: hidden;
+  border-radius: 10px; background: #f0f0f0;
 }
 .v8-nav__mega-img img {
   width: 100%; height: 100%; object-fit: cover;
 }
 .v8-nav__mega-name {
-  margin-top: 10px; font-size: 14px; font-weight: 500;
-  text-align: center;
+  margin-top: 14px; font-size: 16px; font-weight: 500;
+  text-align: left;
+}
+.v8-nav__mega-actions {
+  margin-top: 8px; display: flex; gap: 16px;
+}
+.v8-nav__mega-action {
+  font-size: 13px; font-weight: 400; color: var(--v8n-ink-2);
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s, color .15s;
+}
+.v8-nav__mega-item:hover .v8-nav__mega-action {
+  color: var(--v8n-ink); border-bottom-color: var(--v8n-ink);
+}
+.v8-nav__mega-side {
+  width: 200px; flex: none; margin-left: 32px;
+  padding-left: 32px; border-left: 1px solid var(--v8n-line);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.v8-nav__mega-sidelink {
+  font-size: 14px; color: var(--v8n-ink-2); text-decoration: none;
+  padding: 8px 0; border-bottom: 1px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.v8-nav__mega-sidelink:hover {
+  color: var(--v8n-ink); border-bottom-color: var(--v8n-line);
 }
 
 /* 汉堡（桌面隐藏） */

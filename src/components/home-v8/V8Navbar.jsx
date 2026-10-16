@@ -148,7 +148,7 @@ export default function V8Navbar({ solid = false }) {
                   {/* 特斯拉式巨型下拉菜单 */}
                   <span className="v8-nav__mega" role="menu">
                     <span className="v8-nav__mega-card">
-                      <span className="v8-nav__mega-grid">
+                      <span className="v8-nav__mega-main">
                         {m.subs.map((s) => (
                           <a
                             className="v8-nav__mega-item"
@@ -160,8 +160,22 @@ export default function V8Navbar({ solid = false }) {
                               <img src={s.img} alt={s.label} loading="lazy" />
                             </span>
                             <span className="v8-nav__mega-name">{s.label}</span>
+                            <span className="v8-nav__mega-actions">
+                              <span className="v8-nav__mega-action">{lang === 'zh' ? '了解' : 'Learn'}</span>
+                            </span>
                           </a>
                         ))}
+                      </span>
+                      <span className="v8-nav__mega-side">
+                        <a className="v8-nav__mega-sidelink" href="#listings" onClick={(e) => go({ href: '/listings' }, e)}>
+                          {lang === 'zh' ? '查看全部房源' : 'View All Listings'}
+                        </a>
+                        <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
+                          {lang === 'zh' ? '预约看房' : 'Book a Viewing'}
+                        </a>
+                        <a className="v8-nav__mega-sidelink" href="#extra-services" onClick={(e) => go({ href: '#extra-services' }, e)}>
+                          {lang === 'zh' ? '安家服务' : 'Relocation Services'}
+                        </a>
                       </span>
                     </span>
                   </span>
