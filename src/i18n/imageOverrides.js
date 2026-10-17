@@ -20,14 +20,36 @@ export function collectImageOverrides(overrides) {
 function applyToElement(el, map) {
   if (!el || el.tagName !== 'IMG') return
   const tagged = el.getAttribute('data-edit-img')
-  const original = el.getAttribute('data-original-src') || el.getAttribute('src')
-  // 记录原始 src，作为替换后再次定位的 key（替换后 src 已是覆盖值）
-  if (original && !el.getAttribute('data-original-src')) {
+  const src = el.getAttribute('src')
+  let applied = el.getAttribute('data-applied-src')
+  let original = el.getAttribute('data-original-src')
+  if (!original) {
+    // 首次见到该图：当前 src 即原始值
+    if (!src) return
+    original = src
     el.setAttribute('data-original-src', original)
+  } else if (src && src !== original && src !== applied) {
+    // 应用程序合法地更换了图片（如筛选/切房）：以新 src 作为新的原始值
+    original = src
+    el.setAttribute('data-original-src', original)
+    el.removeAttribute('data-applied-src')
+    applied = null
   }
   const target = (tagged && map[tagged]) || map[original]
-  if (target && el.getAttribute('src') !== target) {
-    el.setAttribute('src', target)
+  if (target) {
+    if (src !== target) {
+      el.setAttribute('src', target)
+    }
+    if (applied !== target) {
+      el.setAttribute('data-applied-src', target)
+    }
+  } else if (applied) {
+    // 覆盖项已被移除（恢复默认）：src 仍是我们设的覆盖值时才还原，
+    // 避免误伤应用程序设置的其它 src
+    if (src === applied) {
+      el.setAttribute('src', original)
+    }
+    el.removeAttribute('data-applied-src')
   }
 }
 
