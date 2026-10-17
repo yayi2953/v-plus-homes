@@ -1,10 +1,14 @@
 {
   "v8.hero.eyebrow": {
-    "zh": "DNS测试-中文",
-    "en": "DNS Test EN"
+    "zh": "南风 · 阿里中心站",
+    "en": "Alibaba Center · Nanfeng Station"
   },
   "v8.hero.lede": {
     "zh": "广州南风站阿里中心视野开阔，是欣赏落日的理想打卡点。",
     "en": "With its expansive views, Alibaba Center · Nanfeng Station in Guangzhou is a perfect place to catch the sunset."
+  },
+  "v8.hero.title": {
+    "zh": "广州",
+    "en": "Ghuangzhou"
   }
 }
