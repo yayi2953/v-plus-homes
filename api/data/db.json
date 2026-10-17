@@ -1,5 +1,22 @@
 {
-  "users": [],
+  "users": [
+    {
+      "id": "u-mvcplhvr-gojdjy",
+      "role": "user",
+      "createdAt": 1792260449991,
+      "email": "persist-test@v-plus.house",
+      "name": "?????",
+      "password": "8fed70227689061bc04b8d9774c71ef1:4ca998af45c274157b7d5178f55fa29a7dfac2ada2865ca8e99b13e1f43995a51d3f87ed9ca00cfba0811aa0a6dbb85ce43739b76467418b49198faf6599e172"
+    },
+    {
+      "id": "u-admin",
+      "email": "admin@v-plus.house",
+      "name": "管理员",
+      "role": "admin",
+      "password": "feef761f2b3c3003b361750412dd92b9:bd2de02796611b7f119dc763b26e0932a4ba7bd4ae978149701ddb6e9e0b81b3855772bde0f67ccf53f849545151486e3ab76189790e2f494a7178e9057544bd",
+      "createdAt": 1792260450063
+    }
+  ],
   "listings": [],
   "messages": [],
   "services": [],
