@@ -136,8 +136,8 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 0;
   overflow: hidden; pointer-events: none;
 }
-/* video 自身降饱和+轻模糊作为老内核兜底，并放大避免模糊边缘露白 */
-.home-v8 .v8-hero-videobg video {
+/* 背景图自身降饱和+轻模糊作为老内核兜底，并放大避免模糊边缘露白 */
+.home-v8 .v8-hero-videobg img {
   position: absolute; top: -6%; right: -6%; bottom: -6%; left: -6%;
   width: 112%; height: 112%;
   object-fit: cover;
