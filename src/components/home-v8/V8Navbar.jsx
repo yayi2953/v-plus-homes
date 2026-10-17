@@ -131,11 +131,19 @@ export default function V8Navbar({ solid = false }) {
   const pickSub = (s, e) => {
     e?.preventDefault()
     const params = new URLSearchParams()
-    if (s.event) params.set('type', s.event)
-    if (s.key && s.key.startsWith('student')) params.set('type', 'student')
-    if (s.key && !s.key.startsWith('student') && s.key !== 'student-all') {
+    const key = typeof s.key === 'string' ? s.key : ''
+    const isStudentMenu = key === 'student' || key === 'student-all' || key.startsWith('student-')
+    if (isStudentMenu) {
+      // 学生公寓菜单：key 形如 student / student-all / student-<校区>
       params.set('type', 'student')
-      params.set('school', s.key)
+      if (key !== 'student' && key !== 'student-all') params.set('school', key)
+    } else if (s.event) {
+      // 四大类（豪华/普通/学生/城市）：event 即类型 key
+      params.set('type', s.event)
+    } else if (s.href && s.href.startsWith('/')) {
+      navigate(s.href)
+      closeMenu()
+      return
     }
     navigate(`/listings${params.toString() ? `?${params}` : ''}`)
     closeMenu()
