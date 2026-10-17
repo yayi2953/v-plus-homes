@@ -5,6 +5,7 @@ import V8Hero from './V8Hero.jsx'
 import V8Stats from './V8Stats.jsx'
 import V8Types from './V8Types.jsx'
 import V8Process from './V8Process.jsx'
+import V8Bubbles from './V8Bubbles.jsx'
 import V8CTA from './V8CTA.jsx'
 import V8Footer from './V8Footer.jsx'
 import PreviewBadge from './PreviewBadge.jsx'
@@ -23,7 +24,7 @@ export default function HomeV8() {
         {sections.hero !== false && <V8Hero />}
         <V8Stats />
         {sections.types !== false && <V8Types />}
-        {sections.why !== false && <V8Process />}
+        {sections.bubbles !== false && <V8Bubbles />}
         {sections.getstarted !== false && <V8CTA />}
         <V8Footer />
         <PreviewBadge />
