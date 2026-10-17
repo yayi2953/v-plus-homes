@@ -36,5 +36,9 @@
   "v8.hero.s3Title": {
     "zh": "广州",
     "en": "Guangzhou"
+  },
+  "v8.hero.s3Eyebrow": {
+    "zh": "云台花园",
+    "en": "Yuntai Garden"
   }
 }
