@@ -202,8 +202,14 @@ export default function V8Bubbles() {
   }, [])
 
   return (
-    <div ref={wrapRef} className="v8-bubbles__wrap">
-      <canvas ref={canvasRef} className="v8-bubbles__canvas" />
+    <div className="v8-bubbles">
+      <div className="v8-bubbles__head">
+        <p className="v8-eyebrow">CUSTOMER VOICES</p>
+        <h2 className="v8-h-sec" style={{ marginTop: 12 }}>来自全球客户的真实留言</h2>
+      </div>
+      <div ref={wrapRef} className="v8-bubbles__wrap">
+        <canvas ref={canvasRef} className="v8-bubbles__canvas" />
+      </div>
     </div>
   )
 }
