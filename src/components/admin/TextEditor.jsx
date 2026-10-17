@@ -1,27 +1,36 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { iciContent } from '../../i18n/iciContent.js'
 import { flattenTexts } from '../../i18n/flatten.js'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 
 /**
- * 文案管理：展示所有可编辑文案（中英双语），支持搜索、编辑、保存。
- * 数据源：默认文案来自 iciContent，覆盖项来自 /api/admin/texts。
+ * 可视化文案编辑器：
+ * - iframe 嵌入首页（?edit=1）
+ * - 点击页面中的文字 → 弹出编辑框
+ * - 保存后实时同步到 iframe
  */
 export default function TextEditor({ authFetch }) {
   const { lang, reloadTexts } = useIciI18n()
   const zh = lang === 'zh'
   const t = (z, e) => (zh ? z : e)
 
-  // 默认文案（从 iciContent 扁平化）
   const defaults = useMemo(() => flattenTexts(iciContent.zh, iciContent.en), [])
-
   const [overrides, setOverrides] = useState({})
-  const [search, setSearch] = useState('')
-  const [editingKey, setEditingKey] = useState(null)
+  const [clickInfo, setClickInfo] = useState(null) // { text, keys }
+  const [selectedKey, setSelectedKey] = useState('')
   const [editZh, setEditZh] = useState('')
   const [editEn, setEditEn] = useState('')
   const [saving, setSaving] = useState(false)
-  const [onlyOverridden, setOnlyOverridden] = useState(false)
+  const iframeRef = useRef(null)
+
+  // 合并默认 + 覆盖
+  const allTexts = useMemo(() => {
+    const merged = { ...defaults }
+    for (const [key, val] of Object.entries(overrides)) {
+      merged[key] = { ...(merged[key] || {}), ...val }
+    }
+    return merged
+  }, [defaults, overrides])
 
   useEffect(() => { loadOverrides() }, [])
 
@@ -33,129 +42,120 @@ export default function TextEditor({ authFetch }) {
     }
   }
 
-  // 合并默认文案 + 覆盖项
-  const allTexts = useMemo(() => {
-    const merged = {}
-    for (const [key, val] of Object.entries(defaults)) {
-      merged[key] = { ...val }
+  // 监听 iframe 的 postMessage
+  useEffect(() => {
+    function onMessage(e) {
+      if (e.data?.type !== 'EDIT_TEXT') return
+      const { text, keys } = e.data
+      if (!keys || keys.length === 0) return
+      setClickInfo({ text, keys })
+      // 默认选第一个 key
+      const key = keys[0]
+      setSelectedKey(key)
+      const val = allTexts[key] || {}
+      setEditZh(val.zh || '')
+      setEditEn(val.en || '')
     }
-    for (const [key, val] of Object.entries(overrides)) {
-      if (merged[key]) {
-        merged[key] = { ...merged[key], ...val }
-      } else {
-        merged[key] = { zh: val.zh || '', en: val.en || '' }
-      }
-    }
-    return merged
-  }, [defaults, overrides])
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [allTexts])
 
-  // 过滤：搜索 + 只看已覆盖
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    return Object.entries(allTexts).filter(([key, val]) => {
-      if (onlyOverridden && !overrides[key]) return false
-      if (!q) return true
-      return key.toLowerCase().includes(q)
-        || (val.zh || '').toLowerCase().includes(q)
-        || (val.en || '').toLowerCase().includes(q)
-    })
-  }, [allTexts, search, overrides, onlyOverridden])
-
-  function startEdit(key) {
-    const val = allTexts[key]
-    setEditingKey(key)
+  function switchKey(key) {
+    setSelectedKey(key)
+    const val = allTexts[key] || {}
     setEditZh(val.zh || '')
     setEditEn(val.en || '')
   }
 
   async function saveEdit() {
-    if (!editingKey) return
+    if (!selectedKey) return
     setSaving(true)
     const res = await authFetch('/api/admin/texts', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: editingKey, zh: editZh, en: editEn })
+      body: JSON.stringify({ key: selectedKey, zh: editZh, en: editEn })
     })
     if (res.ok) {
-      setOverrides((prev) => ({ ...prev, [editingKey]: { zh: editZh, en: editEn } }))
-      setEditingKey(null)
-      // 通知前端刷新文案
+      setOverrides((prev) => ({ ...prev, [selectedKey]: { zh: editZh, en: editEn } }))
+      // 通知 iframe 更新 DOM
+      iframeRef.current?.contentWindow?.postMessage({
+        type: 'TEXT_UPDATED',
+        key: selectedKey,
+        zh: editZh,
+        en: editEn
+      }, '*')
+      setClickInfo(null)
       reloadTexts()
     }
     setSaving(false)
   }
 
-  async function resetKey(key) {
+  async function resetKey() {
+    if (!selectedKey) return
     if (!confirm(t('恢复该文案为默认值？', 'Reset this text to default?'))) return
     const res = await authFetch('/api/admin/texts', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key })
+      body: JSON.stringify({ key: selectedKey })
     })
     if (res.ok) {
       setOverrides((prev) => {
         const next = { ...prev }
-        delete next[key]
+        delete next[selectedKey]
         return next
       })
+      // 恢复默认值到 iframe
+      const val = defaults[selectedKey] || {}
+      iframeRef.current?.contentWindow?.postMessage({
+        type: 'TEXT_UPDATED',
+        key: selectedKey,
+        zh: val.zh || '',
+        en: val.en || ''
+      }, '*')
+      setClickInfo(null)
       reloadTexts()
     }
   }
 
   return (
-    <div className="v8-admin__panel">
+    <div className="v8-admin__panel v8-admin__visual">
       <div className="v8-admin__texts-head">
-        <h2>{t('文案管理', 'Content Management')} ({filtered.length})</h2>
+        <h2>{t('可视化编辑', 'Visual Editor')}</h2>
         <div className="v8-admin__texts-tools">
-          <input
-            className="v8-admin__search"
-            placeholder={t('搜索文案...', 'Search texts...')}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <label className="v8-admin__check">
-            <input type="checkbox" checked={onlyOverridden} onChange={(e) => setOnlyOverridden(e.target.checked)} />
-            {t('仅显示已修改', 'Only modified')}
-          </label>
+          <span className="v8-admin__hint">{t('点击页面中的文字即可编辑', 'Click any text on the page to edit')}</span>
         </div>
       </div>
 
-      <div className="v8-admin__texts-table">
-        <table className="v8-admin__table">
-          <thead>
-            <tr>
-              <th style={{ width: '30%' }}>{t('键名', 'Key')}</th>
-              <th style={{ width: '32%' }}>{t('中文', 'Chinese')}</th>
-              <th style={{ width: '32%' }}>{t('英文', 'English')}</th>
-              <th style={{ width: '6%' }}>{t('操作', 'Actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(([key, val]) => {
-              const isOverridden = !!overrides[key]
-              return (
-                <tr key={key} className={isOverridden ? 'is-modified' : ''}>
-                  <td className="v8-admin__text-key" title={key}>{key}</td>
-                  <td>{val.zh || '-'}</td>
-                  <td>{val.en || '-'}</td>
-                  <td>
-                    <button className="v8-admin__link" onClick={() => startEdit(key)}>{t('编辑', 'Edit')}</button>
-                    {isOverridden && (
-                      <button className="v8-admin__link v8-admin__link--danger" onClick={() => resetKey(key)}>{t('重置', 'Reset')}</button>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+      <div className="v8-admin__iframe-wrap">
+        <iframe
+          ref={iframeRef}
+          src="/?edit=1"
+          className="v8-admin__iframe"
+          title="preview"
+        />
       </div>
 
-      {editingKey && (
-        <div className="v8-admin__modal" onClick={() => setEditingKey(null)}>
+      {clickInfo && (
+        <div className="v8-admin__modal" onClick={() => setClickInfo(null)}>
           <div className="v8-admin__modal-box" onClick={(e) => e.stopPropagation()}>
             <h3>{t('编辑文案', 'Edit Text')}</h3>
-            <p className="v8-admin__text-key-full">{editingKey}</p>
+            <p className="v8-admin__text-clicked">
+              {t('选中文字：', 'Selected: ')}<strong>{clickInfo.text}</strong>
+            </p>
+
+            {clickInfo.keys.length > 1 && (
+              <label>
+                {t('该文字出现在多个位置，请选择要编辑的项：', 'This text appears in multiple places, select which to edit:')}
+                <select value={selectedKey} onChange={(e) => switchKey(e.target.value)}>
+                  {clickInfo.keys.map((k) => (
+                    <option key={k} value={k}>{k}</option>
+                  ))}
+                </select>
+              </label>
+            )}
+
+            <p className="v8-admin__text-key-full">{selectedKey}</p>
+
             <label>
               {t('中文', 'Chinese')}
               <textarea value={editZh} onChange={(e) => setEditZh(e.target.value)} rows={3} />
@@ -168,7 +168,12 @@ export default function TextEditor({ authFetch }) {
               <button className="v8-admin__btn" onClick={saveEdit} disabled={saving}>
                 {saving ? t('保存中...', 'Saving...') : t('保存', 'Save')}
               </button>
-              <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => setEditingKey(null)}>
+              {overrides[selectedKey] && (
+                <button className="v8-admin__btn v8-admin__btn--ghost" onClick={resetKey}>
+                  {t('恢复默认', 'Reset')}
+                </button>
+              )}
+              <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => setClickInfo(null)}>
                 {t('取消', 'Cancel')}
               </button>
             </div>

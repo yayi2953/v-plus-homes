@@ -7,6 +7,7 @@ import { readRoute, syncRouter } from './lib/router.mjs'
 import FloatingActions from './components/ici/FloatingActions.jsx'
 import PropertyDetail from './components/ici/PropertyDetail.jsx'
 import TypePicker from './components/ici/TypePicker.jsx'
+import EditMode from './components/ici/EditMode.jsx'
 
 // v8 首页与专属导航独立 chunk
 const HomeV8 = lazy(() => import('./components/home-v8/HomeV8.jsx'))
@@ -89,6 +90,7 @@ function Site() {
           <FloatingActions />
           <PropertyDetail />
           <TypePicker />
+          <EditMode />
         </>
       )}
     </div>
