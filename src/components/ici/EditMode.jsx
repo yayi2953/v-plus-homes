@@ -46,7 +46,10 @@ export default function EditMode() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    if (params.get('edit') !== '1') return
+    if (params.get('edit') !== '1' && !window.__EDIT_MODE__) return
+
+    // 设置全局标记，让 router 跳转时保留编辑模式
+    window.__EDIT_MODE__ = true
 
     let highlighted = null
     const highlightStyle = document.createElement('style')
@@ -111,7 +114,23 @@ export default function EditMode() {
       }
     }
 
+    function isInteractive(el) {
+      // 检查元素是否是链接、按钮或表单元素（这些应该允许正常交互）
+      let node = el
+      while (node && node !== document.body) {
+        const tag = node.tagName
+        if (tag === 'A' || tag === 'BUTTON' || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') {
+          return true
+        }
+        node = node.parentElement
+      }
+      return false
+    }
+
     function onClick(e) {
+      // 如果点击的是链接/按钮/表单元素，允许正常跳转，不拦截
+      if (isInteractive(e.target)) return
+
       const found = findEditableAncestor(e.target)
       if (!found) return
       e.preventDefault()

@@ -86,7 +86,9 @@ export function navigate(path, { replace = false } = {}) {
   syncRouter(window.location.pathname)
   const target = withPrefix(path)
   if (window.location.pathname === target) return
-  window.history[replace ? 'replaceState' : 'pushState']({}, '', target)
+  // 可视化编辑模式下保留 ?edit=1 参数，使编辑模式在页面跳转后仍生效
+  const editParam = window.__EDIT_MODE__ ? '?edit=1' : ''
+  window.history[replace ? 'replaceState' : 'pushState']({}, '', target + editParam)
   syncRouter(target)
   window.dispatchEvent(new PopStateEvent('popstate'))
 }
