@@ -61,10 +61,13 @@ export default function TextEditor({ authFetch }) {
   const [imgDevice, setImgDevice] = useState('desktop') // 'desktop' | 'mobile'
   const [imgPosD, setImgPosD] = useState({ x: 50, y: 50 })
   const [imgPosM, setImgPosM] = useState({ x: 50, y: 50 })
+  const [imgZoomD, setImgZoomD] = useState(1)
+  const [imgZoomM, setImgZoomM] = useState(1)
   const [imgFrame, setImgFrame] = useState({ w: 16, h: 9 }) // 桌面显示框宽高比
   const [fileObjUrl, setFileObjUrl] = useState('')
   const [imgDragging, setImgDragging] = useState(false)
   const dragRef = useRef(null)
+  const frameRef = useRef(null)
   const iframeRef = useRef(null)
 
   // 合并默认 + 覆盖
@@ -106,6 +109,8 @@ export default function TextEditor({ authFetch }) {
           x: Number.isFinite(Number(saved.posXm)) ? Number(saved.posXm) : dx,
           y: Number.isFinite(Number(saved.posYm)) ? Number(saved.posYm) : dy
         })
+        setImgZoomD(Number.isFinite(Number(saved.scale)) ? Number(saved.scale) : 1)
+        setImgZoomM(Number.isFinite(Number(saved.scaleM)) ? Number(saved.scaleM) : (Number.isFinite(Number(saved.scale)) ? Number(saved.scale) : 1))
         setImgDevice('desktop')
         setFileObjUrl('')
         setImgFrame(w > 0 && h > 0 ? { w, h } : { w: 16, h: 9 })
@@ -200,8 +205,24 @@ export default function TextEditor({ authFetch }) {
   // 预览框拖动：移动图片选择展示区域（按当前设备 Tab 分别记录）
   const imgPos = imgDevice === 'mobile' ? imgPosM : imgPosD
   const setImgPos = imgDevice === 'mobile' ? setImgPosM : setImgPosD
+  const imgZoom = imgDevice === 'mobile' ? imgZoomM : imgZoomD
+  const setImgZoom = imgDevice === 'mobile' ? setImgZoomM : setImgZoomD
   // 手机端预览用竖屏比例（真实手机展示框因屏幕而异，4:5 为通用近似）
   const frame = imgDevice === 'mobile' ? { w: 4, h: 5 } : imgFrame
+
+  // 滚轮缩放：原生非被动监听才能 preventDefault 阻止弹窗背景滚动
+  useEffect(() => {
+    const el = frameRef.current
+    if (!el || !imgInfo) return
+    const onWheel = (e) => {
+      e.preventDefault()
+      const dir = e.deltaY > 0 ? -0.1 : 0.1
+      const setter = imgDevice === 'mobile' ? setImgZoomM : setImgZoomD
+      setter((z) => Math.round(Math.min(3, Math.max(1, z + dir)) * 10) / 10)
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [imgInfo, imgDevice])
 
   function onFramePointerDown(e) {
     const rect = e.currentTarget.getBoundingClientRect()
@@ -275,8 +296,8 @@ export default function TextEditor({ authFetch }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           key: `img:${imgInfo.imgKey}`, url,
-          posX: imgPosD.x, posY: imgPosD.y,
-          posXm: imgPosM.x, posYm: imgPosM.y
+          posX: imgPosD.x, posY: imgPosD.y, scale: imgZoomD,
+          posXm: imgPosM.x, posYm: imgPosM.y, scaleM: imgZoomM
         })
       })
       if (!res.ok) {
@@ -286,7 +307,10 @@ export default function TextEditor({ authFetch }) {
       }
       setOverrides((prev) => ({
         ...prev,
-        [`img:${imgInfo.imgKey}`]: { url, posX: imgPosD.x, posY: imgPosD.y, posXm: imgPosM.x, posYm: imgPosM.y }
+        [`img:${imgInfo.imgKey}`]: {
+          url, posX: imgPosD.x, posY: imgPosD.y, scale: imgZoomD,
+          posXm: imgPosM.x, posYm: imgPosM.y, scaleM: imgZoomM
+        }
       }))
       if (fileInput) fileInput.value = ''
       iframeRef.current?.contentWindow?.postMessage({ type: 'IMG_UPDATED' }, '*')
@@ -424,8 +448,9 @@ export default function TextEditor({ authFetch }) {
               </span>
             </div>
 
-            {/* 交互预览框：按真实显示比例，拖动图片自定义展示位置 */}
+            {/* 交互预览框：按真实显示比例，拖动定位 + 滚轮缩放 */}
             <div
+              ref={frameRef}
               style={{
                 position: 'relative',
                 overflow: 'hidden',
@@ -443,6 +468,7 @@ export default function TextEditor({ authFetch }) {
               onPointerMove={onFramePointerMove}
               onPointerUp={onFramePointerUp}
               onPointerCancel={onFramePointerUp}
+              onDoubleClick={() => setImgZoom(1)}
             >
               {imgPreviewSrc ? (
                 <img
@@ -454,6 +480,8 @@ export default function TextEditor({ authFetch }) {
                     width: '100%', height: '100%',
                     objectFit: 'cover',
                     objectPosition: `${imgPos.x}% ${imgPos.y}%`,
+                    transform: imgZoom > 1.001 ? `scale(${imgZoom})` : undefined,
+                    transformOrigin: `${imgPos.x}% ${imgPos.y}%`,
                     userSelect: 'none', pointerEvents: 'none'
                   }}
                 />
@@ -468,8 +496,18 @@ export default function TextEditor({ authFetch }) {
                 fontSize: 11, padding: '2px 8px', borderRadius: 4,
                 pointerEvents: 'none'
               }}>
-                {t('拖动图片调整展示位置', 'Drag to adjust image position')}
+                {t('拖动调整位置 · 滚轮缩放 · 双击复位缩放', 'Drag to position · Scroll to zoom · Double-click to reset zoom')}
               </span>
+              {imgZoom > 1.001 && (
+                <span style={{
+                  position: 'absolute', right: 8, bottom: 8,
+                  background: 'rgba(0,0,0,.55)', color: '#fff',
+                  fontSize: 11, padding: '2px 8px', borderRadius: 4,
+                  pointerEvents: 'none'
+                }}>
+                  {Math.round(imgZoom * 100)}%
+                </span>
+              )}
             </div>
 
             <label>

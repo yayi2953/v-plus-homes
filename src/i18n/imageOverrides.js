@@ -5,12 +5,17 @@
 //   2) 原始 src 路径 —— 如 "/images/hero-cityscape.jpg"，未声明的图片按 src 匹配
 // React 重渲染会把 src 重置回原值，所以用 MutationObserver 持续再应用。
 
-// 从 i18n overrides 中提取图片覆盖映射：{ 图片标识: { url, posX, posY, posXm?, posYm? } }
+// 从 i18n overrides 中提取图片覆盖映射：
+// { 图片标识: { url, posX, posY, scale, posXm?, posYm?, scaleM? } }
 export function collectImageOverrides(overrides) {
   const map = {}
   const pct = (v, d) => {
     const n = Number(v)
     return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : d
+  }
+  const zoom = (v, d) => {
+    const n = Number(v)
+    return Number.isFinite(n) ? Math.min(3, Math.max(1, n)) : d
   }
   for (const [key, val] of Object.entries(overrides || {})) {
     if (!key.startsWith('img:')) continue
@@ -19,8 +24,10 @@ export function collectImageOverrides(overrides) {
         url: val.url,
         posX: pct(val.posX, 50),
         posY: pct(val.posY, 50),
+        scale: zoom(val.scale, 1),
         posXm: val.posXm != null ? pct(val.posXm, null) : null,
-        posYm: val.posYm != null ? pct(val.posYm, null) : null
+        posYm: val.posYm != null ? pct(val.posYm, null) : null,
+        scaleM: val.scaleM != null ? zoom(val.scaleM, null) : null
       }
     }
   }
@@ -37,6 +44,13 @@ function pickPos(target) {
     return { x: target.posXm, y: target.posYm }
   }
   return { x: target.posX, y: target.posY }
+}
+
+function pickScale(target) {
+  if (mqMobile && mqMobile.matches && target.scaleM != null) {
+    return target.scaleM
+  }
+  return target.scale
 }
 
 function applyToElement(el, map) {
@@ -65,9 +79,18 @@ function applyToElement(el, map) {
     if (applied !== target.url) {
       el.setAttribute('data-applied-src', target.url)
     }
-    // 自定义展示位置（object-position 百分比，手机端可独立设定）
+    // 自定义展示位置与缩放（object-position 百分比 + transform scale，手机端可独立设定）
     const pos = pickPos(target)
+    const z = pickScale(target)
     el.style.objectPosition = `${pos.x}% ${pos.y}%`
+    if (z && z > 1.001) {
+      // 以焦点（object-position 对应点）为缩放原点，放大不跑偏
+      el.style.transform = `scale(${z})`
+      el.style.transformOrigin = `${pos.x}% ${pos.y}%`
+    } else {
+      el.style.transform = ''
+      el.style.transformOrigin = ''
+    }
   } else if (applied) {
     // 覆盖项已被移除（恢复默认）：src 仍是我们设的覆盖值时才还原，
     // 避免误伤应用程序设置的其它 src
@@ -76,6 +99,8 @@ function applyToElement(el, map) {
     }
     el.removeAttribute('data-applied-src')
     el.style.objectPosition = ''
+    el.style.transform = ''
+    el.style.transformOrigin = ''
   }
 }
 

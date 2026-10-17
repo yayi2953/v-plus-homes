@@ -239,17 +239,19 @@ async function adminTexts(req, res) {
     return res.status(200).json({ texts: await getTexts() })
   }
   if (req.method === 'PUT') {
-    const { key, zh, en, url, posX, posY, posXm, posYm } = req.body || {}
+    const { key, zh, en, url, posX, posY, posXm, posYm, scale, scaleM } = req.body || {}
     if (!key) return res.status(400).json({ error: '缺少 key' })
     try {
-      // 图片覆盖项：值形如 { url, posX?, posY?, posXm?, posYm? }；文案覆盖项：{ zh, en }
+      // 图片覆盖项：值形如 { url, posX?, posY?, scale?, posXm?, posYm?, scaleM? }；文案覆盖项：{ zh, en }
       let value
       if (url !== undefined) {
         value = { url }
         if (Number.isFinite(Number(posX))) value.posX = Number(posX)
         if (Number.isFinite(Number(posY))) value.posY = Number(posY)
+        if (Number.isFinite(Number(scale))) value.scale = Math.min(3, Math.max(1, Number(scale)))
         if (Number.isFinite(Number(posXm))) value.posXm = Number(posXm)
         if (Number.isFinite(Number(posYm))) value.posYm = Number(posYm)
+        if (Number.isFinite(Number(scaleM))) value.scaleM = Math.min(3, Math.max(1, Number(scaleM)))
       } else {
         value = { zh, en }
       }
