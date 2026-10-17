@@ -193,15 +193,19 @@ export default function V8Bubbles() {
   }, [])
 
   return (
-    <div className="v8-bubbles">
-      <div className="v8-bubbles__head">
-        <p className="v8-eyebrow">CUSTOMER VOICES</p>
-        <h2 className="v8-h-sec" style={{ marginTop: 12 }}>来自全球客户的真实留言</h2>
+    <section className="v8-section" id="messages">
+      <div className="v8-wrap">
+        <div className="v8-bubbles v8-rise">
+          <div className="v8-bubbles__head">
+            <p className="v8-eyebrow">CUSTOMER VOICES</p>
+            <h2 className="v8-h-sec" style={{ marginTop: 12 }}>来自全球客户的真实留言</h2>
+          </div>
+          <div ref={wrapRef} className="v8-bubbles__wrap">
+            <canvas ref={canvasRef} className="v8-bubbles__canvas" />
+          </div>
+        </div>
       </div>
-      <div ref={wrapRef} className="v8-bubbles__wrap">
-        <canvas ref={canvasRef} className="v8-bubbles__canvas" />
-      </div>
-    </div>
+    </section>
   )
 }
 
