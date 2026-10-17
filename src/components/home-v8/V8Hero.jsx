@@ -25,6 +25,8 @@ export default function V8Hero() {
         </div>
       </div>
       <div className="v8-hero-body">
+        <p className="v8-eyebrow">{t.eyebrow}</p>
+        <p className="v8-lede">{t.lede}</p>
         <div className="v8-hero-cta">
           <button type="button" className="v8-tlink" onClick={openContact}>
             {t.whatsapp}
