@@ -1,28 +1,62 @@
+import { useState, useCallback } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useContact } from '../ici/contactContext.jsx'
 
-// 首屏静态背景图
-const BG_IMAGE_SRC = '/images/hero-cityscape.jpg'
+// 首屏轮播背景图
+const BG_IMAGES = [
+  '/images/hero-cityscape.jpg',
+  '/images/dream-slide-pool.jpg',
+  '/images/dream-slide-lake2.jpg'
+]
 
 export default function V8Hero() {
   const { c } = useIciI18n()
   const { openContact } = useContact()
+  const [idx, setIdx] = useState(0)
+
+  const prev = useCallback(() => {
+    setIdx((i) => (i - 1 + BG_IMAGES.length) % BG_IMAGES.length)
+  }, [])
+
+  const next = useCallback(() => {
+    setIdx((i) => (i + 1) % BG_IMAGES.length)
+  }, [])
 
   const t = c.v8?.hero || {}
 
   return (
     <section className="v8-hero" id="top">
       <div className="v8-hero-canvas">
-        {/* 静态背景图 */}
+        {/* 轮播背景图 */}
         <div className="v8-hero-videobg" aria-hidden="true">
-          <img src={BG_IMAGE_SRC} alt="" />
+          {BG_IMAGES.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              className={`v8-hero-slide${i === idx ? ' is-active' : ''}`}
+            />
+          ))}
         </div>
-        {/* 图片上的文字层：居中白色，小标题 + 大粗体标题 + 副标题 */}
+
+        {/* 图片上的文字层：上半部分居中白色 */}
         <div className="v8-hero-overlay">
           <p className="v8-hero-overlay__eyebrow">{t.eyebrow}</p>
           <h1 className="v8-hero-overlay__title">V&nbsp;PLUS</h1>
           <p className="v8-hero-overlay__sub">{t.lede}</p>
         </div>
+
+        {/* 左右切换箭头 */}
+        <button type="button" className="v8-hero-arrow v8-hero-arrow--prev" onClick={prev} aria-label="上一张">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+        </button>
+        <button type="button" className="v8-hero-arrow v8-hero-arrow--next" onClick={next} aria-label="下一张">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
       </div>
       <div className="v8-hero-body">
         <p className="v8-eyebrow">{t.eyebrow}</p>

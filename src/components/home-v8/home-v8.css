@@ -141,10 +141,44 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   position: absolute; top: 0; right: 0; bottom: 0; left: 0;
   width: 100%; height: 100%;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+.home-v8 .v8-hero-videobg img.v8-hero-slide.is-active {
+  opacity: 1;
 }
 .home-v8 .v8-hero-videobg::after {
   content: none;
 }
+/* 左右切换箭头：默认透明背景，hover 时浅灰半透明 */
+.home-v8 .v8-hero-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background-color .25s ease, transform .25s ease;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+}
+.home-v8 .v8-hero-arrow svg {
+  width: 22px; height: 22px;
+}
+.home-v8 .v8-hero-arrow:hover {
+  background: rgba(255, 255, 255, .25);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.home-v8 .v8-hero-arrow:active {
+  transform: translateY(-50%) scale(.92);
+}
+.home-v8 .v8-hero-arrow--prev { left: 20px; }
+.home-v8 .v8-hero-arrow--next { right: 20px; }
 /* Hero 图片文字层：上半部分居中白色，小标题 + 大粗体标题 + 副标题 */
 .home-v8 .v8-hero-overlay {
   position: absolute;
