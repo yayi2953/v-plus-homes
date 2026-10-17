@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext.jsx'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate, switchLang } from '../../lib/router.mjs'
+import CaptchaImage from './CaptchaImage.jsx'
 import './auth.css'
 
 const STEPS = 3
@@ -121,7 +122,7 @@ export default function RegisterPage() {
               <label>
                 <span className="v8-auth__field-label">{t('验证码', 'Verification code')}</span>
                 <div className="v8-auth__captcha">
-                  <span className="v8-auth__captcha-text">{captcha}</span>
+                  <CaptchaImage code={captcha} width={120} height={40} />
                   <button type="button" className="v8-auth__captcha-refresh" aria-label="refresh" onClick={refreshCaptcha}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
                   </button>

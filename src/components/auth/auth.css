@@ -188,7 +188,7 @@
   color: var(--ts-pewter);
 }
 
-/* ---------- 验证码框 ---------- */
+/* ---------- 验证码（图片） ---------- */
 .v8-auth__captcha {
   display: flex;
   align-items: center;
@@ -196,17 +196,16 @@
   background: var(--ts-ash);
   border: 1px solid transparent;
   border-radius: 4px;
-  padding: 0 12px;
+  padding: 0 6px 0 0;
   height: 40px;
-  gap: 10px;
+  gap: 8px;
+  overflow: hidden;
 }
-.v8-auth__captcha-text {
-  font-family: "Courier New", monospace;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: var(--ts-carbon);
-  user-select: none;
+.v8-auth__captcha-img {
+  display: block;
+  flex: none;
+  height: 40px;
+  border-radius: 4px 0 0 4px;
 }
 .v8-auth__captcha-refresh {
   background: none;
