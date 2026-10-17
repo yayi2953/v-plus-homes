@@ -1,20 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useContact } from '../ici/contactContext.jsx'
-import { useFinder } from './finderContext.jsx'
-import { navigate } from '../../lib/router.mjs'
-import V8Finder from './V8Finder.jsx'
-
-// 点击「帮我找房」：带着当前筛选条件跳转到房源结果页
-function goToListings(f) {
-  const params = new URLSearchParams()
-  if (f.district && f.district !== 'all') params.set('district', f.district)
-  if (f.beds != null) params.set('beds', String(f.beds))
-  if (f.budget != null) params.set('budget', String(f.budget))
-  if (f.type) params.set('type', f.type)
-  if (f.school) params.set('school', f.school.key)
-  navigate(`/listings${params.toString() ? `?${params}` : ''}`)
-}
 
 // 首屏氛围背景视频（静音自动循环，仅作找房条的柔和背景）
 const BG_VIDEO_SRC = '/videos/hero-intro.mp4'
@@ -24,7 +10,6 @@ const BG_VIDEO_POSTER = '/images/dream-slide-pool.jpg'
 export default function V8Hero() {
   const { c } = useIciI18n()
   const { openContact } = useContact()
-  const f = useFinder()
   const videoRef = useRef(null)
 
   useEffect(() => {
@@ -112,21 +97,6 @@ export default function V8Hero() {
             loop
             playsInline
             preload="auto"
-          />
-        </div>
-
-        {/* 真实可交互的一句话找房，直接居中于舞台 */}
-        <div className="v8-hero-finder">
-          <V8Finder
-            district={f.district}
-            beds={f.beds}
-            budget={f.budget}
-            type={f.type}
-            count={f.items.length}
-            filtered={f.filtering}
-            onChange={f.patch}
-            onReset={f.reset}
-            onConfirm={() => goToListings(f)}
           />
         </div>
       </div>
