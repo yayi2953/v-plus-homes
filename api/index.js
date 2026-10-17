@@ -1,5 +1,6 @@
 import { sign, verify, hashPassword, verifyPassword } from './lib/auth.js'
 import {
+  initDb,
   getUsers, getListings, getMessages,
   findUserByEmail, createUser,
   createListing, updateListing, deleteListing,
@@ -25,6 +26,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    // 预热：从 GitHub 加载数据库到内存（后续读接口走缓存）
+    await initDb()
+
     // ---------- Auth ----------
     if (rel === '/auth/register' && req.method === 'POST') {
       return register(req, res)
@@ -106,7 +110,7 @@ async function register(req, res) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: '邮箱格式不正确' })
   if (findUserByEmail(email)) return res.status(409).json({ error: '该邮箱已注册' })
 
-  const user = createUser({
+  const user = await createUser({
     email: email.trim().toLowerCase(),
     name: (name || email.split('@')[0]).trim(),
     password: hashPassword(password)
@@ -139,19 +143,20 @@ async function adminListings(req, res) {
     for (const f of ['title', 'type', 'price', 'city']) {
       if (!data[f]) return res.status(400).json({ error: `缺少字段: ${f}` })
     }
-    return res.status(201).json({ listing: createListing(data) })
+    return res.status(201).json({ listing: await createListing(data) })
   }
   if (req.method === 'PUT') {
     const { id, ...fields } = req.body || {}
     if (!id) return res.status(400).json({ error: '缺少 id' })
-    const listing = updateListing(id, fields)
+    const listing = await updateListing(id, fields)
     if (!listing) return res.status(404).json({ error: '房源不存在' })
     return res.status(200).json({ listing })
   }
   if (req.method === 'DELETE') {
     const id = req.body?.id || req.query?.id
     if (!id) return res.status(400).json({ error: '缺少 id' })
-    return res.status(deleteListing(id) ? 200 : 404).json({ ok: !!deleteListing(id) })
+    const ok = await deleteListing(id)
+    return res.status(ok ? 200 : 404).json({ ok })
   }
   return res.status(405).json({ error: 'Method not allowed' })
 }
@@ -170,7 +175,7 @@ async function adminMessages(req, res) {
   if (req.method === 'PUT') {
     const { id, action } = req.body || {}
     if (action === 'read' && id) {
-      const msg = markMessageRead(id)
+      const msg = await markMessageRead(id)
       return res.status(msg ? 200 : 404).json({ ok: !!msg })
     }
     return res.status(400).json({ error: '无效操作' })
@@ -178,7 +183,8 @@ async function adminMessages(req, res) {
   if (req.method === 'DELETE') {
     const id = req.body?.id || req.query?.id
     if (!id) return res.status(400).json({ error: '缺少 id' })
-    return res.status(deleteMessage(id) ? 200 : 404).json({ ok: !!deleteMessage(id) })
+    const ok = await deleteMessage(id)
+    return res.status(ok ? 200 : 404).json({ ok })
   }
   return res.status(405).json({ error: 'Method not allowed' })
 }
@@ -204,7 +210,7 @@ async function adminImageUpload(req, res) {
 async function contact(req, res) {
   const { name, email, phone, message, type } = req.body || {}
   if (!name || !email || !message) return res.status(400).json({ error: '姓名、邮箱和留言不能为空' })
-  const msg = createMessage({
+  const msg = await createMessage({
     name: String(name).slice(0, 100),
     email: String(email).slice(0, 200),
     phone: phone ? String(phone).slice(0, 50) : '',
