@@ -8,6 +8,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = process.env.NODE_ENV === 'production' ? '/tmp' : path.join(__dirname, '..', 'data')
 const DB_PATH = path.join(DATA_DIR, 'db.json')
 
+// GitHub API 配置（文案持久化到仓库 texts.json）
+const GITHUB_REPO = 'yayi2953/v-plus-homes'
+const GITHUB_TEXTS_PATH = 'api/data/texts.json'
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''
+
 // 默认管理员账号
 const ADMIN_EMAIL = 'admin@v-plus.house'
 const ADMIN_PASSWORD = 'admin123'
@@ -22,6 +27,8 @@ const SEED = {
 }
 
 let cache = null
+let textsCache = null
+let textsCacheTime = 0
 
 function ensureDir() {
   try {
@@ -78,19 +85,118 @@ function getUsers() { return load().users }
 function getListings() { return load().listings }
 function getMessages() { return load().messages }
 function getServices() { return load().services }
-function getTexts() { return load().texts || {} }
-
-function updateTexts(updates) {
-  const db = load()
-  db.texts = { ...db.texts, ...updates }
-  save(db)
-  return db.texts
+// 通过 GitHub API 读取文案覆盖项（持久化到仓库）
+async function fetchTextsFromGitHub() {
+  try {
+    const res = await fetch(
+      `https://raw.githubusercontent.com/${GITHUB_REPO}/main/${GITHUB_TEXTS_PATH}`,
+      { headers: { 'Cache-Control': 'no-cache' } }
+    )
+    if (res.ok) {
+      const data = await res.json()
+      textsCache = data
+      textsCacheTime = Date.now()
+      return data
+    }
+  } catch { /* ignore */ }
+  return {}
 }
 
-function resetTexts() {
+async function getTexts() {
+  // 缓存 30 秒，避免频繁请求 GitHub
+  if (textsCache && Date.now() - textsCacheTime < 30000) {
+    return textsCache
+  }
+  return await fetchTextsFromGitHub()
+}
+
+async function updateTexts(updates) {
+  const current = await getTexts()
+  const next = { ...current, ...updates }
+
+  if (GITHUB_TOKEN) {
+    try {
+      // 获取当前文件的 sha
+      const metaRes = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
+        { headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
+      )
+      const meta = await metaRes.json()
+      const sha = meta.sha
+
+      // 提交更新
+      const content = Buffer.from(JSON.stringify(next, null, 2), 'utf-8').toString('base64')
+      const putRes = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: 'update text overrides',
+            content,
+            sha
+          })
+        }
+      )
+      if (putRes.ok) {
+        textsCache = next
+        textsCacheTime = Date.now()
+        return next
+      }
+    } catch (e) {
+      console.error('GitHub update failed:', e.message)
+    }
+  }
+
+  // 降级：写 /tmp（不持久，但至少当前实例可用）
+  const db = load()
+  db.texts = next
+  save(db)
+  textsCache = next
+  textsCacheTime = Date.now()
+  return next
+}
+
+async function resetTexts() {
+  const next = {}
+  if (GITHUB_TOKEN) {
+    try {
+      const metaRes = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
+        { headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
+      )
+      const meta = await metaRes.json()
+      const content = Buffer.from(JSON.stringify({}, null, 2), 'utf-8').toString('base64')
+      const putRes = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: 'reset text overrides', content, sha: meta.sha })
+        }
+      )
+      if (putRes.ok) {
+        textsCache = {}
+        textsCacheTime = Date.now()
+        return {}
+      }
+    } catch (e) {
+      console.error('GitHub reset failed:', e.message)
+    }
+  }
   const db = load()
   db.texts = {}
   save(db)
+  textsCache = {}
+  textsCacheTime = Date.now()
   return {}
 }
 
