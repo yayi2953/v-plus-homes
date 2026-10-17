@@ -33,7 +33,7 @@ export default function ExtraServices() {
   return (
     <section className="extras" id="extra-services">
       <div className="container">
-        <span className="eyebrow-pill eyebrow-pill--dark">
+        <span className="eyebrow-pill eyebrow-pill--dark" data-edit-key="extraServices.eyebrow">
           <Sparkle size={12} /> {s.eyebrow}
         </span>
         <h2 className="section-title extras__title">
@@ -63,7 +63,7 @@ export default function ExtraServices() {
                 </div>
                 <div className="extras-card__veil" />
                 <div className="extras-card__body">
-                  <h4>{card.title}</h4>
+                  <h4 data-edit-key={`extraServices.cards.${i}.title`}>{card.title}</h4>
                   <span className="extras-card__pill">
                     {CARD_CTA[lang] || CARD_CTA.zh}
                     <ArrowUpRight size={14} />

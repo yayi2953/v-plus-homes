@@ -159,33 +159,22 @@ export default function EditMode() {
       const { key, zh, en } = e.data
       const newVal = lang === 'zh' ? zh : en
       if (newVal === undefined || newVal === null) return
-      // 用当前显示值（来自 c，含覆盖项）作为旧值来匹配 DOM
       const oldVal = norm(getByPath(c, key))
-      // 优先只更新声明了该 key 的元素（同文案多处出现时避免联动）
+      // 只更新声明了该 key 的元素（同文案多处出现时避免联动）。
+      // 未标记的元素不做全局文本替换：reloadTexts() 会触发 React 重渲染，
+      // 每个位置只按自己的 key 更新，天然隔离同名文案。
       const tagged = key ? document.querySelectorAll(`[data-edit-key="${key}"]`) : []
-      if (tagged.length > 0) {
-        tagged.forEach((el) => {
-          // 替换元素内所有匹配旧值的文本节点，保留子元素结构
-          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null)
-          const nodes = []
-          let n
-          while ((n = walker.nextNode())) nodes.push(n)
-          nodes.forEach((node) => {
-            if (!oldVal || norm(node.textContent) === oldVal || !node.textContent.trim()) {
-              node.textContent = newVal
-            }
-          })
-        })
-      } else if (oldVal) {
-        // 回退：替换页面中所有匹配旧值的文本节点
-        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null)
-        let node
-        while ((node = walker.nextNode())) {
-          if (norm(node.textContent) === oldVal) {
+      tagged.forEach((el) => {
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null)
+        const nodes = []
+        let n
+        while ((n = walker.nextNode())) nodes.push(n)
+        nodes.forEach((node) => {
+          if (!oldVal || norm(node.textContent) === oldVal || !node.textContent.trim()) {
             node.textContent = newVal
           }
-        }
-      }
+        })
+      })
       // 刷新 i18n 上下文，让 reverseMap 包含新值，这样修改后的文案可再次编辑
       reloadTexts()
     }

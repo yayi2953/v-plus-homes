@@ -9,7 +9,7 @@ export default function V8Process() {
     <section className="v8-section" id="process">
       <div className="v8-wrap">
         <div className="v8-sec-head v8-rise">
-          <p className="v8-eyebrow">{t.eyebrow}</p>
+          <p className="v8-eyebrow" data-edit-key="v8.process.eyebrow">{t.eyebrow}</p>
           <h2 className="v8-h-sec" style={{ marginTop: 12 }}>{t.title}</h2>
         </div>
         <div className="v8-proc">
