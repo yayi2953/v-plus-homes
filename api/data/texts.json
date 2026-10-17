@@ -10,5 +10,8 @@
   "v8.hero.title": {
     "zh": "广州",
     "en": "Ghuangzhou"
+  },
+  "img:v8.hero.slide2": {
+    "url": "public/images/uploads/mvcnbw91-19fae585def3d403bfa55f7492160435.jpg"
   }
 }
