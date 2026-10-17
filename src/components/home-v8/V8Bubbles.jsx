@@ -66,15 +66,63 @@ const MESSAGES = [
   "ค่าเช่าถูกในย่านดี"
 ]
 
-const NAMES = [
-  'Emma', 'Lucas', 'Yuki', 'Min-jun', 'Aarav', 'Niran',
-  'Sophie', 'Hugo', 'Hana', 'Seo-yeon', 'Priya', 'Somchai',
-  'Oliver', 'Camille', 'Ren', 'Ji-ho', 'Arjun', 'Kanya',
-  'Noah', 'Léa', 'Aoi', 'Ha-eun', 'Vihaan', 'Anan'
-]
-
 const COLORS = ['#1e40af', '#0f766e', '#b91c1c', '#6d28d9', '#0369a1', '#9f1239']
 const LANE_HEIGHT = 42
+
+// 各文化名 + 姓组合，生成 1000 个不重复全名
+const NAME_POOLS = {
+  en: {
+    given: ['James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer', 'Michael', 'Linda', 'William', 'Elizabeth', 'David', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica', 'Thomas', 'Sarah', 'Charles', 'Karen', 'Christopher', 'Nancy', 'Daniel', 'Lisa', 'Matthew', 'Betty', 'Anthony', 'Margaret', 'Mark', 'Sandra', 'Donald', 'Ashley', 'Steven', 'Dorothy', 'Paul', 'Kimberly', 'Andrew', 'Emily', 'Joshua', 'Donna'],
+    sur: ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Perez', 'Thompson', 'White', 'Harris']
+  },
+  fr: {
+    given: ['Jean', 'Marie', 'Pierre', 'Anne', 'Michel', 'Isabelle', 'Philippe', 'Nathalie', 'François', 'Catherine', 'Nicolas', 'Sophie', 'Luc', 'Julie', 'Marc', 'Camille', 'David', 'Charlotte', 'Thomas', 'Émilie', 'Antoine', 'Laura', 'Alexandre', 'Manon', 'Julien', 'Clara', 'Maxime', 'Léa', 'Quentin', 'Chloé', 'Romain', 'Sarah', 'Kevin', 'Océane', 'Mathieu', 'Inès', 'Arthur', 'Lola', 'Théo', 'Zoe'],
+    sur: ['Martin', 'Bernard', 'Thomas', 'Petit', 'Robert', 'Richard', 'Durand', 'Dubois', 'Moreau', 'Simon', 'Laurent', 'Lefebvre', 'Michel', 'Garcia', 'David', 'Bertrand', 'Roux', 'Vincent', 'Fournier', 'Morel', 'Girard', 'André', 'Lefevre', 'Mercier', 'Dupont']
+  },
+  ja: {
+    given: ['Haruto', 'Yui', 'Sota', 'Hina', 'Ren', 'Mio', 'Yuto', 'Mei', 'Hiroto', 'Sakura', 'Aoi', 'Yuna', 'Riku', 'Himari', 'Sora', 'Rin', 'Yuki', 'Amane', 'Daichi', 'Koharu', 'Kaito', 'Misaki', 'Haruki', 'Nanami', 'Ryusei', 'Tsumugi', 'Sosuke', 'Wakana', 'Haru', 'Kokona', 'Yusei', 'Riko', 'Koki', 'Sae', 'Tatsuki', 'Kotone', 'Hayato', 'Mao', 'Ruki', 'Suzuka'],
+    sur: ['Sato', 'Suzuki', 'Takahashi', 'Tanaka', 'Watanabe', 'Ito', 'Yamamoto', 'Nakamura', 'Kobayashi', 'Kato', 'Yoshida', 'Yamada', 'Sasaki', 'Matsumoto', 'Inoue', 'Kimura', 'Hayashi', 'Shimizu', 'Yamazaki', 'Mori', 'Abe', 'Ikeda', 'Hashimoto', 'Yamashita', 'Ishii']
+  },
+  ko: {
+    given: ['Min-jun', 'Seo-yeon', 'Ji-ho', 'Ha-eun', 'Seo-jun', 'Ji-woo', 'Do-yun', 'Seo-hyun', 'Joon-woo', 'Min-seo', 'Ju-won', 'Yoon-seo', 'Ha-joon', 'Chae-won', 'Ji-hoon', 'Da-eun', 'Seung-woo', 'Yoo-na', 'Ji-hyun', 'So-hee', 'Jin-woo', 'Hae-won', 'Min-kyu', 'Ji-min', 'Seung-min', 'Eun-ji', 'Hyung-woo', 'Seo-ah', 'Jae-won', 'Ye-jin', 'Sung-jun', 'Su-bin', 'Tae-woo', 'Na-yeon', 'Jung-woo', 'Mi-rae', 'Kyung-joon', 'Yu-na', 'Dong-hyun', 'Si-eun'],
+    sur: ['Kim', 'Lee', 'Park', 'Choi', 'Jung', 'Kang', 'Cho', 'Yoon', 'Jang', 'Lim', 'Oh', 'Seo', 'Shin', 'Kwon', 'Han', 'Sohn', 'Cho', 'Hwang', 'Ahn', 'Song', 'Ryu', 'Hong', 'Jeon', 'Ko', 'Joo']
+  },
+  hi: {
+    given: ['Aarav', 'Priya', 'Vihaan', 'Ananya', 'Arjun', 'Diya', 'Reyansh', 'Saanvi', 'Krishna', 'Ishita', 'Ishaan', 'Myra', 'Shaurya', 'Aadhya', 'Atharv', 'Anika', 'Advik', 'Sara', 'Dhruv', 'Kavya', 'Kabir', 'Anjali', 'Rohan', 'Neha', 'Karan', 'Pooja', 'Aryan', 'Riya', 'Vivaan', 'Sneha', 'Aditya', 'Divya', 'Arnav', 'Nisha', 'Karthik', 'Meera', 'Raghav', 'Tanvi', 'Manav', 'Kriti'],
+    sur: ['Sharma', 'Verma', 'Patel', 'Gupta', 'Singh', 'Kumar', 'Reddy', 'Rao', 'Chopra', 'Mehta', 'Joshi', 'Nair', 'Agarwal', 'Desai', 'Kapoor', 'Bose', 'Pandey', 'Rastogi', 'Shah', 'Malhotra', 'Bhat', 'Iyer', 'Menon', 'Thakur', 'Chauhan']
+  },
+  th: {
+    given: ['Somchai', 'Niran', 'Kanya', 'Anan', 'Somsak', 'Malee', 'Somboon', 'Pim', 'Chai', 'Nok', 'Prasert', 'Dao', 'Wichai', 'Bua', 'Amnat', 'Fah', 'Somdet', 'Kwan', 'Thongchai', 'Ploy', 'Manop', 'Namtarn', 'Charn', 'Kae', 'Sakchai', 'Mint', 'Phong', 'Pang', 'Tawatchai', 'Ning', 'Veraphol', 'Aom', 'Sathien', 'Pimchanok', 'Niphon', 'Nattha', 'Wirot', 'Bussakorn', 'Kriengkrai', 'Jittranee'],
+    sur: ['Srisawat', 'Phueng', 'Charoen', 'Saetang', 'Wong', 'Sukhum', 'Sinthawan', 'Lao', 'Boonmee', 'Nanthachai', 'Panya', 'Suksawat', 'Chaiyo', 'Khambai', 'Yothi', 'Phat', 'Phon', 'Sri', 'Thanom', 'Kham', 'Sang', 'Nok', 'Peng', 'Chaem', 'Saelim']
+  }
+}
+
+// 生成 1000 个不重复全名（按文化均分）
+function generateNames() {
+  const names = []
+  const cultures = Object.keys(NAME_POOLS)
+  const perCulture = Math.ceil(1000 / cultures.length)
+  for (const c of cultures) {
+    const { given, sur } = NAME_POOLS[c]
+    const pool = new Set()
+    let guard = 0
+    while (pool.size < perCulture && guard < 50000) {
+      const g = given[Math.floor(Math.random() * given.length)]
+      const s = sur[Math.floor(Math.random() * sur.length)]
+      pool.add(`${g} ${s}`)
+      guard++
+    }
+    for (const n of pool) names.push(n)
+  }
+  // 打乱
+  for (let i = names.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[names[i], names[j]] = [names[j], names[i]]
+  }
+  return names
+}
+
+const NAMES = generateNames()
 
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)] }
 
