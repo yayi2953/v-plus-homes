@@ -1,0 +1,201 @@
+import { sign, verify, hashPassword, verifyPassword } from './lib/auth.js'
+import {
+  getUsers, getListings, getMessages,
+  findUserByEmail, createUser,
+  createListing, updateListing, deleteListing,
+  createMessage, markMessageRead, deleteMessage
+} from './lib/store.js'
+
+// 统一入口：所有 /api/* 路由在此函数内分发，共享同一个 /tmp/db.json
+// （Vercel 各 serverless 函数 /tmp 隔离，合并到单函数才能跨接口共享数据）
+export default async function handler(req, res) {
+  const url = new URL(req.url, 'http://localhost')
+  const path = url.pathname
+
+  // 去掉可能的 /api 前缀，得到相对路径
+  const rel = path.replace(/^\/api/, '') || '/'
+
+  // CORS（如有需要）
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end()
+  }
+
+  try {
+    // ---------- Auth ----------
+    if (rel === '/auth/register' && req.method === 'POST') {
+      return register(req, res)
+    }
+    if (rel === '/auth/login' && req.method === 'POST') {
+      return login(req, res)
+    }
+    if (rel === '/auth/me' && req.method === 'GET') {
+      return me(req, res)
+    }
+
+    // ---------- Admin ----------
+    if (rel === '/admin/listings') {
+      return adminListings(req, res)
+    }
+    if (rel === '/admin/users' && req.method === 'GET') {
+      return adminUsers(req, res)
+    }
+    if (rel === '/admin/messages') {
+      return adminMessages(req, res)
+    }
+
+    // ---------- Public ----------
+    if (rel === '/contact' && req.method === 'POST') {
+      return contact(req, res)
+    }
+    if (rel === '/listings' && req.method === 'GET') {
+      return listingsPublic(req, res)
+    }
+    if (rel === '/messages' && req.method === 'GET') {
+      return messagesPublic(req, res)
+    }
+
+    return res.status(404).json({ error: 'Not found' })
+  } catch (e) {
+    console.error('API error:', e)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
+// ============ Auth handlers ============
+function getToken(req) {
+  const h = req.headers.authorization || ''
+  const m = h.match(/^Bearer\s+(.+)$/i)
+  return m ? m[1] : null
+}
+
+function requireAdmin(req) {
+  const token = getToken(req)
+  if (!token) return null
+  const payload = verify(token)
+  if (!payload || payload.role !== 'admin') return null
+  const user = getUsers().find((u) => u.id === payload.sub)
+  if (!user || user.role !== 'admin') return null
+  return user
+}
+
+function requireAuth(req) {
+  const token = getToken(req)
+  if (!token) return null
+  const payload = verify(token)
+  if (!payload) return null
+  return getUsers().find((u) => u.id === payload.sub) || null
+}
+
+async function register(req, res) {
+  const { email, password, name } = req.body || {}
+  if (!email || !password) return res.status(400).json({ error: '邮箱和密码不能为空' })
+  if (password.length < 6) return res.status(400).json({ error: '密码至少 6 位' })
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: '邮箱格式不正确' })
+  if (findUserByEmail(email)) return res.status(409).json({ error: '该邮箱已注册' })
+
+  const user = createUser({
+    email: email.trim().toLowerCase(),
+    name: (name || email.split('@')[0]).trim(),
+    password: hashPassword(password)
+  })
+  const token = sign({ sub: user.id, email: user.email, role: user.role })
+  return res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } })
+}
+
+async function login(req, res) {
+  const { email, password } = req.body || {}
+  if (!email || !password) return res.status(400).json({ error: '邮箱和密码不能为空' })
+  const user = findUserByEmail(email)
+  if (!user || !verifyPassword(password, user.password)) return res.status(401).json({ error: '邮箱或密码错误' })
+  const token = sign({ sub: user.id, email: user.email, role: user.role })
+  return res.status(200).json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } })
+}
+
+async function me(req, res) {
+  const user = requireAuth(req)
+  if (!user) return res.status(401).json({ error: '未登录或登录已过期' })
+  return res.status(200).json({ user: { id: user.id, email: user.email, name: user.name, role: user.role } })
+}
+
+// ============ Admin handlers ============
+async function adminListings(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  if (req.method === 'GET') return res.status(200).json({ listings: getListings() })
+  if (req.method === 'POST') {
+    const data = req.body || {}
+    for (const f of ['title', 'type', 'price', 'city']) {
+      if (!data[f]) return res.status(400).json({ error: `缺少字段: ${f}` })
+    }
+    return res.status(201).json({ listing: createListing(data) })
+  }
+  if (req.method === 'PUT') {
+    const { id, ...fields } = req.body || {}
+    if (!id) return res.status(400).json({ error: '缺少 id' })
+    const listing = updateListing(id, fields)
+    if (!listing) return res.status(404).json({ error: '房源不存在' })
+    return res.status(200).json({ listing })
+  }
+  if (req.method === 'DELETE') {
+    const id = req.body?.id || req.query?.id
+    if (!id) return res.status(400).json({ error: '缺少 id' })
+    return res.status(deleteListing(id) ? 200 : 404).json({ ok: !!deleteListing(id) })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function adminUsers(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  const users = getUsers().map((u) => ({
+    id: u.id, email: u.email, name: u.name, role: u.role, createdAt: u.createdAt
+  }))
+  return res.status(200).json({ users })
+}
+
+async function adminMessages(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  if (req.method === 'GET') return res.status(200).json({ messages: getMessages() })
+  if (req.method === 'PUT') {
+    const { id, action } = req.body || {}
+    if (action === 'read' && id) {
+      const msg = markMessageRead(id)
+      return res.status(msg ? 200 : 404).json({ ok: !!msg })
+    }
+    return res.status(400).json({ error: '无效操作' })
+  }
+  if (req.method === 'DELETE') {
+    const id = req.body?.id || req.query?.id
+    if (!id) return res.status(400).json({ error: '缺少 id' })
+    return res.status(deleteMessage(id) ? 200 : 404).json({ ok: !!deleteMessage(id) })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
+// ============ Public handlers ============
+async function contact(req, res) {
+  const { name, email, phone, message, type } = req.body || {}
+  if (!name || !email || !message) return res.status(400).json({ error: '姓名、邮箱和留言不能为空' })
+  const msg = createMessage({
+    name: String(name).slice(0, 100),
+    email: String(email).slice(0, 200),
+    phone: phone ? String(phone).slice(0, 50) : '',
+    message: String(message).slice(0, 2000),
+    type: type || 'contact'
+  })
+  return res.status(201).json({ ok: true, message: msg })
+}
+
+async function listingsPublic(req, res) {
+  const listings = getListings().filter((l) => l.published !== false)
+  return res.status(200).json({ listings })
+}
+
+async function messagesPublic(req, res) {
+  // 返回已读/未读的公开留言（不暴露邮箱、电话）
+  const messages = getMessages()
+    .filter((m) => m.type === 'message-board')
+    .map((m) => ({ id: m.id, name: m.name, message: m.message, createdAt: m.createdAt }))
+  return res.status(200).json({ messages })
+}

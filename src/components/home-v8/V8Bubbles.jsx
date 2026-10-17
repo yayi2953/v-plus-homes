@@ -232,7 +232,17 @@ function makeMessage(w, lanes) {
   const color = rand(COLORS)
   const speed = 1.2 + Math.random() * 1.4
   const fontSize = 14 + Math.floor(Math.random() * 4)
-  return { y: lane.y, text: `${name}: ${text}`, color, speed, fontSize }
+  return { y: lane.y, text: `${name}: ${text}`, color, speed, fontSize, real: false }
+}
+
+// 真实留言：绿色 + 「真实」标签，速度稍慢便于阅读
+function makeRealMessage(w, lanes, realMsg) {
+  const lane = lanes[Math.floor(Math.random() * lanes.length)]
+  const name = realMsg.name || '匿名用户'
+  const text = realMsg.message || ''
+  const speed = 0.9 + Math.random() * 0.6
+  const fontSize = 15
+  return { y: lane.y, text: `${name}: ${text}`, color: '#0f766e', speed, fontSize, real: true }
 }
 
 export default function V8Bubbles() {
@@ -241,6 +251,7 @@ export default function V8Bubbles() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [submitting, setSubmitting] = useState(false)
   const [feedback, setFeedback] = useState(null) // { type: 'ok'|'err', text }
+  const realMessagesRef = useRef([])
 
   async function submitMessage(e) {
     e.preventDefault()
@@ -267,12 +278,31 @@ export default function V8Bubbles() {
       if (!res.ok) throw new Error(data.error || '提交失败')
       setFeedback({ type: 'ok', text: '留言已提交，感谢您的反馈！' })
       setForm({ name: '', email: '', phone: '', message: '' })
+      // 重新拉取真实留言，让弹幕尽快展示新提交的内容
+      fetch('/api/messages')
+        .then((r) => r.json())
+        .then((d) => { if (Array.isArray(d.messages)) realMessagesRef.current = d.messages })
+        .catch(() => {})
     } catch (err) {
       setFeedback({ type: 'err', text: err.message || '提交失败，请稍后重试' })
     } finally {
       setSubmitting(false)
     }
   }
+
+  // 拉取真实留言
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/messages')
+      .then((r) => r.json())
+      .then((d) => {
+        if (!cancelled && Array.isArray(d.messages)) {
+          realMessagesRef.current = d.messages
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -315,7 +345,12 @@ export default function V8Bubbles() {
 
     const spawn = () => {
       if (lanes.length === 0 || w <= 0) return
-      const m = makeMessage(w, lanes)
+      const reals = realMessagesRef.current
+      // 30% 概率使用真实留言（如果有）
+      const useReal = reals.length > 0 && Math.random() < 0.3
+      const m = useReal
+        ? makeRealMessage(w, lanes, rand(reals))
+        : makeMessage(w, lanes)
       ctx.font = `500 ${m.fontSize}px "PingFang SC", "Microsoft YaHei", Arial, sans-serif`
       const textWidth = ctx.measureText(m.text).width
       messages.push({ ...m, x: w + 20, width: textWidth })
