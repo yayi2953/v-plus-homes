@@ -256,6 +256,7 @@ export default function V8Bubbles() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [submitting, setSubmitting] = useState(false)
   const [feedback, setFeedback] = useState(null) // { type: 'ok'|'err', text }
+  const [formOpen, setFormOpen] = useState(false) // 留言表单默认收起为按钮
   const realMessagesRef = useRef([])
 
   async function submitMessage(e) {
@@ -426,12 +427,28 @@ export default function V8Bubbles() {
             <canvas ref={canvasRef} className="v8-bubbles__canvas" />
           </div>
 
-          <div className="v8-msgform">
-            <div className="v8-msgform__head">
-              <p className="v8-eyebrow">{t('留下您的留言', 'LEAVE A MESSAGE', 'メッセージを残す')}</p>
-              <h3 className="v8-msgform__title">{t('我要留言', 'Leave a Message', 'メッセージを送る')}</h3>
-              <p className="v8-msgform__sub">{t('告诉我们您的需求或疑问，我们会尽快与您联系。', 'Tell us your needs or questions, and we\'ll get back to you soon.', 'ご要望やご質問をお聞かせください。できるだけ早くご連絡します。')}</p>
-            </div>
+          {/* 留言表单：默认收起为按钮，点击向下展开 */}
+          <div className="v8-msgform-toggle-row">
+            <button
+              type="button"
+              className={`v8-btn v8-btn--dark v8-msgform-toggle${formOpen ? ' is-open' : ''}`}
+              onClick={() => setFormOpen((o) => !o)}
+              aria-expanded={formOpen}
+              aria-controls="v8-msgform-collapse"
+            >
+              {t('我要留言', 'Leave a Message', 'メッセージを送る')}
+              <svg className="v8-msgform-toggle__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+          </div>
+          <div id="v8-msgform-collapse" className={`v8-msgform-collapse${formOpen ? ' is-open' : ''}`}>
+            <div className="v8-msgform">
+              <div className="v8-msgform__head">
+                <p className="v8-eyebrow">{t('留下您的留言', 'LEAVE A MESSAGE', 'メッセージを残す')}</p>
+                <h3 className="v8-msgform__title">{t('我要留言', 'Leave a Message', 'メッセージを送る')}</h3>
+                <p className="v8-msgform__sub">{t('告诉我们您的需求或疑问，我们会尽快与您联系。', 'Tell us your needs or questions, and we\'ll get back to you soon.', 'ご要望やご質問をお聞かせください。できるだけ早くご連絡します。')}</p>
+              </div>
             <form className="v8-msgform__body" onSubmit={submitMessage}>
               <div className="v8-msgform__row">
                 <label className="v8-msgform__field">
@@ -483,6 +500,7 @@ export default function V8Bubbles() {
                 {submitting ? t('提交中...', 'Submitting...', '送信中...') : t('提交留言', 'Submit', '送信する')}
               </button>
             </form>
+            </div>
           </div>
         </div>
       </div>

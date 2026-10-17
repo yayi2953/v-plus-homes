@@ -648,6 +648,32 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   .v8-msgform__row { grid-template-columns: 1fr; }
 }
 
+/* 留言表单收起/展开：grid-rows 0fr→1fr 平滑高度动画 */
+.home-v8 .v8-msgform-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .45s var(--v8-ease);
+}
+.home-v8 .v8-msgform-collapse > .v8-msgform {
+  overflow: hidden;
+  min-height: 0;
+  margin-top: 0;
+}
+/* 收起时表单卡片无外边距和阴影干扰，展开后恢复呼吸感 */
+.home-v8 .v8-msgform-collapse.is-open > .v8-msgform { margin-top: 32px; }
+.home-v8 .v8-msgform-toggle-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 48px;
+}
+.home-v8 .v8-msgform-toggle__chevron {
+  width: 17px; height: 17px;
+  transition: transform .35s var(--v8-ease);
+}
+.home-v8 .v8-msgform-toggle.is-open .v8-msgform-toggle__chevron {
+  transform: rotate(180deg);
+}
+
 /* ---------- Team ---------- */
 .home-v8 .v8-team { background: var(--v8-paper); border-top: 1px solid var(--v8-line-soft); }
 .home-v8 .v8-team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--v8-line-soft); border: 1px solid var(--v8-line-soft); }
