@@ -61,32 +61,25 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .home-v8 .v8-lede { font-size: 17px; color: var(--v8-ink-2); line-height: 1.65; margin: 0; }
 .home-v8 .v8-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .22em; color: var(--v8-muted); text-transform: uppercase; margin: 0; }
 
-/* 按钮 */
+/* 按钮：统一特斯拉式平角矩形（4px 圆角、扁平无浮影），颜色跟随各变体 */
 .home-v8 .v8-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-  font-size: 15px; font-weight: 500; line-height: 1; padding: 14px 26px;
-  border-radius: 99px; white-space: nowrap; border: 0; cursor: pointer;
+  font-size: 15px; font-weight: 500; line-height: 1; padding: 14px 28px;
+  border-radius: 4px; white-space: nowrap; border: 0; cursor: pointer;
   transition: transform .22s var(--v8-ease), background-color .25s, color .25s, border-color .25s, box-shadow .25s var(--v8-ease);
 }
 .home-v8 .v8-btn:active { transform: scale(.97); }
 .home-v8 .v8-btn--dark {
   background: var(--v8-ink); color: #fff;
-  /* 顶部 1px 内高光环 + 冷调柔影：深色胶囊在浅底/视频上有真实分离感 */
-  box-shadow: var(--v8-shadow-btn);
 }
 .home-v8 .v8-btn--dark:hover {
   background: #000;
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .18),
-    0 16px 32px -14px rgba(22, 22, 26, .5);
 }
-.home-v8 .v8-btn--dark:active { transform: translateY(0) scale(.97); }
+.home-v8 .v8-btn--dark:active { transform: scale(.97); }
 .home-v8 .v8-btn--wa {
   background: var(--v8-wa); color: #fff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 10px 24px rgba(31, 185, 87, .28);
 }
-.home-v8 .v8-btn--wa:hover { background: #179b49; transform: translateY(-1px); }
+.home-v8 .v8-btn--wa:hover { background: #179b49; }
 .home-v8 .v8-btn--wa:active { transform: translateY(0) scale(.97); }
 .home-v8 .v8-tlink {
   display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500;
@@ -459,7 +452,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 .home-v8 .v8-fmore {
   display: inline-flex; align-items: center; gap: 10px; background: #f1f1f3; color: var(--v8-ink);
-  border: 0; border-radius: 99px; padding: 14px 28px; font-size: 14.5px; font-weight: 500; cursor: pointer;
+  border: 0; border-radius: 4px; padding: 14px 28px; font-size: 14.5px; font-weight: 500; cursor: pointer;
   transition: background-color .25s, color .25s, opacity .3s, transform .3s;
 }
 .home-v8 .v8-fmore__count { font-size: 13px; font-weight: 400; color: var(--v8-muted); }
@@ -563,18 +556,14 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .home-v8 .v8-finder__actions { display: flex; justify-content: center; margin-top: 18px; }
 .home-v8 .v8-finder__go {
   padding: 14px 42px; font-size: 15px; font-weight: 600;
-  background: rgba(255, 255, 255, .95);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  background: #fff;
   border: 1px solid rgba(22, 22, 26, .18);
   color: var(--v8-ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), 0 10px 24px -12px rgba(22, 22, 26, .4);
 }
 .home-v8 .v8-finder__go:hover {
   background: #fff; border-color: rgba(22, 22, 26, .32);
-  transform: translateY(-1px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), 0 16px 32px -14px rgba(22, 22, 26, .5);
 }
-.home-v8 .v8-finder__go:active { transform: translateY(0) scale(.98); }
+.home-v8 .v8-finder__go:active { transform: scale(.98); }
 
 /* ---------- Process ---------- */
 .home-v8 .v8-proc { display: grid; grid-template-columns: 1fr 1fr; gap: 0 72px; }
@@ -1183,10 +1172,9 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-drawer__link--sub { font-size: 14.5px; color: var(--v8n-ink-2); background: rgba(255, 255, 255, .35); padding: 11px 14px; }
 .v8-drawer__foot { padding: 14px 22px calc(22px + env(safe-area-inset-bottom, 0px)); }
 .v8-drawer__book {
-  width: 100%; padding: 15px; border-radius: 99px; border: 0; cursor: pointer;
+  width: 100%; padding: 15px; border-radius: 4px; border: 0; cursor: pointer;
   font-size: 15px; font-weight: 500;
   background: var(--v8n-ink); color: #fff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14);
   transition: transform .2s cubic-bezier(.22, 1, .36, 1), background-color .25s;
 }
 .v8-drawer__book:active { transform: scale(.98); }

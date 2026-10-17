@@ -2940,7 +2940,7 @@ button.extras-card--more:focus-visible .extras-card__pill--solid svg {
   width: 100%;
   padding: 15px;
   border: none;
-  border-radius: 999px;
+  border-radius: 4px;
   background: var(--whatsapp);
   color: #fff;
   font-size: 15px;
