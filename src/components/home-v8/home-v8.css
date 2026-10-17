@@ -475,14 +475,15 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .home-v8 .v8-proc-row h3 { font-size: 21px; font-weight: 600; letter-spacing: -.01em; margin: 0 0 7px; }
 .home-v8 .v8-proc-row p { font-size: 14.5px; color: var(--v8-muted); margin: 0; max-width: 42ch; line-height: 1.65; }
 
-/* ---------- Customer Bubbles ---------- */
-.home-v8 .v8-bubbles__wrap {
-  width: 100%; height: 560px;
-  border-radius: 20px; overflow: hidden;
-  background: linear-gradient(180deg, #f8f9fb 0%, #eef0f4 100%);
+/* ---------- Customer Danmaku Bubbles ---------- */
+.home-v8 .v8-bubbles__wrap,
+.v8-listings .v8-bubbles__wrap {
+  width: 100%; height: 520px;
+  border-radius: 16px; overflow: hidden;
+  background: #f5f6f8;
   position: relative;
 }
-.home-v8 .v8-bubbles__canvas { display: block; width: 100%; height: 100%; }
+.v8-bubbles__canvas { display: block; width: 100%; height: 100%; }
 
 /* ---------- Team ---------- */
 .home-v8 .v8-team { background: var(--v8-paper); border-top: 1px solid var(--v8-line-soft); }

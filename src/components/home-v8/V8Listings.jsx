@@ -3,6 +3,7 @@ import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useProperty } from '../ici/propertyContext.jsx'
 import { navigate } from '../../lib/router.mjs'
 import SmartImage from '../common/SmartImage.jsx'
+import V8Bubbles from './V8Bubbles.jsx'
 
 /* 房源结果页：根据 URL 查询参数（district/beds/budget/type/school）
    过滤并展示真实房源。延续 v8 极简编辑档案卡风格，无模板感。 */
@@ -135,19 +136,8 @@ export default function V8Listings() {
           </p>
         </div>
 
-        {/* 房源网格 */}
-        {items.length > 0 ? (
-          <div className="v8-flist v8-listings__grid">
-            {items.map((item, i) => renderCard(item, i + 1))}
-          </div>
-        ) : (
-          <div className="v8-featured-empty">
-            <p>{featured.emptyFilter || (lang === 'zh' ? '当前条件下暂无房源，试试调整筛选条件。' : 'No homes match your filters. Try adjusting your search.')}</p>
-            <button type="button" className="v8-btn v8-btn--dark" onClick={() => navigate('/listings')}>
-              {lang === 'zh' ? '查看全部房源' : 'View all homes'}
-            </button>
-          </div>
-        )}
+        {/* 客户留言弹幕 */}
+        <V8Bubbles />
       </div>
     </div>
   )
