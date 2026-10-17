@@ -9,7 +9,7 @@ const TABS = ['listings', 'messages', 'users', 'texts']
 
 const EMPTY_LISTING = {
   title: '', type: 'luxury', price: '', city: '', bedrooms: '', bathrooms: '',
-  area: '', address: '', description: '', image: '', published: true
+  area: '', address: '', description: '', image: '', images: [], published: true
 }
 
 export default function AdminPage() {
@@ -24,10 +24,14 @@ export default function AdminPage() {
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ ...EMPTY_LISTING })
   const [saving, setSaving] = useState(false)
-  // 房源图片本地上传
+  // 房源图片本地上传（多选批量）
   const [imgUploading, setImgUploading] = useState(false)
   const [imgError, setImgError] = useState('')
+  const [uploadDone, setUploadDone] = useState(0)
+  const [uploadTotal, setUploadTotal] = useState(0)
+  const [urlDraft, setUrlDraft] = useState('')
   const imgFileRef = useRef(null)
+  const dragIdx = useRef(null)
 
   const isAdmin = user?.role === 'admin'
 
@@ -65,30 +69,58 @@ export default function AdminPage() {
   }
 
   async function handleListingImageUpload(e) {
-    const file = e.target.files?.[0]
+    const files = Array.from(e.target.files || [])
     e.target.value = ''
-    if (!file) return
-    if (!file.type.startsWith('image/')) {
-      setImgError(t('请选择图片文件', 'Please choose an image file'))
-      return
-    }
+    if (!files.length) return
     setImgError('')
     setImgUploading(true)
+    setUploadTotal(files.length)
+    setUploadDone(0)
     try {
-      const dataBase64 = await fileToUploadBase64(file)
-      const res = await authFetch('/api/admin/images', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: file.name, dataBase64 })
-      })
-      const d = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`)
-      setForm((f) => ({ ...f, image: d.url }))
+      const urls = []
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue
+        const dataBase64 = await fileToUploadBase64(file)
+        const res = await authFetch('/api/admin/images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: file.name, dataBase64 })
+        })
+        const d = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`)
+        urls.push(d.url)
+        setUploadDone((n) => n + 1)
+      }
+      setForm((f) => ({ ...f, images: [...f.images, ...urls] }))
     } catch (err) {
       setImgError(err.message || t('上传失败', 'Upload failed'))
     } finally {
       setImgUploading(false)
     }
+  }
+
+  // 图片列表操作：拖拽排序 / 删除 / URL 添加；第一张即封面（存 image 字段兼容旧展示）
+  function reorderImages(toIdx) {
+    const from = dragIdx.current
+    dragIdx.current = null
+    if (from == null || from === toIdx) return
+    setForm((f) => {
+      const arr = [...f.images]
+      const [moved] = arr.splice(from, 1)
+      arr.splice(toIdx, 0, moved)
+      return { ...f, images: arr }
+    })
+  }
+
+  function removeImage(idx) {
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }))
+  }
+
+  function addImageUrl() {
+    const u = urlDraft.trim()
+    if (!u) return
+    setForm((f) => (f.images.includes(u) ? f : { ...f, images: [...f.images, u] }))
+    setUrlDraft('')
   }
 
   useEffect(() => {
@@ -124,7 +156,9 @@ export default function AdminPage() {
 
   async function saveListing() {
     setSaving(true)
-    const body = editing ? { id: editing.id, ...form } : form
+    // images 数组为主数据，首图同步到 image 字段兼容旧展示
+    const payload = { ...form, image: form.images[0] || form.image || '' }
+    const body = editing ? { id: editing.id, ...payload } : payload
     const res = await authFetch('/api/admin/listings', {
       method: editing ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -235,32 +269,84 @@ export default function AdminPage() {
                 <label>{t('面积 (㎡)', 'Area (㎡)')}<input type="number" value={form.area} onChange={(e) => setForm({ ...form, area: e.target.value })} /></label>
               </div>
               <label>{t('描述', 'Description')}<textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} /></label>
-              <label>{t('图片 URL', 'Image URL')}<input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder={t('https://... 或点击下方上传本地图片', 'https://... or upload a local image below')} /></label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                <button
-                  type="button"
-                  className="v8-admin__btn v8-admin__btn--ghost"
-                  disabled={imgUploading}
-                  onClick={() => imgFileRef.current?.click()}
-                >
-                  {imgUploading ? t('上传中...', 'Uploading...') : t('上传本地图片', 'Upload Image')}
-                </button>
-                <input
-                  ref={imgFileRef}
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={handleListingImageUpload}
-                />
-                {form.image && (
-                  <img
-                    src={form.image}
-                    alt=""
-                    style={{ height: 44, borderRadius: 4, border: '1px solid rgba(0,0,0,.12)' }}
+              {/* 房源图片：多张管理，支持批量上传 / URL 添加 / 拖拽排序，第一张为封面 */}
+              <div>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
+                  {form.images.map((src, i) => (
+                    <div
+                      key={src + '#' + i}
+                      draggable
+                      onDragStart={() => { dragIdx.current = i }}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={() => reorderImages(i)}
+                      title={t('拖拽调整顺序', 'Drag to reorder')}
+                      style={{
+                        position: 'relative', width: 86, height: 64,
+                        borderRadius: 4, overflow: 'hidden',
+                        border: '1px solid rgba(0,0,0,.14)',
+                        cursor: 'grab', background: '#f5f5f6'
+                      }}
+                    >
+                      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', display: 'block' }} />
+                      {i === 0 && (
+                        <span style={{
+                          position: 'absolute', left: 0, top: 0,
+                          background: 'rgba(22,22,26,.78)', color: '#fff',
+                          fontSize: 10, padding: '1px 5px', borderRadius: '0 0 4px 0'
+                        }}>{t('封面', 'Cover')}</span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        aria-label={t('删除图片', 'Remove image')}
+                        style={{
+                          position: 'absolute', right: 2, top: 2,
+                          width: 18, height: 18, lineHeight: '16px',
+                          borderRadius: 99, border: 'none',
+                          background: 'rgba(22,22,26,.72)', color: '#fff',
+                          fontSize: 12, cursor: 'pointer', padding: 0
+                        }}
+                      >×</button>
+                    </div>
+                  ))}
+                  {form.images.length === 0 && (
+                    <span style={{ fontSize: 13, color: '#76767d' }}>
+                      {t('暂无图片：可批量上传本地图片或粘贴 URL 添加，第一张为封面', 'No images yet — batch upload or add URLs; the first one is the cover')}
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    className="v8-admin__btn v8-admin__btn--ghost"
+                    disabled={imgUploading}
+                    onClick={() => imgFileRef.current?.click()}
+                  >
+                    {imgUploading
+                      ? t(`上传中 ${uploadDone}/${uploadTotal}...`, `Uploading ${uploadDone}/${uploadTotal}...`)
+                      : t('批量上传本地图片', 'Upload Images (multi)')}
+                  </button>
+                  <input
+                    ref={imgFileRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style={{ display: 'none' }}
+                    onChange={handleListingImageUpload}
                   />
-                )}
+                  <input
+                    value={urlDraft}
+                    onChange={(e) => setUrlDraft(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addImageUrl() } }}
+                    placeholder={t('粘贴图片 URL，回车添加', 'Paste an image URL and press Enter')}
+                    style={{ flex: 1, minWidth: 200, padding: '8px 10px', border: '1px solid rgba(0,0,0,.16)', borderRadius: 4, fontSize: 14 }}
+                  />
+                  <button type="button" className="v8-admin__btn v8-admin__btn--ghost" onClick={addImageUrl}>
+                    {t('添加', 'Add')}
+                  </button>
+                </div>
+                {imgError && <p style={{ color: '#c0392b', fontSize: 13, margin: '6px 0 0' }}>{imgError}</p>}
               </div>
-              {imgError && <p style={{ color: '#c0392b', fontSize: 13, margin: 0 }}>{imgError}</p>}
               <label className="v8-admin__check">
                 <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
                 {t('发布（前端可见）', 'Published (visible on site)')}
@@ -288,13 +374,23 @@ export default function AdminPage() {
                 )}
                 {listings.map((l) => (
                   <tr key={l.id}>
-                    <td>{l.title}</td>
+                    <td>
+                      {l.title}
+                      {(Array.isArray(l.images) ? l.images.length : (l.image ? 1 : 0)) > 0 && (
+                        <span style={{ marginLeft: 6, fontSize: 12, color: '#76767d' }}>
+                          {t('图', 'img')}×{Array.isArray(l.images) ? l.images.length : (l.image ? 1 : 0)}
+                        </span>
+                      )}
+                    </td>
                     <td>{typeLabels[l.type] || l.type}</td>
                     <td>¥{l.price}</td>
                     <td>{l.city}</td>
                     <td>{l.published === false ? t('未发布', 'Unpublished') : t('已发布', 'Published')}</td>
                     <td>
-                      <button className="v8-admin__link" onClick={() => { setEditing(l); setForm({ ...EMPTY_LISTING, ...l }); window.scrollTo(0, 0) }}>{t('编辑', 'Edit')}</button>
+                      <button className="v8-admin__link" onClick={() => {
+                        const imgs = Array.isArray(l.images) && l.images.length ? l.images.filter(Boolean) : (l.image ? [l.image] : [])
+                        setEditing(l); setForm({ ...EMPTY_LISTING, ...l, images: imgs }); window.scrollTo(0, 0)
+                      }}>{t('编辑', 'Edit')}</button>
                       <button className="v8-admin__link v8-admin__link--danger" onClick={() => removeListing(l.id)}>{t('删除', 'Delete')}</button>
                     </td>
                   </tr>
