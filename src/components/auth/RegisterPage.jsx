@@ -1,10 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext.jsx'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate, switchLang } from '../../lib/router.mjs'
 import './auth.css'
 
 const STEPS = 3
+
+// 生成 5 位随机验证码（字母+数字，排除易混淆字符）
+function genCaptcha() {
+  const chars = 'abcdefghjkmnpqrstuvwxyz23456789'
+  let s = ''
+  for (let i = 0; i < 5; i++) s += chars[Math.floor(Math.random() * chars.length)]
+  return s
+}
 
 export default function RegisterPage() {
   const { lang } = useIciI18n()
@@ -23,14 +31,35 @@ export default function RegisterPage() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [phone, setPhone] = useState('')
   const [code, setCode] = useState(['', '', '', '', '', ''])
+  const [captcha, setCaptcha] = useState(genCaptcha())
+  const [captchaInput, setCaptchaInput] = useState('')
   const [error, setError] = useState('')
 
+  // 每次进入第 1 步重新生成验证码
+  useEffect(() => {
+    if (step === 1) {
+      setCaptcha(genCaptcha())
+      setCaptchaInput('')
+    }
+  }, [step])
+
   const fullName = `${lastName}${lastName && firstName ? ' ' : ''}${firstName}`.trim() || firstName
+
+  function refreshCaptcha() {
+    setCaptcha(genCaptcha())
+    setCaptchaInput('')
+  }
 
   function nextStep() {
     setError('')
     if (step === 1) {
       if (!lastName.trim() || !firstName.trim()) { setError(t('请填写姓名', 'Please enter your name')); return }
+      if (!captchaInput.trim()) { setError(t('请输入验证码', 'Please enter the verification code')); return }
+      if (captchaInput.trim().toLowerCase() !== captcha.toLowerCase()) {
+        setError(t('验证码错误', 'Verification code incorrect'))
+        refreshCaptcha()
+        return
+      }
       if (!agreed) { setError(t('请同意服务条款', 'Please agree to the terms')); return }
       setStep(2)
     } else if (step === 2) {
@@ -88,19 +117,19 @@ export default function RegisterPage() {
                 <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
               </label>
 
-              {/* 验证码（视觉还原） */}
+              {/* 验证码 */}
               <label>
                 <span className="v8-auth__field-label">{t('验证码', 'Verification code')}</span>
                 <div className="v8-auth__captcha">
-                  <span className="v8-auth__captcha-text">p2fmh</span>
-                  <button type="button" className="v8-auth__captcha-refresh" aria-label="refresh">
+                  <span className="v8-auth__captcha-text">{captcha}</span>
+                  <button type="button" className="v8-auth__captcha-refresh" aria-label="refresh" onClick={refreshCaptcha}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
                   </button>
                 </div>
               </label>
               <label>
                 <span className="v8-auth__field-label">{t('请输入图片中的字符', 'Enter the characters above')}</span>
-                <input type="text" />
+                <input type="text" value={captchaInput} onChange={(e) => setCaptchaInput(e.target.value)} autoComplete="off" />
               </label>
 
               <label className="v8-auth__check">
