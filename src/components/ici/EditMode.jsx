@@ -25,7 +25,7 @@ function walk(obj, prefix, out) {
  * 可视化编辑模式：当 URL 包含 ?edit=1 时激活。
  */
 export default function EditMode() {
-  const { lang, c } = useIciI18n()
+  const { lang, c, reloadTexts } = useIciI18n()
 
   // 默认文案（用于 key → {zh, en} 的完整映射）
   const flat = useMemo(() => flattenTexts(iciContent.zh, iciContent.en), [])
@@ -145,6 +145,8 @@ export default function EditMode() {
           node.textContent = newVal
         }
       }
+      // 刷新 i18n 上下文，让 reverseMap 包含新值，这样修改后的文案可再次编辑
+      reloadTexts()
     }
     window.addEventListener('message', onMessage)
 
@@ -158,7 +160,7 @@ export default function EditMode() {
         highlighted.removeAttribute('data-edit-key')
       }
     }
-  }, [reverseMap, c, lang])
+  }, [reverseMap, c, lang, reloadTexts])
 
   return null
 }
