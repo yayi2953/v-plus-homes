@@ -263,14 +263,6 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   margin: 0;
   font-family: "Universal Sans Display", "SF Pro Display", "PingFang SC", "Microsoft YaHei", -apple-system, Arial, sans-serif;
 }
-/* Hero 标题 V LU logo：高度自适应匹配原文字大小，宽度按比例缩放 */
-.home-v8 .v8-hero-overlay__logo {
-  height: clamp(36px, 5vw, 56px);
-  width: auto;
-  display: block;
-  margin: 0 auto;
-  filter: drop-shadow(0 2px 12px rgba(0, 0, 0, .35));
-}
 .home-v8 .v8-hero-overlay__sub {
   font-size: clamp(13px, 1.4vw, 16px);
   font-weight: 400;
