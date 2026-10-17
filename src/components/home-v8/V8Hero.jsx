@@ -68,7 +68,7 @@ export default function V8Hero() {
 
         {/* 轮播指示器：底部居中，特斯拉风格圆点 */}
         <div className="v8-hero-dots" role="tablist" aria-label="轮播图切换">
-          {BG_IMAGES.map((src, i) => (
+          {SLIDES.map((src, i) => (
             <button
               key={src}
               type="button"
