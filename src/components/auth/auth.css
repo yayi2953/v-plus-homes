@@ -135,6 +135,143 @@
   border-color: #171a20;
 }
 
+/* 步骤提示 */
+.v8-auth__step {
+  font-size: 13px;
+  color: #5c5e62;
+  margin: 0 0 6px;
+}
+
+.v8-auth__desc {
+  font-size: 14px;
+  color: #5c5e62;
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+/* 表单标签（部分字段有独立标签行） */
+.v8-auth__label {
+  font-size: 13px;
+  color: #5c5e62;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* 复选框协议 */
+.v8-auth__check {
+  flex-direction: row !important;
+  align-items: flex-start;
+  gap: 10px !important;
+}
+.v8-auth__check input[type="checkbox"] {
+  width: auto;
+  margin-top: 2px;
+  accent-color: #3e6ae1;
+}
+.v8-auth__check span {
+  font-size: 13px;
+  color: #5c5e62;
+  line-height: 1.5;
+}
+
+/* 验证码框 */
+.v8-auth__captcha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f4f4f4;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0 14px;
+  height: 44px;
+  gap: 10px;
+}
+.v8-auth__captcha-text {
+  font-family: "Courier New", monospace;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #171a20;
+  user-select: none;
+}
+.v8-auth__captcha-refresh {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5c5e62;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+.v8-auth__captcha-refresh:hover { color: #171a20; }
+.v8-auth__captcha-refresh svg { width: 18px; height: 18px; }
+
+/* 密码可见性切换 */
+.v8-auth__pwd {
+  position: relative;
+}
+.v8-auth__pwd input {
+  padding-right: 44px;
+}
+.v8-auth__eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #5c5e62;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+.v8-auth__eye svg { width: 18px; height: 18px; }
+.v8-auth__eye:hover { color: #171a20; }
+
+/* 电话输入：国家码前缀 */
+.v8-auth__phone {
+  display: flex;
+  align-items: center;
+  background: #f4f4f4;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color .15s, background .15s;
+}
+.v8-auth__phone:focus-within {
+  background: #fff;
+  border-color: #171a20;
+}
+.v8-auth__phone-prefix {
+  padding: 0 14px;
+  font-size: 15px;
+  color: #171a20;
+  border-right: 1px solid #d0d1d2;
+  white-space: nowrap;
+}
+.v8-auth__phone input {
+  border: none;
+  background: transparent;
+  flex: 1;
+}
+.v8-auth__phone input:focus {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* 返回按钮 */
+.v8-auth__back {
+  background: none;
+  border: none;
+  color: #5c5e62;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 0;
+  text-align: center;
+}
+.v8-auth__back:hover { color: #171a20; text-decoration: underline; }
+
 /* 错误提示 */
 .v8-auth__error {
   color: #b91c1c;
