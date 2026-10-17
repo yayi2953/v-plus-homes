@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext.jsx'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate } from '../../lib/router.mjs'
+import TextEditor from './TextEditor.jsx'
 import './admin.css'
 
-const TABS = ['listings', 'messages', 'users']
+const TABS = ['listings', 'messages', 'users', 'texts']
 
 const EMPTY_LISTING = {
   title: '', type: 'luxury', price: '', city: '', bedrooms: '', bathrooms: '',
@@ -138,7 +139,7 @@ export default function AdminPage() {
             className={`v8-admin__tab${tab === tb ? ' is-active' : ''}`}
             onClick={() => setTab(tb)}
           >
-            {tb === 'listings' ? t('房源管理', 'Listings') : tb === 'messages' ? t('客户留言', 'Messages') : t('注册用户', 'Users')}
+            {tb === 'listings' ? t('房源管理', 'Listings') : tb === 'messages' ? t('客户留言', 'Messages') : tb === 'users' ? t('注册用户', 'Users') : t('文案管理', 'Content')}
           </button>
         ))}
       </div>
@@ -264,6 +265,8 @@ export default function AdminPage() {
           </table>
         </div>
       )}
+
+      {tab === 'texts' && <TextEditor authFetch={authFetch} />}
     </div>
   )
 }

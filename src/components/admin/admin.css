@@ -226,3 +226,114 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- 文案管理 ---------- */
+.v8-admin__texts-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.v8-admin__texts-head h2 {
+  margin: 0;
+}
+.v8-admin__texts-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.v8-admin__search {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 220px;
+}
+.v8-admin__check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #4b5563;
+  cursor: pointer;
+}
+.v8-admin__texts-table {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.v8-admin__text-key {
+  font-family: "SF Mono", "Courier New", monospace;
+  font-size: 12px;
+  color: #6b7280;
+  word-break: break-all;
+}
+.v8-admin__text-key-full {
+  font-family: "SF Mono", "Courier New", monospace;
+  font-size: 12px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 8px;
+  border-radius: 4px;
+  word-break: break-all;
+  margin: 0 0 16px;
+}
+.v8-admin__table tbody tr.is-modified {
+  background: #fefce8;
+}
+.v8-admin__table tbody tr.is-modified:hover {
+  background: #fef9c3;
+}
+
+/* ---------- 编辑弹窗 ---------- */
+.v8-admin__modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.v8-admin__modal-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+}
+.v8-admin__modal-box h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.v8-admin__modal-box label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #4b5563;
+  font-weight: 500;
+}
+.v8-admin__modal-box textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  margin-top: 4px;
+}
+.v8-admin__modal-box textarea:focus {
+  outline: none;
+  border-color: #3e6ae1;
+}
+.v8-admin__modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}

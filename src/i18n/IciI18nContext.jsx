@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
 import { iciContent } from './iciContent.js'
 import { setDefaultTitle, resyncSeo } from '../lib/seo.mjs'
 import { urlLang, syncRouter } from '../lib/router.mjs'
+import { setByPath } from './flatten.js'
 
 const IciI18nContext = createContext(null)
 const STORAGE_KEY = 'hereici-lang'
@@ -22,8 +23,14 @@ function getInitialLang() {
   return 'en'
 }
 
+// 深拷贝翻译对象，避免修改原数据
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj))
+}
+
 export function IciI18nProvider({ children }) {
   const [lang, setLang] = useState(getInitialLang)
+  const [overrides, setOverrides] = useState({})
 
   useEffect(() => { syncRouter(window.location.pathname) }, [])
 
@@ -33,8 +40,21 @@ export function IciI18nProvider({ children }) {
     resyncSeo()
   }, [lang])
 
+  // 从后端拉取文案覆盖项
+  const loadOverrides = useCallback(async () => {
+    try {
+      const res = await fetch('/api/texts')
+      if (res.ok) {
+        const data = await res.json()
+        setOverrides(data.texts || {})
+      }
+    } catch { /* ignore */ }
+  }, [])
+
+  useEffect(() => { loadOverrides() }, [loadOverrides])
+
   const value = useMemo(() => {
-    const c = { ...iciContent[lang] }
+    const c = deepClone(iciContent[lang])
     delete c.lang
     c.sections = { ...DEFAULT_SECTIONS, ...(c.sections || {}) }
     // 房源类型/校区多选兼容
@@ -45,6 +65,17 @@ export function IciI18nProvider({ children }) {
       schoolKeys: Array.isArray(p.schoolKeys) && p.schoolKeys.length
         ? p.schoolKeys : (p.schoolKey ? [p.schoolKey] : [])
     }))
+
+    // 应用后端文案覆盖项
+    for (const [key, val] of Object.entries(overrides)) {
+      if (val && typeof val === 'object') {
+        const text = val[lang]
+        if (text !== undefined && text !== null) {
+          setByPath(c, key, text)
+        }
+      }
+    }
+
     const t = typeof c.siteName === 'string' ? c.siteName.trim() : ''
     if (t) setDefaultTitle(t)
     return {
@@ -52,9 +83,10 @@ export function IciI18nProvider({ children }) {
       setLang,
       toggleLang: () => setLang((l) => (l === 'zh' ? 'en' : 'zh')),
       c,
-      remoteReady: true
+      remoteReady: true,
+      reloadTexts: loadOverrides
     }
-  }, [lang])
+  }, [lang, overrides, loadOverrides])
 
   return <IciI18nContext.Provider value={value}>{children}</IciI18nContext.Provider>
 }

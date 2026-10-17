@@ -17,7 +17,8 @@ const SEED = {
   users: [],
   listings: [],
   messages: [],
-  services: []
+  services: [],
+  texts: {}
 }
 
 let cache = null
@@ -77,6 +78,21 @@ function getUsers() { return load().users }
 function getListings() { return load().listings }
 function getMessages() { return load().messages }
 function getServices() { return load().services }
+function getTexts() { return load().texts || {} }
+
+function updateTexts(updates) {
+  const db = load()
+  db.texts = { ...db.texts, ...updates }
+  save(db)
+  return db.texts
+}
+
+function resetTexts() {
+  const db = load()
+  db.texts = {}
+  save(db)
+  return {}
+}
 
 function findUserByEmail(email) {
   return load().users.find((u) => u.email.toLowerCase() === email.toLowerCase())
@@ -145,8 +161,9 @@ function deleteMessage(id) {
 
 export {
   genId,
-  getUsers, getListings, getMessages, getServices,
+  getUsers, getListings, getMessages, getServices, getTexts,
   findUserByEmail, createUser,
   createListing, updateListing, deleteListing,
-  createMessage, markMessageRead, deleteMessage
+  createMessage, markMessageRead, deleteMessage,
+  updateTexts, resetTexts
 }

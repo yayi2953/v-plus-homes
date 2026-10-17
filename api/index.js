@@ -3,7 +3,8 @@ import {
   getUsers, getListings, getMessages,
   findUserByEmail, createUser,
   createListing, updateListing, deleteListing,
-  createMessage, markMessageRead, deleteMessage
+  createMessage, markMessageRead, deleteMessage,
+  getTexts, updateTexts, resetTexts
 } from './lib/store.js'
 
 // 统一入口：所有 /api/* 路由在此函数内分发，共享同一个 /tmp/db.json
@@ -45,6 +46,9 @@ export default async function handler(req, res) {
     if (rel === '/admin/messages') {
       return adminMessages(req, res)
     }
+    if (rel === '/admin/texts') {
+      return adminTexts(req, res)
+    }
 
     // ---------- Public ----------
     if (rel === '/contact' && req.method === 'POST') {
@@ -55,6 +59,9 @@ export default async function handler(req, res) {
     }
     if (rel === '/messages' && req.method === 'GET') {
       return messagesPublic(req, res)
+    }
+    if (rel === '/texts' && req.method === 'GET') {
+      return textsPublic(req, res)
     }
 
     return res.status(404).json({ error: 'Not found' })
@@ -198,4 +205,37 @@ async function messagesPublic(req, res) {
     .filter((m) => m.type === 'message-board')
     .map((m) => ({ id: m.id, name: m.name, message: m.message, createdAt: m.createdAt }))
   return res.status(200).json({ messages })
+}
+
+// ============ Texts handlers ============
+async function textsPublic(req, res) {
+  // 公开接口：返回所有文案覆盖项（前端合并到默认翻译）
+  return res.status(200).json({ texts: getTexts() })
+}
+
+async function adminTexts(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  if (req.method === 'GET') {
+    return res.status(200).json({ texts: getTexts() })
+  }
+  if (req.method === 'PUT') {
+    const { key, zh, en } = req.body || {}
+    if (!key) return res.status(400).json({ error: '缺少 key' })
+    const updated = updateTexts({ [key]: { zh, en } })
+    return res.status(200).json({ ok: true, texts: updated })
+  }
+  if (req.method === 'DELETE') {
+    const { key } = req.body || {}
+    if (key) {
+      // 重置单个 key：从覆盖项中删除
+      const db = getTexts()
+      delete db[key]
+      updateTexts(db)
+      return res.status(200).json({ ok: true })
+    }
+    // 无 key 则全部重置
+    resetTexts()
+    return res.status(200).json({ ok: true })
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
 }
