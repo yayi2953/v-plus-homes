@@ -1,15 +1,30 @@
-/* 特斯拉风格登录 / 注册页 —— 1:1 还原 auth.tesla.cn */
+/* ============================================================
+   特斯拉官网登录 / 注册页 — 1:1 像素级还原
+   设计 token 来源：awesome-design-md/tesla/DESIGN.md
+   ============================================================ */
 .v8-auth {
+  /* Tesla 色彩 token */
+  --ts-blue: #3E6AE1;       /* Electric Blue — 唯一主色，仅用于主 CTA */
+  --ts-white: #FFFFFF;      /* 纯白画布 */
+  --ts-ash: #F4F4F4;        /* Light Ash — 输入框底色 */
+  --ts-carbon: #171A20;     /* Carbon Dark — 标题/最深文字 */
+  --ts-graphite: #393C41;   /* Graphite — 正文 */
+  --ts-pewter: #5C5E62;     /* Pewter — 三级文字/链接 */
+  --ts-silver: #8E8E8E;     /* Silver Fog — placeholder */
+  --ts-cloud: #EEEEEE;      /* Cloud Gray — 分割线 */
+  --ts-pale: #D0D1D2;       /* Pale Silver — 描边边框 */
+
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  font-family: "Tesla", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-  color: #171a20;
-  position: relative;
+  background: var(--ts-white);
+  font-family: "Universal Sans Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  color: var(--ts-carbon);
+  /* Tesla 全局过渡节奏 */
+  --ts-ease: 0.33s cubic-bezier(0.5, 0, 0, 0.75);
 }
 
-/* 顶部栏：左 Logo，右语言 */
+/* ---------- 顶部栏 ---------- */
 .v8-auth__topbar {
   display: flex;
   align-items: center;
@@ -20,35 +35,37 @@
 }
 .v8-auth__topbar-logo {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 3px;
-  color: #171a20;
+  color: var(--ts-carbon);
   text-decoration: none;
   cursor: pointer;
+  text-transform: uppercase;
 }
 .v8-auth__topbar-lang {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: #171a20;
+  font-weight: 500;
+  color: var(--ts-carbon);
   cursor: pointer;
   background: none;
   border: none;
-  padding: 6px 10px;
-  border-radius: 999px;
-  transition: background .15s;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: background-color var(--ts-ease);
 }
-.v8-auth__topbar-lang:hover { background: #f4f4f4; }
+.v8-auth__topbar-lang:hover { background: var(--ts-ash); }
 .v8-auth__topbar-lang svg { width: 16px; height: 16px; }
 
-/* 主体：水平居中，偏上 */
+/* ---------- 主体 ---------- */
 .v8-auth__main {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px 60px;
+  padding: 48px 20px 60px;
 }
 
 .v8-auth__card {
@@ -56,14 +73,34 @@
   max-width: 340px;
 }
 
-.v8-auth__title {
-  font-size: 32px;
-  font-weight: 600;
-  margin: 0 0 24px;
-  color: #171a20;
-  letter-spacing: -0.01em;
+/* 步骤指示 */
+.v8-auth__step {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ts-pewter);
+  margin: 0 0 6px;
+  line-height: 20px;
 }
 
+/* 标题：40px / 500 / 48px 行高 */
+.v8-auth__title {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 48px;
+  letter-spacing: normal;
+  margin: 0 0 24px;
+  color: var(--ts-carbon);
+}
+
+.v8-auth__desc {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ts-graphite);
+  margin: 0 0 16px;
+}
+
+/* ---------- 表单 ---------- */
 .v8-auth__form {
   display: flex;
   flex-direction: column;
@@ -76,114 +113,70 @@
   gap: 0;
 }
 
-/* 输入框：浅灰背景填充，圆角，无边框 */
+.v8-auth__label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ts-pewter);
+  margin-bottom: 6px;
+  display: block;
+  line-height: 20px;
+}
+
+/* 输入框：Light Ash 底色，4px 圆角，无外边框 */
 .v8-auth__form input {
   width: 100%;
-  padding: 12px 16px;
-  background: #f4f4f4;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--ts-ash);
   border: 1px solid transparent;
   border-radius: 4px;
-  font-size: 15px;
-  color: #171a20;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ts-carbon);
   outline: none;
-  transition: border-color .15s, background .15s;
+  transition: border-color var(--ts-ease), background-color var(--ts-ease);
   box-sizing: border-box;
 }
 
 .v8-auth__form input::placeholder {
-  color: #5c5e62;
+  color: var(--ts-silver);
 }
 
 .v8-auth__form input:focus {
-  background: #fff;
-  border-color: #171a20;
+  background: var(--ts-white);
+  border-color: var(--ts-carbon);
 }
 
-/* 主按钮：特斯拉蓝 #3e6ae1，禁用时灰色 */
-.v8-auth__btn {
-  padding: 13px 24px;
-  background: #3e6ae1;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  cursor: pointer;
-  transition: background-color .2s ease;
-  margin-top: 4px;
-}
-
-.v8-auth__btn:hover:not(:disabled) {
-  background: #3558b8;
-}
-
-.v8-auth__btn:disabled {
-  background: #c4c4c4;
-  color: #fff;
-  cursor: not-allowed;
-}
-
-/* 次按钮：描边样式（创建账户） */
-.v8-auth__btn--outline {
-  background: #fff;
-  color: #171a20;
-  border: 1px solid #d0d1d2;
-}
-.v8-auth__btn--outline:hover:not(:disabled) {
-  background: #f4f4f4;
-  border-color: #171a20;
-}
-
-/* 步骤提示 */
-.v8-auth__step {
-  font-size: 13px;
-  color: #5c5e62;
-  margin: 0 0 6px;
-}
-
-.v8-auth__desc {
-  font-size: 14px;
-  color: #5c5e62;
-  margin: 0 0 12px;
-  line-height: 1.5;
-}
-
-/* 表单标签（部分字段有独立标签行） */
-.v8-auth__label {
-  font-size: 13px;
-  color: #5c5e62;
-  margin-bottom: 6px;
-  display: block;
-}
-
-/* 复选框协议 */
+/* 复选框协议行 */
 .v8-auth__check {
   flex-direction: row !important;
   align-items: flex-start;
   gap: 10px !important;
 }
 .v8-auth__check input[type="checkbox"] {
-  width: auto;
+  width: 16px;
+  height: 16px;
   margin-top: 2px;
-  accent-color: #3e6ae1;
+  accent-color: var(--ts-blue);
+  flex: none;
 }
 .v8-auth__check span {
-  font-size: 13px;
-  color: #5c5e62;
-  line-height: 1.5;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ts-pewter);
 }
 
-/* 验证码框 */
+/* ---------- 验证码框 ---------- */
 .v8-auth__captcha {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f4f4f4;
+  background: var(--ts-ash);
   border: 1px solid transparent;
   border-radius: 4px;
-  padding: 0 14px;
-  height: 44px;
+  padding: 0 12px;
+  height: 40px;
   gap: 10px;
 }
 .v8-auth__captcha-text {
@@ -191,88 +184,135 @@
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 4px;
-  color: #171a20;
+  color: var(--ts-carbon);
   user-select: none;
 }
 .v8-auth__captcha-refresh {
   background: none;
   border: none;
   cursor: pointer;
-  color: #5c5e62;
+  color: var(--ts-pewter);
   padding: 4px;
   display: flex;
   align-items: center;
+  transition: color var(--ts-ease);
 }
-.v8-auth__captcha-refresh:hover { color: #171a20; }
+.v8-auth__captcha-refresh:hover { color: var(--ts-carbon); }
 .v8-auth__captcha-refresh svg { width: 18px; height: 18px; }
 
-/* 密码可见性切换 */
+/* ---------- 密码可见性切换 ---------- */
 .v8-auth__pwd {
   position: relative;
 }
 .v8-auth__pwd input {
-  padding-right: 44px;
+  padding-right: 40px;
 }
 .v8-auth__eye {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  color: #5c5e62;
+  color: var(--ts-pewter);
   padding: 4px;
   display: flex;
   align-items: center;
+  transition: color var(--ts-ease);
 }
 .v8-auth__eye svg { width: 18px; height: 18px; }
-.v8-auth__eye:hover { color: #171a20; }
+.v8-auth__eye:hover { color: var(--ts-carbon); }
 
-/* 电话输入：国家码前缀 */
+/* ---------- 电话输入（国家码前缀） ---------- */
 .v8-auth__phone {
   display: flex;
   align-items: center;
-  background: #f4f4f4;
+  background: var(--ts-ash);
   border: 1px solid transparent;
   border-radius: 4px;
   overflow: hidden;
-  transition: border-color .15s, background .15s;
+  height: 40px;
+  transition: border-color var(--ts-ease), background-color var(--ts-ease);
 }
 .v8-auth__phone:focus-within {
-  background: #fff;
-  border-color: #171a20;
+  background: var(--ts-white);
+  border-color: var(--ts-carbon);
 }
 .v8-auth__phone-prefix {
-  padding: 0 14px;
-  font-size: 15px;
-  color: #171a20;
-  border-right: 1px solid #d0d1d2;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ts-carbon);
+  border-right: 1px solid var(--ts-pale);
   white-space: nowrap;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 .v8-auth__phone input {
   border: none;
   background: transparent;
   flex: 1;
+  height: 100%;
 }
 .v8-auth__phone input:focus {
   background: transparent;
   border-color: transparent;
 }
 
-/* 返回按钮 */
+/* ---------- 按钮（Tesla 精确规格） ---------- */
+/* 主 CTA：Electric Blue #3E6AE1，4px 圆角，40px 高，3px 透明描边占位 */
+.v8-auth__btn {
+  height: 40px;
+  padding: 0 16px;
+  background: var(--ts-blue);
+  color: var(--ts-white);
+  border: 3px solid transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16.8px;
+  letter-spacing: normal;
+  cursor: pointer;
+  transition: border-color var(--ts-ease), background-color var(--ts-ease), color var(--ts-ease);
+  margin-top: 4px;
+}
+.v8-auth__btn:hover:not(:disabled) {
+  background: #3558b8;
+}
+.v8-auth__btn:disabled {
+  background: var(--ts-silver);
+  color: var(--ts-white);
+  cursor: not-allowed;
+}
+
+/* 次按钮：白底 + Graphite 文字 + Pale 描边 */
+.v8-auth__btn--outline {
+  background: var(--ts-white);
+  color: var(--ts-graphite);
+  border-color: var(--ts-pale);
+}
+.v8-auth__btn--outline:hover:not(:disabled) {
+  background: var(--ts-ash);
+  border-color: var(--ts-carbon);
+}
+
+/* 返回链接按钮 */
 .v8-auth__back {
   background: none;
   border: none;
-  color: #5c5e62;
+  color: var(--ts-pewter);
   font-size: 14px;
+  font-weight: 400;
   cursor: pointer;
-  padding: 8px 0;
+  padding: 6px 0;
   text-align: center;
+  transition: color var(--ts-ease);
 }
-.v8-auth__back:hover { color: #171a20; text-decoration: underline; }
+.v8-auth__back:hover { color: var(--ts-carbon); text-decoration: underline; }
 
-/* 错误提示 */
+/* ---------- 错误提示 ---------- */
 .v8-auth__error {
   color: #b91c1c;
   font-size: 13px;
@@ -280,11 +320,12 @@
   margin-top: -8px;
 }
 
-/* 辅助链接：无法登录？ */
+/* ---------- 辅助链接 ---------- */
 .v8-auth__help {
   text-align: center;
   font-size: 14px;
-  color: #171a20;
+  font-weight: 400;
+  color: var(--ts-carbon);
   text-decoration: underline;
   text-underline-offset: 2px;
   cursor: pointer;
@@ -292,10 +333,11 @@
   border: none;
   padding: 0;
   margin: 4px 0;
+  transition: color var(--ts-ease);
 }
-.v8-auth__help:hover { opacity: 0.7; }
+.v8-auth__help:hover { color: var(--ts-pewter); }
 
-/* 分隔线 + 或 */
+/* ---------- 分隔线 + 或 ---------- */
 .v8-auth__divider {
   display: flex;
   align-items: center;
@@ -307,53 +349,55 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: #d0d1d2;
+  background: var(--ts-cloud);
 }
 .v8-auth__divider span {
-  font-size: 13px;
-  color: #5c5e62;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ts-pewter);
 }
 
-/* 底部切换链接 */
+/* ---------- 底部切换链接 ---------- */
 .v8-auth__foot {
   text-align: center;
   font-size: 14px;
-  color: #5c5e62;
+  color: var(--ts-pewter);
   margin-top: 4px;
 }
 .v8-auth__foot a {
-  color: #171a20;
+  color: var(--ts-carbon);
   text-decoration: underline;
   text-underline-offset: 2px;
   margin-left: 2px;
 }
-.v8-auth__foot a:hover { opacity: 0.7; }
+.v8-auth__foot a:hover { color: var(--ts-pewter); }
 
 /* 演示账号提示 */
 .v8-auth__hint {
   margin-top: 20px;
   text-align: center;
   font-size: 12px;
-  color: #a0a2a6;
+  color: var(--ts-silver);
   line-height: 1.6;
 }
 
-/* 页脚：版权 + 链接 */
+/* ---------- 页脚 ---------- */
 .v8-auth__footer {
   padding: 20px;
   text-align: center;
   font-size: 12px;
-  color: #5c5e62;
+  color: var(--ts-pewter);
 }
 .v8-auth__footer a {
-  color: #5c5e62;
+  color: var(--ts-pewter);
   text-decoration: none;
   margin: 0 8px;
 }
 .v8-auth__footer a:hover { text-decoration: underline; }
 
+/* ---------- 响应式 ---------- */
 @media (max-width: 480px) {
   .v8-auth__topbar { padding: 14px 16px; }
-  .v8-auth__main { padding: 24px 16px 40px; }
-  .v8-auth__title { font-size: 26px; }
+  .v8-auth__main { padding: 32px 16px 40px; }
+  .v8-auth__title { font-size: 32px; line-height: 40px; }
 }
