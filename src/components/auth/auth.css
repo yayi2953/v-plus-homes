@@ -287,6 +287,7 @@
 /* ---------- 按钮（Tesla 精确规格） ---------- */
 /* 主 CTA：Electric Blue #3E6AE1，4px 圆角，40px 高，3px 透明描边占位 */
 .v8-auth__btn {
+  width: 100%;
   height: 40px;
   padding: 0 16px;
   background: var(--ts-blue);
@@ -355,7 +356,7 @@
   background: none;
   border: none;
   padding: 0;
-  margin: 4px 0;
+  margin: 20px 0 0;
   transition: color var(--ts-ease);
 }
 .v8-auth__help:hover { color: var(--ts-pewter); }
@@ -365,7 +366,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 8px 0;
+  margin: 28px 0;
 }
 .v8-auth__divider::before,
 .v8-auth__divider::after {
