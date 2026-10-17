@@ -57,8 +57,11 @@ export default function TextEditor({ authFetch }) {
   const [imgSaving, setImgSaving] = useState(false)
   const [imgErrorMsg, setImgErrorMsg] = useState('')
   // 图片定位：在预览框内拖动选择展示区域（object-position 百分比）
-  const [imgPos, setImgPos] = useState({ x: 50, y: 50 })
-  const [imgFrame, setImgFrame] = useState({ w: 16, h: 9 }) // 显示框宽高比
+  // 桌面端与手机端分别设定；手机端未单独设定时沿用桌面端位置
+  const [imgDevice, setImgDevice] = useState('desktop') // 'desktop' | 'mobile'
+  const [imgPosD, setImgPosD] = useState({ x: 50, y: 50 })
+  const [imgPosM, setImgPosM] = useState({ x: 50, y: 50 })
+  const [imgFrame, setImgFrame] = useState({ w: 16, h: 9 }) // 桌面显示框宽高比
   const [fileObjUrl, setFileObjUrl] = useState('')
   const [imgDragging, setImgDragging] = useState(false)
   const dragRef = useRef(null)
@@ -93,12 +96,16 @@ export default function TextEditor({ authFetch }) {
         setImgInfo({ imgKey, src })
         setImgUrl('')
         setImgErrorMsg('')
-        // 初始定位沿用已保存的覆盖位置，否则居中；预览框按真实元素比例
+        // 初始定位沿用已保存的覆盖位置，否则居中；手机端未单独保存时沿用桌面端
         const saved = overrides[`img:${imgKey}`] || {}
-        setImgPos({
-          x: Number.isFinite(Number(saved.posX)) ? Number(saved.posX) : 50,
-          y: Number.isFinite(Number(saved.posY)) ? Number(saved.posY) : 50
+        const dx = Number.isFinite(Number(saved.posX)) ? Number(saved.posX) : 50
+        const dy = Number.isFinite(Number(saved.posY)) ? Number(saved.posY) : 50
+        setImgPosD({ x: dx, y: dy })
+        setImgPosM({
+          x: Number.isFinite(Number(saved.posXm)) ? Number(saved.posXm) : dx,
+          y: Number.isFinite(Number(saved.posYm)) ? Number(saved.posYm) : dy
         })
+        setImgDevice('desktop')
         setFileObjUrl('')
         setImgFrame(w > 0 && h > 0 ? { w, h } : { w: 16, h: 9 })
         return
@@ -189,7 +196,12 @@ export default function TextEditor({ authFetch }) {
   // 预览源：优先本选择的文件，其次填写的 URL，最后当前图
   const imgPreviewSrc = fileObjUrl || imgUrl.trim() || imgInfo?.src || ''
 
-  // 预览框拖动：移动图片选择展示区域
+  // 预览框拖动：移动图片选择展示区域（按当前设备 Tab 分别记录）
+  const imgPos = imgDevice === 'mobile' ? imgPosM : imgPosD
+  const setImgPos = imgDevice === 'mobile' ? setImgPosM : setImgPosD
+  // 手机端预览用竖屏比例（真实手机展示框因屏幕而异，4:5 为通用近似）
+  const frame = imgDevice === 'mobile' ? { w: 4, h: 5 } : imgFrame
+
   function onFramePointerDown(e) {
     const rect = e.currentTarget.getBoundingClientRect()
     dragRef.current = { startX: e.clientX, startY: e.clientY, origX: imgPos.x, origY: imgPos.y, rect }
@@ -255,14 +267,21 @@ export default function TextEditor({ authFetch }) {
       const res = await authFetch('/api/admin/texts', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: `img:${imgInfo.imgKey}`, url, posX: imgPos.x, posY: imgPos.y })
+        body: JSON.stringify({
+          key: `img:${imgInfo.imgKey}`, url,
+          posX: imgPosD.x, posY: imgPosD.y,
+          posXm: imgPosM.x, posYm: imgPosM.y
+        })
       })
       if (!res.ok) {
         let msg = `保存失败（HTTP ${res.status}）`
         try { msg = (await res.json()).error || msg } catch { /* ignore */ }
         throw new Error(msg)
       }
-      setOverrides((prev) => ({ ...prev, [`img:${imgInfo.imgKey}`]: { url, posX: imgPos.x, posY: imgPos.y } }))
+      setOverrides((prev) => ({
+        ...prev,
+        [`img:${imgInfo.imgKey}`]: { url, posX: imgPosD.x, posY: imgPosD.y, posXm: imgPosM.x, posYm: imgPosM.y }
+      }))
       if (fileInput) fileInput.value = ''
       iframeRef.current?.contentWindow?.postMessage({ type: 'IMG_UPDATED' }, '*')
       closeImgDialog()
@@ -369,6 +388,36 @@ export default function TextEditor({ authFetch }) {
             <h3>{t('替换图片', 'Replace Image')}</h3>
             <p className="v8-admin__text-key-full">{imgInfo.imgKey}</p>
 
+            {/* 设备切换：桌面端 / 手机端分别拖拽定位 */}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+              {[
+                { id: 'desktop', label: t('桌面端', 'Desktop') },
+                { id: 'mobile', label: t('手机端', 'Mobile') }
+              ].map((d) => (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => setImgDevice(d.id)}
+                  style={{
+                    padding: '5px 14px',
+                    fontSize: 13,
+                    borderRadius: 99,
+                    border: '1px solid ' + (imgDevice === d.id ? '#3e6ae1' : '#d1d5db'),
+                    background: imgDevice === d.id ? '#3e6ae1' : '#fff',
+                    color: imgDevice === d.id ? '#fff' : '#374151',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {d.label}
+                </button>
+              ))}
+              <span style={{ fontSize: 12, color: '#76767d', alignSelf: 'center' }}>
+                {imgDevice === 'mobile'
+                  ? t('≤768px 屏幕生效', 'Applies to ≤768px screens')
+                  : t('>768px 屏幕生效', 'Applies to >768px screens')}
+              </span>
+            </div>
+
             {/* 交互预览框：按真实显示比例，拖动图片自定义展示位置 */}
             <div
               style={{
@@ -377,10 +426,12 @@ export default function TextEditor({ authFetch }) {
                 borderRadius: 8,
                 border: '1px solid rgba(0,0,0,.1)',
                 background: '#f5f5f6',
-                aspectRatio: `${imgFrame.w} / ${imgFrame.h}`,
+                aspectRatio: `${frame.w} / ${frame.h}`,
                 cursor: imgDragging ? 'grabbing' : 'grab',
                 touchAction: 'none',
-                marginBottom: 10
+                marginBottom: 10,
+                maxHeight: 420,
+                marginInline: 'auto'
               }}
               onPointerDown={onFramePointerDown}
               onPointerMove={onFramePointerMove}

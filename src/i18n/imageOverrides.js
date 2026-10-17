@@ -5,7 +5,7 @@
 //   2) 原始 src 路径 —— 如 "/images/hero-cityscape.jpg"，未声明的图片按 src 匹配
 // React 重渲染会把 src 重置回原值，所以用 MutationObserver 持续再应用。
 
-// 从 i18n overrides 中提取图片覆盖映射：{ 图片标识: { url, posX, posY } }
+// 从 i18n overrides 中提取图片覆盖映射：{ 图片标识: { url, posX, posY, posXm?, posYm? } }
 export function collectImageOverrides(overrides) {
   const map = {}
   const pct = (v, d) => {
@@ -15,10 +15,28 @@ export function collectImageOverrides(overrides) {
   for (const [key, val] of Object.entries(overrides || {})) {
     if (!key.startsWith('img:')) continue
     if (val && typeof val === 'object' && typeof val.url === 'string' && val.url) {
-      map[key.slice(4)] = { url: val.url, posX: pct(val.posX, 50), posY: pct(val.posY, 50) }
+      map[key.slice(4)] = {
+        url: val.url,
+        posX: pct(val.posX, 50),
+        posY: pct(val.posY, 50),
+        posXm: val.posXm != null ? pct(val.posXm, null) : null,
+        posYm: val.posYm != null ? pct(val.posYm, null) : null
+      }
     }
   }
   return map
+}
+
+// 移动端判定：≤768px 视口使用手机端定位（可独立于桌面端拖拽设定）
+const mqMobile = typeof window !== 'undefined' && window.matchMedia
+  ? window.matchMedia('(max-width: 768px)')
+  : null
+
+function pickPos(target) {
+  if (mqMobile && mqMobile.matches && target.posXm != null && target.posYm != null) {
+    return { x: target.posXm, y: target.posYm }
+  }
+  return { x: target.posX, y: target.posY }
 }
 
 function applyToElement(el, map) {
@@ -47,8 +65,9 @@ function applyToElement(el, map) {
     if (applied !== target.url) {
       el.setAttribute('data-applied-src', target.url)
     }
-    // 自定义展示位置（object-position 百分比）
-    el.style.objectPosition = `${target.posX}% ${target.posY}%`
+    // 自定义展示位置（object-position 百分比，手机端可独立设定）
+    const pos = pickPos(target)
+    el.style.objectPosition = `${pos.x}% ${pos.y}%`
   } else if (applied) {
     // 覆盖项已被移除（恢复默认）：src 仍是我们设的覆盖值时才还原，
     // 避免误伤应用程序设置的其它 src
@@ -98,9 +117,20 @@ export function startImageOverrides(getMap) {
     attributes: true,
     attributeFilter: ['src', 'data-edit-img']
   })
+  // 视口跨越手机/桌面断点时重新应用对应端的位置
+  let mqHandler = null
+  if (mqMobile) {
+    mqHandler = () => run()
+    if (mqMobile.addEventListener) mqMobile.addEventListener('change', mqHandler)
+    else if (mqMobile.addListener) mqMobile.addListener(mqHandler)
+  }
   run()
   return () => {
     if (timer) clearTimeout(timer)
     observer.disconnect()
+    if (mqMobile && mqHandler) {
+      if (mqMobile.removeEventListener) mqMobile.removeEventListener('change', mqHandler)
+      else if (mqMobile.removeListener) mqMobile.removeListener(mqHandler)
+    }
   }
 }
