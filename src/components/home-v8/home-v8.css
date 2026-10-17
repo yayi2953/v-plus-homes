@@ -113,7 +113,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   min-height: 100vh;
   min-height: 100dvh; /* 老内核不识别 dvh 时回退上一行 vh */
   display: flex; flex-direction: column;
-  padding: 86px 24px 0;
+  padding: 0;
   background: #fff;
 }
 .home-v8 .v8-hero-canvas { position: relative; width: 100%; height: clamp(340px, 56vh, 540px); flex: none; }
@@ -614,7 +614,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 @media (max-width: 768px) {
   /* 手机端横幅全出血：去掉 hero 横向 padding 让找房条/视频铺满屏幕左右边，
      正文单独补 20px 与全站内容对齐 */
-  .home-v8 .v8-hero { padding: 76px 0 0; }
+  .home-v8 .v8-hero { padding: 0; }
   .home-v8 .v8-hero-canvas { height: 412px; }
   .home-v8 .v8-hero-body { gap: 14px; padding: 4px 20px 30px; }
   .home-v8 .v8-lede { font-size: 15.5px; }
