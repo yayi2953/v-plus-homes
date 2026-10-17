@@ -94,6 +94,7 @@ export default function V8Navbar({ solid = false }) {
     // 外部链接（mailto / tel / http）不拦截，让浏览器默认处理
     if (m.href && !m.href.startsWith('/') && !m.href.startsWith('#')) {
       closeMenu()
+      document.activeElement?.blur()
       return
     }
     e?.preventDefault()
@@ -111,6 +112,8 @@ export default function V8Navbar({ solid = false }) {
       }
     })
     closeMenu()
+    // 移除焦点，避免 :focus-within 保持下拉展开
+    document.activeElement?.blur()
   }
 
   const pickSub = (s, e) => {
@@ -124,6 +127,7 @@ export default function V8Navbar({ solid = false }) {
     }
     navigate(`/listings${params.toString() ? `?${params}` : ''}`)
     closeMenu()
+    document.activeElement?.blur()
   }
 
   const book = () => {
