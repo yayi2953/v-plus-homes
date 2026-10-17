@@ -56,6 +56,12 @@ export default function TextEditor({ authFetch }) {
   const [imgUrl, setImgUrl] = useState('')
   const [imgSaving, setImgSaving] = useState(false)
   const [imgErrorMsg, setImgErrorMsg] = useState('')
+  // 图片定位：在预览框内拖动选择展示区域（object-position 百分比）
+  const [imgPos, setImgPos] = useState({ x: 50, y: 50 })
+  const [imgFrame, setImgFrame] = useState({ w: 16, h: 9 }) // 显示框宽高比
+  const [fileObjUrl, setFileObjUrl] = useState('')
+  const [imgDragging, setImgDragging] = useState(false)
+  const dragRef = useRef(null)
   const iframeRef = useRef(null)
 
   // 合并默认 + 覆盖
@@ -81,12 +87,20 @@ export default function TextEditor({ authFetch }) {
   useEffect(() => {
     function onMessage(e) {
       if (e.data?.type === 'IMG_EDIT') {
-        const { imgKey, src } = e.data
+        const { imgKey, src, w, h } = e.data
         if (!imgKey) return
         setClickInfo(null)
         setImgInfo({ imgKey, src })
         setImgUrl('')
         setImgErrorMsg('')
+        // 初始定位沿用已保存的覆盖位置，否则居中；预览框按真实元素比例
+        const saved = overrides[`img:${imgKey}`] || {}
+        setImgPos({
+          x: Number.isFinite(Number(saved.posX)) ? Number(saved.posX) : 50,
+          y: Number.isFinite(Number(saved.posY)) ? Number(saved.posY) : 50
+        })
+        setFileObjUrl('')
+        setImgFrame(w > 0 && h > 0 ? { w, h } : { w: 16, h: 9 })
         return
       }
       if (e.data?.type !== 'EDIT_TEXT') return
@@ -172,6 +186,42 @@ export default function TextEditor({ authFetch }) {
 
   const imgOverrideKey = imgInfo ? `img:${imgInfo.imgKey}` : ''
   const imgHasOverride = !!(imgOverrideKey && overrides[imgOverrideKey]?.url)
+  // 预览源：优先本选择的文件，其次填写的 URL，最后当前图
+  const imgPreviewSrc = fileObjUrl || imgUrl.trim() || imgInfo?.src || ''
+
+  // 预览框拖动：移动图片选择展示区域
+  function onFramePointerDown(e) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: imgPos.x, origY: imgPos.y, rect }
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+    setImgDragging(true)
+  }
+  function onFramePointerMove(e) {
+    const d = dragRef.current
+    if (!d) return
+    const dx = e.clientX - d.startX
+    const dy = e.clientY - d.startY
+    setImgPos({
+      x: Math.min(100, Math.max(0, d.origX - (dx * 100) / d.rect.width)),
+      y: Math.min(100, Math.max(0, d.origY - (dy * 100) / d.rect.height))
+    })
+  }
+  function onFramePointerUp() {
+    dragRef.current = null
+    setImgDragging(false)
+  }
+
+  function onFilePicked(e) {
+    const f = e.target.files?.[0]
+    if (fileObjUrl) URL.revokeObjectURL(fileObjUrl)
+    setFileObjUrl(f ? URL.createObjectURL(f) : '')
+  }
+
+  function closeImgDialog() {
+    if (fileObjUrl) URL.revokeObjectURL(fileObjUrl)
+    setFileObjUrl('')
+    setImgInfo(null)
+  }
 
   // 保存图片替换：优先本地上传的文件，否则用填写的 URL
   async function saveImage() {
@@ -205,17 +255,17 @@ export default function TextEditor({ authFetch }) {
       const res = await authFetch('/api/admin/texts', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: `img:${imgInfo.imgKey}`, url })
+        body: JSON.stringify({ key: `img:${imgInfo.imgKey}`, url, posX: imgPos.x, posY: imgPos.y })
       })
       if (!res.ok) {
         let msg = `保存失败（HTTP ${res.status}）`
         try { msg = (await res.json()).error || msg } catch { /* ignore */ }
         throw new Error(msg)
       }
-      setOverrides((prev) => ({ ...prev, [`img:${imgInfo.imgKey}`]: { url } }))
+      setOverrides((prev) => ({ ...prev, [`img:${imgInfo.imgKey}`]: { url, posX: imgPos.x, posY: imgPos.y } }))
       if (fileInput) fileInput.value = ''
       iframeRef.current?.contentWindow?.postMessage({ type: 'IMG_UPDATED' }, '*')
-      setImgInfo(null)
+      closeImgDialog()
       reloadTexts()
     } catch (err) {
       setImgErrorMsg(err.message || '保存失败')
@@ -314,31 +364,60 @@ export default function TextEditor({ authFetch }) {
       )}
 
       {imgInfo && (
-        <div className="v8-admin__modal" onClick={() => setImgInfo(null)}>
+        <div className="v8-admin__modal" onClick={closeImgDialog}>
           <div className="v8-admin__modal-box" onClick={(e) => e.stopPropagation()}>
             <h3>{t('替换图片', 'Replace Image')}</h3>
             <p className="v8-admin__text-key-full">{imgInfo.imgKey}</p>
 
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', margin: '10px 0' }}>
-              <div>
-                <p style={{ fontSize: 12, color: '#76767d', margin: '0 0 4px' }}>{t('当前图片', 'Current')}</p>
-                {imgInfo.src ? (
-                  <img src={imgInfo.src} alt="" style={{ maxWidth: 180, maxHeight: 110, borderRadius: 8, border: '1px solid rgba(0,0,0,.1)', objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ width: 120, height: 80, borderRadius: 8, background: '#f2f2f4' }} />
-                )}
-              </div>
-              {imgHasOverride && (
-                <div>
-                  <p style={{ fontSize: 12, color: '#76767d', margin: '0 0 4px' }}>{t('已替换为', 'Replaced with')}</p>
-                  <img src={overrides[`img:${imgInfo.imgKey}`].url} alt="" style={{ maxWidth: 180, maxHeight: 110, borderRadius: 8, border: '1px solid rgba(0,0,0,.1)', objectFit: 'cover' }} />
+            {/* 交互预览框：按真实显示比例，拖动图片自定义展示位置 */}
+            <div
+              style={{
+                position: 'relative',
+                overflow: 'hidden',
+                borderRadius: 8,
+                border: '1px solid rgba(0,0,0,.1)',
+                background: '#f5f5f6',
+                aspectRatio: `${imgFrame.w} / ${imgFrame.h}`,
+                cursor: imgDragging ? 'grabbing' : 'grab',
+                touchAction: 'none',
+                marginBottom: 10
+              }}
+              onPointerDown={onFramePointerDown}
+              onPointerMove={onFramePointerMove}
+              onPointerUp={onFramePointerUp}
+              onPointerCancel={onFramePointerUp}
+            >
+              {imgPreviewSrc ? (
+                <img
+                  src={imgPreviewSrc}
+                  alt=""
+                  draggable={false}
+                  style={{
+                    position: 'absolute', inset: 0,
+                    width: '100%', height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: `${imgPos.x}% ${imgPos.y}%`,
+                    userSelect: 'none', pointerEvents: 'none'
+                  }}
+                />
+              ) : (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9a9aa2', fontSize: 13 }}>
+                  {t('暂无图片', 'No image')}
                 </div>
               )}
+              <span style={{
+                position: 'absolute', left: 8, bottom: 8,
+                background: 'rgba(0,0,0,.55)', color: '#fff',
+                fontSize: 11, padding: '2px 8px', borderRadius: 4,
+                pointerEvents: 'none'
+              }}>
+                {t('拖动图片调整展示位置', 'Drag to adjust image position')}
+              </span>
             </div>
 
             <label>
               {t('上传本地图片（自动压缩，存入网站仓库）', 'Upload a local image (auto-compressed, stored in the site repo)')}
-              <input id="v8-img-file-input" type="file" accept="image/*" />
+              <input id="v8-img-file-input" type="file" accept="image/*" onChange={onFilePicked} />
             </label>
 
             <label style={{ marginTop: 10 }}>
@@ -360,12 +439,19 @@ export default function TextEditor({ authFetch }) {
               <button className="v8-admin__btn" onClick={saveImage} disabled={imgSaving}>
                 {imgSaving ? t('保存中...', 'Saving...') : t('保存', 'Save')}
               </button>
+              <button
+                className="v8-admin__btn v8-admin__btn--ghost"
+                onClick={() => setImgPos({ x: 50, y: 50 })}
+                title={t('恢复居中显示', 'Center the image')}
+              >
+                {t('位置居中', 'Center')}
+              </button>
               {imgHasOverride && (
                 <button className="v8-admin__btn v8-admin__btn--ghost" onClick={resetImage}>
                   {t('恢复默认', 'Reset')}
                 </button>
               )}
-              <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => setImgInfo(null)}>
+              <button className="v8-admin__btn v8-admin__btn--ghost" onClick={closeImgDialog}>
                 {t('取消', 'Cancel')}
               </button>
             </div>

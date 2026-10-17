@@ -5,13 +5,17 @@
 //   2) 原始 src 路径 —— 如 "/images/hero-cityscape.jpg"，未声明的图片按 src 匹配
 // React 重渲染会把 src 重置回原值，所以用 MutationObserver 持续再应用。
 
-// 从 i18n overrides 中提取图片覆盖映射：{ 图片标识: url }
+// 从 i18n overrides 中提取图片覆盖映射：{ 图片标识: { url, posX, posY } }
 export function collectImageOverrides(overrides) {
   const map = {}
+  const pct = (v, d) => {
+    const n = Number(v)
+    return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : d
+  }
   for (const [key, val] of Object.entries(overrides || {})) {
     if (!key.startsWith('img:')) continue
     if (val && typeof val === 'object' && typeof val.url === 'string' && val.url) {
-      map[key.slice(4)] = val.url
+      map[key.slice(4)] = { url: val.url, posX: pct(val.posX, 50), posY: pct(val.posY, 50) }
     }
   }
   return map
@@ -37,12 +41,14 @@ function applyToElement(el, map) {
   }
   const target = (tagged && map[tagged]) || map[original]
   if (target) {
-    if (src !== target) {
-      el.setAttribute('src', target)
+    if (src !== target.url) {
+      el.setAttribute('src', target.url)
     }
-    if (applied !== target) {
-      el.setAttribute('data-applied-src', target)
+    if (applied !== target.url) {
+      el.setAttribute('data-applied-src', target.url)
     }
+    // 自定义展示位置（object-position 百分比）
+    el.style.objectPosition = `${target.posX}% ${target.posY}%`
   } else if (applied) {
     // 覆盖项已被移除（恢复默认）：src 仍是我们设的覆盖值时才还原，
     // 避免误伤应用程序设置的其它 src
@@ -50,6 +56,7 @@ function applyToElement(el, map) {
       el.setAttribute('src', original)
     }
     el.removeAttribute('data-applied-src')
+    el.style.objectPosition = ''
   }
 }
 

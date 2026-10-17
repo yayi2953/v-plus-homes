@@ -239,11 +239,18 @@ async function adminTexts(req, res) {
     return res.status(200).json({ texts: await getTexts() })
   }
   if (req.method === 'PUT') {
-    const { key, zh, en, url } = req.body || {}
+    const { key, zh, en, url, posX, posY } = req.body || {}
     if (!key) return res.status(400).json({ error: '缺少 key' })
     try {
-      // 图片覆盖项：值形如 { url }；文案覆盖项：{ zh, en }
-      const value = url !== undefined ? { url } : { zh, en }
+      // 图片覆盖项：值形如 { url, posX?, posY? }；文案覆盖项：{ zh, en }
+      let value
+      if (url !== undefined) {
+        value = { url }
+        if (Number.isFinite(Number(posX))) value.posX = Number(posX)
+        if (Number.isFinite(Number(posY))) value.posY = Number(posY)
+      } else {
+        value = { zh, en }
+      }
       const updated = await updateTexts({ [key]: value })
       return res.status(200).json({ ok: true, texts: updated })
     } catch (e) {
