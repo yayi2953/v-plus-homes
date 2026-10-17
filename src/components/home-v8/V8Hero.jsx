@@ -41,9 +41,9 @@ export default function V8Hero() {
 
         {/* 图片上的文字层：上半部分居中白色 */}
         <div className="v8-hero-overlay">
-          <p className="v8-hero-overlay__eyebrow">{t.eyebrow}</p>
+          <p className="v8-hero-overlay__eyebrow" data-edit-key="v8.hero.eyebrow">{t.eyebrow}</p>
           <h1 className="v8-hero-overlay__title">V&nbsp;PLUS</h1>
-          <p className="v8-hero-overlay__sub">{t.lede}</p>
+          <p className="v8-hero-overlay__sub" data-edit-key="v8.hero.lede">{t.lede}</p>
         </div>
 
         {/* 左右切换箭头 */}
@@ -74,8 +74,8 @@ export default function V8Hero() {
         </div>
       </div>
       <div className="v8-hero-body">
-        <p className="v8-eyebrow">{t.eyebrow}</p>
-        <p className="v8-lede">{t.lede}</p>
+        <p className="v8-eyebrow" data-edit-key="v8.hero.bodyEyebrow">{t.bodyEyebrow}</p>
+        <p className="v8-lede" data-edit-key="v8.hero.bodyLede">{t.bodyLede}</p>
         <div className="v8-hero-cta">
           <button type="button" className="v8-tlink" onClick={openContact}>
             {t.whatsapp}

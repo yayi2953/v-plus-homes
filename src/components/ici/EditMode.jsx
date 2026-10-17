@@ -88,6 +88,12 @@ export default function EditMode() {
     }
 
     function findEditableAncestor(target) {
+      // 优先使用元素上声明的 data-edit-key（同文案多处出现时可精确区分）
+      const tagged = target.closest?.('[data-edit-key]')
+      if (tagged) {
+        const text = getElText(tagged)
+        if (text) return { el: tagged, text, key: tagged.getAttribute('data-edit-key') }
+      }
       let el = target
       while (el && el !== document.body && el !== document.documentElement) {
         const text = getElText(el)
@@ -108,7 +114,7 @@ export default function EditMode() {
       }
       if (found && found.el !== highlighted) {
         highlighted = found.el
-        const keys = reverseMap.get(found.text)
+        const keys = found.key ? [found.key] : reverseMap.get(found.text)
         highlighted.setAttribute('data-edit-highlight', '1')
         highlighted.setAttribute('data-edit-key', keys[0])
       }
@@ -135,7 +141,7 @@ export default function EditMode() {
       if (!found) return
       e.preventDefault()
       e.stopPropagation()
-      const keys = reverseMap.get(found.text)
+      const keys = found.key ? [found.key] : reverseMap.get(found.text)
       window.parent.postMessage({
         type: 'EDIT_TEXT',
         text: found.text,
@@ -155,13 +161,29 @@ export default function EditMode() {
       if (newVal === undefined || newVal === null) return
       // 用当前显示值（来自 c，含覆盖项）作为旧值来匹配 DOM
       const oldVal = norm(getByPath(c, key))
-      if (!oldVal) return
-      // 替换页面中所有匹配旧值的文本节点（按规范化后的值比较）
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null)
-      let node
-      while ((node = walker.nextNode())) {
-        if (norm(node.textContent) === oldVal) {
-          node.textContent = newVal
+      // 优先只更新声明了该 key 的元素（同文案多处出现时避免联动）
+      const tagged = key ? document.querySelectorAll(`[data-edit-key="${key}"]`) : []
+      if (tagged.length > 0) {
+        tagged.forEach((el) => {
+          // 替换元素内所有匹配旧值的文本节点，保留子元素结构
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null)
+          const nodes = []
+          let n
+          while ((n = walker.nextNode())) nodes.push(n)
+          nodes.forEach((node) => {
+            if (!oldVal || norm(node.textContent) === oldVal || !node.textContent.trim()) {
+              node.textContent = newVal
+            }
+          })
+        })
+      } else if (oldVal) {
+        // 回退：替换页面中所有匹配旧值的文本节点
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null)
+        let node
+        while ((node = walker.nextNode())) {
+          if (norm(node.textContent) === oldVal) {
+            node.textContent = newVal
+          }
         }
       }
       // 刷新 i18n 上下文，让 reverseMap 包含新值，这样修改后的文案可再次编辑

@@ -343,6 +343,8 @@ const en = {
     hero: {
       eyebrow: 'Apartments for Rent in Guangzhou – Expat Housing Solutions',
       lede: 'Move-in-ready apartments, villas and serviced homes across Guangzhou — all verified, fully furnished, and supported by an English-speaking team.',
+      bodyEyebrow: 'Apartments for Rent in Guangzhou – Expat Housing Solutions',
+      bodyLede: 'Move-in-ready apartments, villas and serviced homes across Guangzhou — all verified, fully furnished, and supported by an English-speaking team.',
       browse: 'Browse Homes',
       whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
     },
@@ -751,6 +753,8 @@ const zh = {
     hero: {
       eyebrow: '广州外籍人士安家服务',
       lede: '覆盖广州全城的精装公寓、别墅与服务式住宅，全部实地核验、拎包入住，由中英双语团队全程服务。',
+      bodyEyebrow: '广州外籍人士安家服务',
+      bodyLede: '覆盖广州全城的精装公寓、别墅与服务式住宅，全部实地核验、拎包入住，由中英双语团队全程服务。',
       browse: '浏览房源',
       whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
     },
@@ -1156,6 +1160,8 @@ const ja = {
     hero: {
       eyebrow: '広州の賃貸アパート – 外国人向け住まいソリューション',
       lede: '広州全市の家具付きアパート、ヴィラ、サービス付き住宅。すべて実際に確認済み、家具完備、日本語対応チームがサポートします。',
+      bodyEyebrow: '広州の賃貸アパート – 外国人向け住まいソリューション',
+      bodyLede: '広州全市の家具付きアパート、ヴィラ、サービス付き住宅。すべて実際に確認済み、家具完備、日本語対応チームがサポートします。',
       browse: '物件を探す',
       whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
     },
