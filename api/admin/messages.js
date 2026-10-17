@@ -1,5 +1,5 @@
-import { requireAdmin } from '../../lib/guard.js'
-import { getMessages, markMessageRead, deleteMessage } from '../../lib/store.js'
+import { requireAdmin } from '../lib/guard.js'
+import { getMessages, markMessageRead, deleteMessage } from '../lib/store.js'
 
 export default async function handler(req, res) {
   const admin = requireAdmin(req)

@@ -1,5 +1,5 @@
-import { verify } from '../../lib/auth.js'
-import { getUsers } from '../../lib/store.js'
+import { verify } from '../lib/auth.js'
+import { getUsers } from '../lib/store.js'
 
 function getToken(req) {
   const h = req.headers.authorization || ''

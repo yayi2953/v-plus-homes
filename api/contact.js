@@ -1,4 +1,4 @@
-import { createMessage } from '../../lib/store.js'
+import { createMessage } from './lib/store.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

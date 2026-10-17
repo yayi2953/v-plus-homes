@@ -1,5 +1,5 @@
-import { sign, verifyPassword } from '../../lib/auth.js'
-import { findUserByEmail } from '../../lib/store.js'
+import { sign, verifyPassword } from '../lib/auth.js'
+import { findUserByEmail } from '../lib/store.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
