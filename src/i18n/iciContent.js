@@ -341,6 +341,7 @@ const en = {
   // v8 粒子版首页内置文案（后端 site_texts.v8 可深合并覆盖）
   v8: {
     hero: {
+      title: 'V PLUS',
       eyebrow: 'Apartments for Rent in Guangzhou – Expat Housing Solutions',
       lede: 'Move-in-ready apartments, villas and serviced homes across Guangzhou — all verified, fully furnished, and supported by an English-speaking team.',
       bodyEyebrow: 'Apartments for Rent in Guangzhou – Expat Housing Solutions',
@@ -751,6 +752,7 @@ const zh = {
   // v8 粒子版首页内置文案（后端 site_texts.v8 可深合并覆盖）
   v8: {
     hero: {
+      title: 'V PLUS',
       eyebrow: '广州外籍人士安家服务',
       lede: '覆盖广州全城的精装公寓、别墅与服务式住宅，全部实地核验、拎包入住，由中英双语团队全程服务。',
       bodyEyebrow: '广州外籍人士安家服务',
@@ -1158,6 +1160,7 @@ const ja = {
   },
   v8: {
     hero: {
+      title: 'V PLUS',
       eyebrow: '広州の賃貸アパート – 外国人向け住まいソリューション',
       lede: '広州全市の家具付きアパート、ヴィラ、サービス付き住宅。すべて実際に確認済み、家具完備、日本語対応チームがサポートします。',
       bodyEyebrow: '広州の賃貸アパート – 外国人向け住まいソリューション',

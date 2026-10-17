@@ -42,7 +42,7 @@ export default function V8Hero() {
         {/* 图片上的文字层：上半部分居中白色 */}
         <div className="v8-hero-overlay">
           <p className="v8-hero-overlay__eyebrow" data-edit-key="v8.hero.eyebrow">{t.eyebrow}</p>
-          <h1 className="v8-hero-overlay__title">V&nbsp;PLUS</h1>
+          <h1 className="v8-hero-overlay__title" data-edit-key="v8.hero.title">{t.title || 'V PLUS'}</h1>
           <p className="v8-hero-overlay__sub" data-edit-key="v8.hero.lede">{t.lede}</p>
         </div>
 
