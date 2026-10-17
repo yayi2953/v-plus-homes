@@ -5,6 +5,7 @@ import { navigate, switchLang } from '../../lib/router.mjs'
 import { useContact } from '../ici/contactContext.jsx'
 import { Mail, Phone, WhatsApp, WeChat } from '../ici/Icons.jsx'
 import LegalModal from '../ici/LegalModal.jsx'
+import { useAuth } from '../../contexts/AuthContext.jsx'
 import './home-v8.css'
 
 /* 特斯拉风格导航：左 Logo + 居中菜单 + 右侧图标组 + 房源巨型下拉菜单。
@@ -33,6 +34,7 @@ const ICON_MAP = { mail: Mail, phone: Phone, whatsapp: WhatsApp, wechat: WeChat 
 export default function V8Navbar({ solid = false }) {
   const { c, lang } = useIciI18n()
   const { openContact } = useContact()
+  const { user, isAuthenticated, isAdmin, logout } = useAuth()
   const { nav } = c
   const residenceTypes = c.discover.types ?? []
   const menus = nav.menus.map((m) =>
@@ -315,17 +317,49 @@ export default function V8Navbar({ solid = false }) {
               </AnimatePresence>
             </div>
 
-            <button
-              type="button"
-              className="v8-nav__iconbtn"
-              onClick={book}
-              aria-label="Account"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-            </button>
+            {isAuthenticated ? (
+              <div className="v8-nav__account">
+                {isAdmin && (
+                  <button
+                    type="button"
+                    className="v8-nav__iconbtn v8-nav__iconbtn--admin"
+                    onClick={() => navigate('/admin')}
+                    aria-label="Admin"
+                    title="管理后台"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <path d="M3 9h18M9 21V9" />
+                    </svg>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="v8-nav__iconbtn"
+                  onClick={() => { logout(); navigate('/') }}
+                  aria-label="Logout"
+                  title={`退出 (${user?.name})`}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="v8-nav__iconbtn"
+                onClick={() => navigate('/login')}
+                aria-label="Login"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </button>
+            )}
 
             <button
               type="button"

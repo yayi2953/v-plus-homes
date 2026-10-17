@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { PropertyProvider, useProperty } from './components/ici/propertyContext.jsx'
 import { ContactProvider } from './components/ici/contactContext.jsx'
+import { AuthProvider } from './contexts/AuthContext.jsx'
 import { useIciI18n } from './i18n/IciI18nContext.jsx'
 import { readRoute, syncRouter } from './lib/router.mjs'
 import FloatingActions from './components/ici/FloatingActions.jsx'
@@ -11,12 +12,17 @@ import TypePicker from './components/ici/TypePicker.jsx'
 const HomeV8 = lazy(() => import('./components/home-v8/HomeV8.jsx'))
 const V8Navbar = lazy(() => import('./components/home-v8/V8Navbar.jsx'))
 const V8Listings = lazy(() => import('./components/home-v8/V8Listings.jsx'))
+const LoginPage = lazy(() => import('./components/auth/LoginPage.jsx'))
+const RegisterPage = lazy(() => import('./components/auth/RegisterPage.jsx'))
+const AdminPage = lazy(() => import('./components/admin/AdminPage.jsx'))
 
 function Site() {
   const { c, lang, setLang } = useIciI18n()
   const { active, openProperty } = useProperty()
   const [route, setRoute] = useState(() => readRoute())
   const isListings = route.type === 'listings'
+  const isAuth = route.type === 'login' || route.type === 'register'
+  const isAdmin = route.type === 'admin'
 
   // History API 路由同步
   useEffect(() => {
@@ -44,12 +50,28 @@ function Site() {
     window.scrollTo(0, 0)
   }, [route.type, route.slug])
 
+  const showNav = !isAuth && !isAdmin
+
   return (
     <div className="ici-page">
-      <Suspense fallback={null}>
-        <V8Navbar solid={isListings} />
-      </Suspense>
-      {isListings ? (
+      {showNav && (
+        <Suspense fallback={null}>
+          <V8Navbar solid={isListings} />
+        </Suspense>
+      )}
+      {isAuth ? (
+        <main>
+          <Suspense fallback={<div style={{ minHeight: '100vh', background: '#f5f6f8' }} />}>
+            {route.type === 'login' ? <LoginPage /> : <RegisterPage />}
+          </Suspense>
+        </main>
+      ) : isAdmin ? (
+        <main>
+          <Suspense fallback={<div style={{ minHeight: '100vh', background: '#f5f6f8' }} />}>
+            <AdminPage />
+          </Suspense>
+        </main>
+      ) : isListings ? (
         <main>
           <Suspense fallback={<div style={{ minHeight: '100vh', background: '#fff' }} />}>
             <V8Listings />
@@ -62,19 +84,25 @@ function Site() {
           </Suspense>
         </main>
       )}
-      <FloatingActions />
-      <PropertyDetail />
-      <TypePicker />
+      {!isAuth && !isAdmin && (
+        <>
+          <FloatingActions />
+          <PropertyDetail />
+          <TypePicker />
+        </>
+      )}
     </div>
   )
 }
 
 export default function App() {
   return (
-    <PropertyProvider>
-      <ContactProvider>
-        <Site />
-      </ContactProvider>
-    </PropertyProvider>
+    <AuthProvider>
+      <PropertyProvider>
+        <ContactProvider>
+          <Site />
+        </ContactProvider>
+      </PropertyProvider>
+    </AuthProvider>
   )
 }

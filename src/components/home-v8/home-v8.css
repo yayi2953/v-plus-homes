@@ -700,6 +700,9 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 .v8-nav__iconbtn:hover { background: rgba(0, 0, 0, .05); }
 .v8-nav__iconbtn svg { width: 20px; height: 20px; }
+.v8-nav__account { display: inline-flex; align-items: center; gap: 4px; }
+.v8-nav__iconbtn--admin { color: #b91c1c; }
+.v8-nav__iconbtn--admin:hover { background: rgba(185, 28, 28, .08); }
 
 /* ---------- 语言图标按钮 + 下拉 ---------- */
 .v8-lang { position: relative; }

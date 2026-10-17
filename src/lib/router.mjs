@@ -73,6 +73,9 @@ export function readRoute(pathname = window.location.pathname) {
   if (bare === '/map' || bare === '/map/') return { type: 'map', lang: prefix }
   if (bare === '/guides' || bare === '/guides/') return { type: 'guides', lang: prefix }
   if (bare === '/listings' || bare === '/listings/') return { type: 'listings', lang: prefix }
+  if (bare === '/login' || bare === '/login/') return { type: 'login', lang: prefix }
+  if (bare === '/register' || bare === '/register/') return { type: 'register', lang: prefix }
+  if (bare === '/admin' || bare === '/admin/') return { type: 'admin', lang: prefix }
   const gm = bare.match(GUIDE_ARTICLE_RE)
   if (gm) return { type: 'guide', slug: decodeURIComponent(gm[1]), lang: prefix }
   return { type: 'home', lang: prefix }
