@@ -57,6 +57,21 @@ export default function V8Hero() {
             <path d="m9 18 6-6-6-6" />
           </svg>
         </button>
+
+        {/* 轮播指示器：底部居中，特斯拉风格圆点 */}
+        <div className="v8-hero-dots" role="tablist" aria-label="轮播图切换">
+          {BG_IMAGES.map((src, i) => (
+            <button
+              key={src}
+              type="button"
+              role="tab"
+              aria-selected={i === idx}
+              aria-label={`第 ${i + 1} 张`}
+              className={`v8-hero-dot${i === idx ? ' is-active' : ''}`}
+              onClick={() => setIdx(i)}
+            />
+          ))}
+        </div>
       </div>
       <div className="v8-hero-body">
         <p className="v8-eyebrow">{t.eyebrow}</p>

@@ -179,6 +179,42 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 .home-v8 .v8-hero-arrow--prev { left: 20px; }
 .home-v8 .v8-hero-arrow--next { right: 20px; }
+
+/* 轮播指示器：特斯拉风格圆点，位于图片底部居中 */
+.home-v8 .v8-hero-dots {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.home-v8 .v8-hero-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 1.5px solid rgba(255, 255, 255, .9);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color .25s ease, border-color .25s ease, transform .2s ease;
+}
+.home-v8 .v8-hero-dot.is-active {
+  background: #fff;
+  border-color: #fff;
+}
+.home-v8 .v8-hero-dot:hover:not(.is-active) {
+  background: rgba(255, 255, 255, .5);
+}
+.home-v8 .v8-hero-dot:active {
+  transform: scale(.85);
+}
+@media (max-width: 768px) {
+  .home-v8 .v8-hero-dots { bottom: 12px; gap: 8px; }
+  .home-v8 .v8-hero-dot { width: 7px; height: 7px; }
+}
 /* Hero 图片文字层：上半部分居中白色，小标题 + 大粗体标题 + 副标题 */
 .home-v8 .v8-hero-overlay {
   position: absolute;
