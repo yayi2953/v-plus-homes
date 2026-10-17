@@ -143,7 +143,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   object-fit: cover;
   filter: saturate(.5) brightness(1.05) blur(3px);
 }
-/* 灰色毛玻璃 + 四边羽化：background-color 是整体浅灰雾；
+/* 灰色雾化 + 四边羽化：background-color 是整体浅灰雾；
    两层渐变在左右/上下边缘叠纯白，中间透明只留灰雾盖背景图 */
 .home-v8 .v8-hero-videobg::after {
   content: "";
@@ -152,8 +152,6 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   background-image:
     linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 13%, rgba(255, 255, 255, 0) 87%, #fff 100%),
     linear-gradient(to bottom, #fff 0%, rgba(255, 255, 255, 0) 14%, rgba(255, 255, 255, 0) 66%, #fff 100%);
-  -webkit-backdrop-filter: blur(8px) saturate(.8);
-  backdrop-filter: blur(8px) saturate(.8);
 }
 /* 手机端背景已全出血贴到屏幕左右边：不做左右白色羽化（否则屏幕两侧出现白边），
    仅保留上下方向与白底的过渡，并减弱灰雾让背景存在感不被洗白。
@@ -163,8 +161,6 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
     background-color: rgba(245, 245, 247, .35);
     background-image:
       linear-gradient(to bottom, #fff 0%, rgba(255, 255, 255, 0) 10%, rgba(255, 255, 255, 0) 78%, #fff 100%);
-    -webkit-backdrop-filter: blur(5px) saturate(.8);
-    backdrop-filter: blur(5px) saturate(.8);
   }
 }
 .home-v8 .v8-hero-body {
