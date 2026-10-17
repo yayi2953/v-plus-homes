@@ -43,7 +43,7 @@ export default function V8Hero() {
         <div className="v8-hero-overlay">
           <p className="v8-hero-overlay__eyebrow">{t.eyebrow}</p>
           <h1 className="v8-hero-overlay__title">
-            <img src="/images/vlu-logo.png" alt="V PLUS" className="v8-hero-overlay__logo" />
+            <img src="/images/vlu-logo-wide.png" alt="V PLUS" className="v8-hero-overlay__logo" />
           </h1>
           <p className="v8-hero-overlay__sub">{t.lede}</p>
         </div>
