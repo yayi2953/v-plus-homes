@@ -325,7 +325,7 @@ export default function V8Navbar({ solid = false }) {
                     className="v8-nav__iconbtn v8-nav__iconbtn--admin"
                     onClick={() => navigate('/admin')}
                     aria-label="Admin"
-                    title="管理后台"
+                    title={lang === 'zh' ? '管理后台' : 'Admin Dashboard'}
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -338,7 +338,7 @@ export default function V8Navbar({ solid = false }) {
                   className="v8-nav__iconbtn"
                   onClick={() => { logout(); navigate('/') }}
                   aria-label="Logout"
-                  title={`退出 (${user?.name})`}
+                  title={`${lang === 'zh' ? '退出' : 'Sign out'} (${user?.name})`}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext.jsx'
+import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate } from '../../lib/router.mjs'
 import './auth.css'
 
 export default function RegisterPage() {
+  const { lang } = useIciI18n()
+  const zh = lang === 'zh'
+  const t = (z, e) => (zh ? z : e)
   const { register, loading } = useAuth()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -15,7 +19,7 @@ export default function RegisterPage() {
     e.preventDefault()
     setError('')
     if (password !== confirm) {
-      setError('两次密码不一致')
+      setError(t('两次密码不一致', 'Passwords do not match'))
       return
     }
     const r = await register(email, password, name)
@@ -29,21 +33,21 @@ export default function RegisterPage() {
   return (
     <div className="v8-auth">
       <div className="v8-auth__card">
-        <h1 className="v8-auth__title">注册</h1>
-        <p className="v8-auth__sub">创建您的 V PLUS 账户</p>
+        <h1 className="v8-auth__title">{t('注册', 'Sign Up')}</h1>
+        <p className="v8-auth__sub">{t('创建您的 V PLUS 账户', 'Create your V PLUS account')}</p>
         <form onSubmit={onSubmit} className="v8-auth__form">
           <label>
-            <span>姓名</span>
+            <span>{t('姓名', 'Name')}</span>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="您的姓名"
+              placeholder={t('您的姓名', 'Your name')}
               required
             />
           </label>
           <label>
-            <span>邮箱</span>
+            <span>{t('邮箱', 'Email')}</span>
             <input
               type="email"
               value={email}
@@ -54,24 +58,24 @@ export default function RegisterPage() {
             />
           </label>
           <label>
-            <span>密码</span>
+            <span>{t('密码', 'Password')}</span>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="至少 6 位"
+              placeholder={t('至少 6 位', 'At least 6 characters')}
               required
               minLength={6}
               autoComplete="new-password"
             />
           </label>
           <label>
-            <span>确认密码</span>
+            <span>{t('确认密码', 'Confirm Password')}</span>
             <input
               type="password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              placeholder="再次输入密码"
+              placeholder={t('再次输入密码', 'Re-enter password')}
               required
               minLength={6}
               autoComplete="new-password"
@@ -79,12 +83,12 @@ export default function RegisterPage() {
           </label>
           {error && <div className="v8-auth__error">{error}</div>}
           <button type="submit" className="v8-auth__btn" disabled={loading}>
-            {loading ? '注册中...' : '注册'}
+            {loading ? t('注册中...', 'Signing up...') : t('注册', 'Sign Up')}
           </button>
         </form>
         <p className="v8-auth__foot">
-          已有账户？
-          <a href="#login" onClick={(e) => { e.preventDefault(); navigate('/login') }}>去登录</a>
+          {t('已有账户？', 'Already have an account?')}
+          <a href="#login" onClick={(e) => { e.preventDefault(); navigate('/login') }}>{t('去登录', 'Sign in')}</a>
         </p>
       </div>
     </div>

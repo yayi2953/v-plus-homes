@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 
 // 多语言虚拟留言池（英 / 法 / 日 / 韩 / 印地 / 泰）
 // 80% 负面抱怨（为什么没有房子租）、20% 期待（希望能开启租房）
@@ -238,7 +239,7 @@ function makeMessage(w, lanes) {
 // 真实留言：绿色 + 「真实」标签，速度稍慢便于阅读
 function makeRealMessage(w, lanes, realMsg) {
   const lane = lanes[Math.floor(Math.random() * lanes.length)]
-  const name = realMsg.name || '匿名用户'
+  const name = realMsg.name || '匿名'
   const text = realMsg.message || ''
   const speed = 0.9 + Math.random() * 0.6
   const fontSize = 15
@@ -246,6 +247,9 @@ function makeRealMessage(w, lanes, realMsg) {
 }
 
 export default function V8Bubbles() {
+  const { lang } = useIciI18n()
+  const zh = lang === 'zh'
+  const t = (zhStr, enStr) => (zh ? zhStr : enStr)
   const canvasRef = useRef(null)
   const wrapRef = useRef(null)
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
@@ -257,7 +261,7 @@ export default function V8Bubbles() {
     e.preventDefault()
     if (submitting) return
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      setFeedback({ type: 'err', text: '请填写姓名、邮箱和留言内容' })
+      setFeedback({ type: 'err', text: t('请填写姓名、邮箱和留言内容', 'Please fill in name, email and message') })
       return
     }
     setSubmitting(true)
@@ -275,8 +279,8 @@ export default function V8Bubbles() {
         })
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || '提交失败')
-      setFeedback({ type: 'ok', text: '留言已提交，感谢您的反馈！' })
+      if (!res.ok) throw new Error(data.error || t('提交失败', 'Submission failed'))
+      setFeedback({ type: 'ok', text: t('留言已提交，感谢您的反馈！', 'Message submitted, thanks for your feedback!') })
       setForm({ name: '', email: '', phone: '', message: '' })
       // 重新拉取真实留言，让弹幕尽快展示新提交的内容
       fetch('/api/messages')
@@ -284,7 +288,7 @@ export default function V8Bubbles() {
         .then((d) => { if (Array.isArray(d.messages)) realMessagesRef.current = d.messages })
         .catch(() => {})
     } catch (err) {
-      setFeedback({ type: 'err', text: err.message || '提交失败，请稍后重试' })
+      setFeedback({ type: 'err', text: err.message || t('提交失败，请稍后重试', 'Submission failed, please try again later') })
     } finally {
       setSubmitting(false)
     }
@@ -414,8 +418,8 @@ export default function V8Bubbles() {
       <div className="v8-wrap">
         <div className="v8-bubbles v8-rise">
           <div className="v8-bubbles__head">
-            <p className="v8-eyebrow">CUSTOMER VOICES</p>
-            <h2 className="v8-h-sec" style={{ marginTop: 12 }}>来自全球客户的真实留言</h2>
+            <p className="v8-eyebrow">{t('客户声音', 'CUSTOMER VOICES')}</p>
+            <h2 className="v8-h-sec" style={{ marginTop: 12 }}>{t('来自全球客户的真实留言', 'Real Messages from Customers Worldwide')}</h2>
           </div>
           <div ref={wrapRef} className="v8-bubbles__wrap">
             <canvas ref={canvasRef} className="v8-bubbles__canvas" />
@@ -423,24 +427,24 @@ export default function V8Bubbles() {
 
           <div className="v8-msgform">
             <div className="v8-msgform__head">
-              <p className="v8-eyebrow">LEAVE A MESSAGE</p>
-              <h3 className="v8-msgform__title">我要留言</h3>
-              <p className="v8-msgform__sub">告诉我们您的需求或疑问，我们会尽快与您联系。</p>
+              <p className="v8-eyebrow">{t('留下您的留言', 'LEAVE A MESSAGE')}</p>
+              <h3 className="v8-msgform__title">{t('我要留言', 'Leave a Message')}</h3>
+              <p className="v8-msgform__sub">{t('告诉我们您的需求或疑问，我们会尽快与您联系。', 'Tell us your needs or questions, and we\'ll get back to you soon.')}</p>
             </div>
             <form className="v8-msgform__body" onSubmit={submitMessage}>
               <div className="v8-msgform__row">
                 <label className="v8-msgform__field">
-                  <span>姓名 *</span>
+                  <span>{t('姓名 *', 'Name *')}</span>
                   <input
                     type="text"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="您的姓名"
+                    placeholder={t('您的姓名', 'Your name')}
                     required
                   />
                 </label>
                 <label className="v8-msgform__field">
-                  <span>邮箱 *</span>
+                  <span>{t('邮箱 *', 'Email *')}</span>
                   <input
                     type="email"
                     value={form.email}
@@ -450,21 +454,21 @@ export default function V8Bubbles() {
                   />
                 </label>
                 <label className="v8-msgform__field">
-                  <span>电话</span>
+                  <span>{t('电话', 'Phone')}</span>
                   <input
                     type="tel"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    placeholder="选填"
+                    placeholder={t('选填', 'Optional')}
                   />
                 </label>
               </div>
               <label className="v8-msgform__field">
-                <span>留言内容 *</span>
+                <span>{t('留言内容 *', 'Message *')}</span>
                 <textarea
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  placeholder="请输入您想说的话..."
+                  placeholder={t('请输入您想说的话...', 'Type your message...')}
                   rows={4}
                   required
                 />
@@ -475,7 +479,7 @@ export default function V8Bubbles() {
                 </div>
               )}
               <button type="submit" className="v8-btn v8-btn--dark" disabled={submitting}>
-                {submitting ? '提交中...' : '提交留言'}
+                {submitting ? t('提交中...', 'Submitting...') : t('提交留言', 'Submit')}
               </button>
             </form>
           </div>

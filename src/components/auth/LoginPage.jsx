@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext.jsx'
+import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate } from '../../lib/router.mjs'
 import './auth.css'
 
 export default function LoginPage() {
+  const { lang } = useIciI18n()
+  const zh = lang === 'zh'
+  const t = (z, e) => (zh ? z : e)
   const { login, loading } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -27,11 +31,11 @@ export default function LoginPage() {
   return (
     <div className="v8-auth">
       <div className="v8-auth__card">
-        <h1 className="v8-auth__title">登录</h1>
-        <p className="v8-auth__sub">欢迎回来，请登录您的账户</p>
+        <h1 className="v8-auth__title">{t('登录', 'Sign In')}</h1>
+        <p className="v8-auth__sub">{t('欢迎回来，请登录您的账户', 'Welcome back, please sign in to your account')}</p>
         <form onSubmit={onSubmit} className="v8-auth__form">
           <label>
-            <span>邮箱</span>
+            <span>{t('邮箱', 'Email')}</span>
             <input
               type="email"
               value={email}
@@ -42,27 +46,27 @@ export default function LoginPage() {
             />
           </label>
           <label>
-            <span>密码</span>
+            <span>{t('密码', 'Password')}</span>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="至少 6 位"
+              placeholder={t('至少 6 位', 'At least 6 characters')}
               required
               autoComplete="current-password"
             />
           </label>
           {error && <div className="v8-auth__error">{error}</div>}
           <button type="submit" className="v8-auth__btn" disabled={loading}>
-            {loading ? '登录中...' : '登录'}
+            {loading ? t('登录中...', 'Signing in...') : t('登录', 'Sign In')}
           </button>
         </form>
         <p className="v8-auth__foot">
-          还没有账户？
-          <a href="#register" onClick={(e) => { e.preventDefault(); navigate('/register') }}>立即注册</a>
+          {t('还没有账户？', "Don't have an account?")}
+          <a href="#register" onClick={(e) => { e.preventDefault(); navigate('/register') }}>{t('立即注册', 'Sign up')}</a>
         </p>
         <p className="v8-auth__hint">
-          演示管理员：admin@v-plus.house / admin123
+          {t('演示管理员：admin@v-plus.house / admin123', 'Demo admin: admin@v-plus.house / admin123')}
         </p>
       </div>
     </div>

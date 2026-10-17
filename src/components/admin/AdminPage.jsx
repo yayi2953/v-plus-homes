@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext.jsx'
+import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate } from '../../lib/router.mjs'
 import './admin.css'
 
@@ -11,6 +12,9 @@ const EMPTY_LISTING = {
 }
 
 export default function AdminPage() {
+  const { lang } = useIciI18n()
+  const zh = lang === 'zh'
+  const t = (z, e) => (zh ? z : e)
   const { user, authFetch, logout } = useAuth()
   const [tab, setTab] = useState('listings')
   const [listings, setListings] = useState([])
@@ -70,7 +74,7 @@ export default function AdminPage() {
   }
 
   async function removeListing(id) {
-    if (!confirm('确定删除该房源？')) return
+    if (!confirm(t('确定删除该房源？', 'Delete this listing?'))) return
     const res = await authFetch('/api/admin/listings', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -89,7 +93,7 @@ export default function AdminPage() {
   }
 
   async function removeMessage(id) {
-    if (!confirm('确定删除该留言？')) return
+    if (!confirm(t('确定删除该留言？', 'Delete this message?'))) return
     const res = await authFetch('/api/admin/messages', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -102,32 +106,39 @@ export default function AdminPage() {
     return (
       <div className="v8-admin">
         <div className="v8-admin__card">
-          <h1>无权限</h1>
-          <p>仅管理员可访问后台。</p>
-          <button className="v8-admin__btn" onClick={() => navigate('/login')}>去登录</button>
+          <h1>{t('无权限', 'No Access')}</h1>
+          <p>{t('仅管理员可访问后台。', 'Only administrators can access the dashboard.')}</p>
+          <button className="v8-admin__btn" onClick={() => navigate('/login')}>{t('去登录', 'Sign In')}</button>
         </div>
       </div>
     )
   }
 
+  const typeLabels = {
+    luxury: t('豪华住宅', 'Luxury Home'),
+    standard: t('普通住宅', 'Standard Home'),
+    student: t('学生公寓', 'Student Apartment'),
+    city: t('城市公寓', 'City Apartment')
+  }
+
   return (
     <div className="v8-admin">
       <div className="v8-admin__header">
-        <h1>管理后台</h1>
+        <h1>{t('管理后台', 'Admin Dashboard')}</h1>
         <div className="v8-admin__user">
-          <span>{user?.name}（{user?.role}）</span>
-          <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => { logout(); navigate('/') }}>退出登录</button>
+          <span>{user?.name}（{user?.role === 'admin' ? t('管理员', 'Admin') : t('用户', 'User')}）</span>
+          <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => { logout(); navigate('/') }}>{t('退出登录', 'Sign Out')}</button>
         </div>
       </div>
 
       <div className="v8-admin__tabs">
-        {TABS.map((t) => (
+        {TABS.map((tb) => (
           <button
-            key={t}
-            className={`v8-admin__tab${tab === t ? ' is-active' : ''}`}
-            onClick={() => setTab(t)}
+            key={tb}
+            className={`v8-admin__tab${tab === tb ? ' is-active' : ''}`}
+            onClick={() => setTab(tb)}
           >
-            {t === 'listings' ? '房源管理' : t === 'messages' ? '客户留言' : '注册用户'}
+            {tb === 'listings' ? t('房源管理', 'Listings') : tb === 'messages' ? t('客户留言', 'Messages') : t('注册用户', 'Users')}
           </button>
         ))}
       </div>
@@ -135,66 +146,66 @@ export default function AdminPage() {
       {tab === 'listings' && (
         <div className="v8-admin__content">
           <div className="v8-admin__panel">
-            <h2>{editing ? '编辑房源' : '新增房源'}</h2>
+            <h2>{editing ? t('编辑房源', 'Edit Listing') : t('新增房源', 'New Listing')}</h2>
             <div className="v8-admin__form">
               <div className="v8-admin__row">
-                <label>标题<input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></label>
-                <label>类型
+                <label>{t('标题', 'Title')}<input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></label>
+                <label>{t('类型', 'Type')}
                   <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
-                    <option value="luxury">豪华住宅</option>
-                    <option value="standard">普通住宅</option>
-                    <option value="student">学生公寓</option>
-                    <option value="city">城市公寓</option>
+                    <option value="luxury">{t('豪华住宅', 'Luxury Home')}</option>
+                    <option value="standard">{t('普通住宅', 'Standard Home')}</option>
+                    <option value="student">{t('学生公寓', 'Student Apartment')}</option>
+                    <option value="city">{t('城市公寓', 'City Apartment')}</option>
                   </select>
                 </label>
               </div>
               <div className="v8-admin__row">
-                <label>价格 (元/月)<input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label>
-                <label>城市<input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></label>
-                <label>地址<input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></label>
+                <label>{t('价格 (元/月)', 'Price (¥/mo)')}<input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label>
+                <label>{t('城市', 'City')}<input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></label>
+                <label>{t('地址', 'Address')}<input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></label>
               </div>
               <div className="v8-admin__row">
-                <label>卧室<input type="number" value={form.bedrooms} onChange={(e) => setForm({ ...form, bedrooms: e.target.value })} /></label>
-                <label>卫生间<input type="number" value={form.bathrooms} onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} /></label>
-                <label>面积 (㎡)<input type="number" value={form.area} onChange={(e) => setForm({ ...form, area: e.target.value })} /></label>
+                <label>{t('卧室', 'Bedrooms')}<input type="number" value={form.bedrooms} onChange={(e) => setForm({ ...form, bedrooms: e.target.value })} /></label>
+                <label>{t('卫生间', 'Bathrooms')}<input type="number" value={form.bathrooms} onChange={(e) => setForm({ ...form, bathrooms: e.target.value })} /></label>
+                <label>{t('面积 (㎡)', 'Area (㎡)')}<input type="number" value={form.area} onChange={(e) => setForm({ ...form, area: e.target.value })} /></label>
               </div>
-              <label>描述<textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} /></label>
-              <label>图片 URL<input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} /></label>
+              <label>{t('描述', 'Description')}<textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} /></label>
+              <label>{t('图片 URL', 'Image URL')}<input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} /></label>
               <label className="v8-admin__check">
                 <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
-                发布（前端可见）
+                {t('发布（前端可见）', 'Published (visible on site)')}
               </label>
               <div className="v8-admin__actions">
                 <button className="v8-admin__btn" onClick={saveListing} disabled={saving}>
-                  {saving ? '保存中...' : editing ? '更新' : '创建'}
+                  {saving ? t('保存中...', 'Saving...') : editing ? t('更新', 'Update') : t('创建', 'Create')}
                 </button>
                 {editing && (
-                  <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => { setEditing(null); setForm({ ...EMPTY_LISTING }) }}>取消</button>
+                  <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => { setEditing(null); setForm({ ...EMPTY_LISTING }) }}>{t('取消', 'Cancel')}</button>
                 )}
               </div>
             </div>
           </div>
 
           <div className="v8-admin__panel">
-            <h2>房源列表 ({listings.length})</h2>
+            <h2>{t('房源列表', 'Listing List')} ({listings.length})</h2>
             <table className="v8-admin__table">
               <thead>
-                <tr><th>标题</th><th>类型</th><th>价格</th><th>城市</th><th>状态</th><th>操作</th></tr>
+                <tr><th>{t('标题', 'Title')}</th><th>{t('类型', 'Type')}</th><th>{t('价格', 'Price')}</th><th>{t('城市', 'City')}</th><th>{t('状态', 'Status')}</th><th>{t('操作', 'Actions')}</th></tr>
               </thead>
               <tbody>
                 {listings.length === 0 && (
-                  <tr><td colSpan={6} className="v8-admin__empty">暂无房源</td></tr>
+                  <tr><td colSpan={6} className="v8-admin__empty">{t('暂无房源', 'No listings yet')}</td></tr>
                 )}
                 {listings.map((l) => (
                   <tr key={l.id}>
                     <td>{l.title}</td>
-                    <td>{l.type}</td>
+                    <td>{typeLabels[l.type] || l.type}</td>
                     <td>¥{l.price}</td>
                     <td>{l.city}</td>
-                    <td>{l.published === false ? '未发布' : '已发布'}</td>
+                    <td>{l.published === false ? t('未发布', 'Unpublished') : t('已发布', 'Published')}</td>
                     <td>
-                      <button className="v8-admin__link" onClick={() => { setEditing(l); setForm({ ...EMPTY_LISTING, ...l }); window.scrollTo(0, 0) }}>编辑</button>
-                      <button className="v8-admin__link v8-admin__link--danger" onClick={() => removeListing(l.id)}>删除</button>
+                      <button className="v8-admin__link" onClick={() => { setEditing(l); setForm({ ...EMPTY_LISTING, ...l }); window.scrollTo(0, 0) }}>{t('编辑', 'Edit')}</button>
+                      <button className="v8-admin__link v8-admin__link--danger" onClick={() => removeListing(l.id)}>{t('删除', 'Delete')}</button>
                     </td>
                   </tr>
                 ))}
@@ -206,14 +217,14 @@ export default function AdminPage() {
 
       {tab === 'messages' && (
         <div className="v8-admin__panel">
-          <h2>客户留言 ({messages.length})</h2>
+          <h2>{t('客户留言', 'Messages')} ({messages.length})</h2>
           <table className="v8-admin__table">
             <thead>
-              <tr><th>姓名</th><th>邮箱</th><th>电话</th><th>留言</th><th>状态</th><th>操作</th></tr>
+              <tr><th>{t('姓名', 'Name')}</th><th>{t('邮箱', 'Email')}</th><th>{t('电话', 'Phone')}</th><th>{t('留言', 'Message')}</th><th>{t('状态', 'Status')}</th><th>{t('操作', 'Actions')}</th></tr>
             </thead>
             <tbody>
               {messages.length === 0 && (
-                <tr><td colSpan={6} className="v8-admin__empty">暂无留言</td></tr>
+                <tr><td colSpan={6} className="v8-admin__empty">{t('暂无留言', 'No messages yet')}</td></tr>
               )}
               {messages.map((m) => (
                 <tr key={m.id}>
@@ -221,10 +232,10 @@ export default function AdminPage() {
                   <td>{m.email}</td>
                   <td>{m.phone || '-'}</td>
                   <td className="v8-admin__msg">{m.message}</td>
-                  <td>{m.read ? '已读' : <span className="v8-admin__badge">未读</span>}</td>
+                  <td>{m.read ? t('已读', 'Read') : <span className="v8-admin__badge">{t('未读', 'Unread')}</span>}</td>
                   <td>
-                    {!m.read && <button className="v8-admin__link" onClick={() => markRead(m.id)}>标已读</button>}
-                    <button className="v8-admin__link v8-admin__link--danger" onClick={() => removeMessage(m.id)}>删除</button>
+                    {!m.read && <button className="v8-admin__link" onClick={() => markRead(m.id)}>{t('标已读', 'Mark Read')}</button>}
+                    <button className="v8-admin__link v8-admin__link--danger" onClick={() => removeMessage(m.id)}>{t('删除', 'Delete')}</button>
                   </td>
                 </tr>
               ))}
@@ -235,18 +246,18 @@ export default function AdminPage() {
 
       {tab === 'users' && (
         <div className="v8-admin__panel">
-          <h2>注册用户 ({users.length})</h2>
+          <h2>{t('注册用户', 'Registered Users')} ({users.length})</h2>
           <table className="v8-admin__table">
             <thead>
-              <tr><th>姓名</th><th>邮箱</th><th>角色</th><th>注册时间</th></tr>
+              <tr><th>{t('姓名', 'Name')}</th><th>{t('邮箱', 'Email')}</th><th>{t('角色', 'Role')}</th><th>{t('注册时间', 'Registered')}</th></tr>
             </thead>
             <tbody>
               {users.map((u) => (
                 <tr key={u.id}>
                   <td>{u.name}</td>
                   <td>{u.email}</td>
-                  <td>{u.role === 'admin' ? '管理员' : '普通用户'}</td>
-                  <td>{new Date(u.createdAt).toLocaleString('zh-CN')}</td>
+                  <td>{u.role === 'admin' ? t('管理员', 'Admin') : t('普通用户', 'User')}</td>
+                  <td>{new Date(u.createdAt).toLocaleString(zh ? 'zh-CN' : 'en-US')}</td>
                 </tr>
               ))}
             </tbody>
