@@ -724,6 +724,16 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 @media (max-width: 680px) {
   .v8-logo { height: 30px; }
 }
+/* V 字母 Logo 图片 */
+.v8-wordmark__img {
+  display: block;
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+}
+@media (max-width: 680px) {
+  .v8-wordmark__img { height: 28px; }
+}
 /* 居中导航（不能用 transform，否则 fixed 子菜单会被限制宽度） */
 .v8-nav__links {
   position: absolute; left: 0; right: 0;
