@@ -257,7 +257,26 @@ export default function V8Bubbles() {
   const [submitting, setSubmitting] = useState(false)
   const [feedback, setFeedback] = useState(null) // { type: 'ok'|'err', text }
   const [formOpen, setFormOpen] = useState(false) // 留言表单默认收起为按钮
+  const [formMaxH, setFormMaxH] = useState(0) // 展开容器的实测内容高度
+  const collapseRef = useRef(null)
   const realMessagesRef = useRef([])
+
+  // 展开时测量表单卡片真实高度（+120px 余量容纳提交反馈提示），窗口尺寸变化时重测
+  function measureForm() {
+    const wrap = collapseRef.current
+    const card = wrap?.querySelector('.v8-msgform')
+    if (card) setFormMaxH(card.offsetHeight + card.offsetTop + 120)
+  }
+  function toggleForm() {
+    const next = !formOpen
+    setFormOpen(next)
+    if (next) requestAnimationFrame(measureForm)
+  }
+  useEffect(() => {
+    if (!formOpen) return
+    window.addEventListener('resize', measureForm)
+    return () => window.removeEventListener('resize', measureForm)
+  }, [formOpen])
 
   async function submitMessage(e) {
     e.preventDefault()
@@ -432,7 +451,7 @@ export default function V8Bubbles() {
             <button
               type="button"
               className={`v8-btn v8-btn--dark v8-msgform-toggle${formOpen ? ' is-open' : ''}`}
-              onClick={() => setFormOpen((o) => !o)}
+              onClick={toggleForm}
               aria-expanded={formOpen}
               aria-controls="v8-msgform-collapse"
             >
@@ -442,7 +461,12 @@ export default function V8Bubbles() {
               </svg>
             </button>
           </div>
-          <div id="v8-msgform-collapse" className={`v8-msgform-collapse${formOpen ? ' is-open' : ''}`}>
+          <div
+            id="v8-msgform-collapse"
+            ref={collapseRef}
+            className={`v8-msgform-collapse${formOpen ? ' is-open' : ''}`}
+            style={{ maxHeight: formOpen ? formMaxH : 0 }}
+          >
             <div className="v8-msgform">
               <div className="v8-msgform__head">
                 <p className="v8-eyebrow">{t('留下您的留言', 'LEAVE A MESSAGE', 'メッセージを残す')}</p>

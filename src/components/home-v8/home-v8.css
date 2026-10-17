@@ -648,19 +648,20 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   .v8-msgform__row { grid-template-columns: 1fr; }
 }
 
-/* 留言表单收起/展开：grid-rows 0fr→1fr 平滑高度动画 */
+/* 留言表单收起/展开：max-height 配合 JS 实测内容高度，兼容所有内核 */
 .home-v8 .v8-msgform-collapse {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows .45s var(--v8-ease);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .5s var(--v8-ease);
+}
+/* 收起时不可聚焦、不响应交互 */
+.home-v8 .v8-msgform-collapse:not(.is-open) {
+  visibility: hidden;
+  transition: max-height .5s var(--v8-ease), visibility 0s .5s;
 }
 .home-v8 .v8-msgform-collapse > .v8-msgform {
-  overflow: hidden;
-  min-height: 0;
-  margin-top: 0;
+  margin-top: 32px;
 }
-/* 收起时表单卡片无外边距和阴影干扰，展开后恢复呼吸感 */
-.home-v8 .v8-msgform-collapse.is-open > .v8-msgform { margin-top: 32px; }
 .home-v8 .v8-msgform-toggle-row {
   display: flex;
   justify-content: center;
