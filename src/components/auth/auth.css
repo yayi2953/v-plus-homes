@@ -1,158 +1,222 @@
-/* 特斯拉风格登录 / 注册页 */
+/* 特斯拉风格登录 / 注册页 —— 1:1 还原 auth.tesla.cn */
 .v8-auth {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px 40px;
+  flex-direction: column;
   background: #fff;
-  font-family: "Tesla", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Tesla", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
   color: #171a20;
+  position: relative;
+}
+
+/* 顶部栏：左 Logo，右语言 */
+.v8-auth__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.v8-auth__topbar-logo {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #171a20;
+  text-decoration: none;
+  cursor: pointer;
+}
+.v8-auth__topbar-lang {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #171a20;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: background .15s;
+}
+.v8-auth__topbar-lang:hover { background: #f4f4f4; }
+.v8-auth__topbar-lang svg { width: 16px; height: 16px; }
+
+/* 主体：水平居中，偏上 */
+.v8-auth__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 60px;
 }
 
 .v8-auth__card {
   width: 100%;
-  max-width: 360px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-/* Tesla 风格 Logo */
-.v8-auth__logo {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 40px;
-}
-.v8-auth__logo svg {
-  width: 120px;
-  height: auto;
-  display: block;
+  max-width: 340px;
 }
 
 .v8-auth__title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 600;
-  margin: 0 0 8px;
+  margin: 0 0 24px;
   color: #171a20;
   letter-spacing: -0.01em;
-}
-
-.v8-auth__sub {
-  font-size: 14px;
-  color: #5c5e62;
-  margin: 0 0 32px;
-  line-height: 1.5;
 }
 
 .v8-auth__form {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 16px;
 }
 
 .v8-auth__form label {
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-bottom: 8px;
 }
 
-.v8-auth__form label > span {
-  font-size: 13px;
-  font-weight: 500;
-  color: #5c5e62;
-  margin-bottom: 4px;
-}
-
-/* 特斯拉下划线式输入框：仅底部边框，无圆角 */
+/* 输入框：浅灰背景填充，圆角，无边框 */
 .v8-auth__form input {
   width: 100%;
-  padding: 10px 0;
-  border: none;
-  border-bottom: 1px solid #d0d1d2;
-  border-radius: 0;
+  padding: 12px 16px;
+  background: #f4f4f4;
+  border: 1px solid transparent;
+  border-radius: 4px;
   font-size: 15px;
   color: #171a20;
-  background: transparent;
   outline: none;
-  transition: border-color .15s ease;
+  transition: border-color .15s, background .15s;
   box-sizing: border-box;
 }
 
 .v8-auth__form input::placeholder {
-  color: #b0b2b6;
-}
-
-.v8-auth__form input:focus {
-  border-bottom-color: #171a20;
-}
-
-/* 按钮：特斯拉实心黑，圆角胶囊 */
-.v8-auth__btn {
-  margin-top: 24px;
-  padding: 13px 24px;
-  background: #171a20;
-  color: #fff;
-  border: none;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  transition: background-color .2s ease, transform .1s ease;
-}
-
-.v8-auth__btn:hover:not(:disabled) {
-  background: #2c2e33;
-}
-
-.v8-auth__btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.v8-auth__btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.v8-auth__error {
-  margin-top: 16px;
-  color: #b91c1c;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* 底部链接：居中文本，链接下划线 */
-.v8-auth__foot {
-  margin-top: 24px;
-  text-align: center;
-  font-size: 14px;
   color: #5c5e62;
 }
 
+.v8-auth__form input:focus {
+  background: #fff;
+  border-color: #171a20;
+}
+
+/* 主按钮：特斯拉蓝 #3e6ae1，禁用时灰色 */
+.v8-auth__btn {
+  padding: 13px 24px;
+  background: #3e6ae1;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-color .2s ease;
+  margin-top: 4px;
+}
+
+.v8-auth__btn:hover:not(:disabled) {
+  background: #3558b8;
+}
+
+.v8-auth__btn:disabled {
+  background: #c4c4c4;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+/* 次按钮：描边样式（创建账户） */
+.v8-auth__btn--outline {
+  background: #fff;
+  color: #171a20;
+  border: 1px solid #d0d1d2;
+}
+.v8-auth__btn--outline:hover:not(:disabled) {
+  background: #f4f4f4;
+  border-color: #171a20;
+}
+
+/* 错误提示 */
+.v8-auth__error {
+  color: #b91c1c;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: -8px;
+}
+
+/* 辅助链接：无法登录？ */
+.v8-auth__help {
+  text-align: center;
+  font-size: 14px;
+  color: #171a20;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 4px 0;
+}
+.v8-auth__help:hover { opacity: 0.7; }
+
+/* 分隔线 + 或 */
+.v8-auth__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+.v8-auth__divider::before,
+.v8-auth__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #d0d1d2;
+}
+.v8-auth__divider span {
+  font-size: 13px;
+  color: #5c5e62;
+}
+
+/* 底部切换链接 */
+.v8-auth__foot {
+  text-align: center;
+  font-size: 14px;
+  color: #5c5e62;
+  margin-top: 4px;
+}
 .v8-auth__foot a {
   color: #171a20;
-  font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 2px;
   margin-left: 2px;
 }
+.v8-auth__foot a:hover { opacity: 0.7; }
 
-.v8-auth__foot a:hover {
-  opacity: 0.7;
-}
-
-/* 演示账号提示：浅灰小字 */
+/* 演示账号提示 */
 .v8-auth__hint {
-  margin-top: 28px;
+  margin-top: 20px;
   text-align: center;
   font-size: 12px;
   color: #a0a2a6;
   line-height: 1.6;
 }
 
+/* 页脚：版权 + 链接 */
+.v8-auth__footer {
+  padding: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: #5c5e62;
+}
+.v8-auth__footer a {
+  color: #5c5e62;
+  text-decoration: none;
+  margin: 0 8px;
+}
+.v8-auth__footer a:hover { text-decoration: underline; }
+
 @media (max-width: 480px) {
-  .v8-auth { padding: 40px 20px; }
-  .v8-auth__title { font-size: 24px; }
+  .v8-auth__topbar { padding: 14px 16px; }
+  .v8-auth__main { padding: 24px 16px 40px; }
+  .v8-auth__title { font-size: 26px; }
 }
