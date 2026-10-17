@@ -2,12 +2,19 @@ import { useState, useCallback } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useContact } from '../ici/contactContext.jsx'
 
-// 首屏轮播背景图
-const BG_IMAGES = [
+// 首屏轮播背景图（每张配独立文案组，切换图片时文字跟随变化）
+const SLIDES = [
   '/images/hero-cityscape.jpg',
   '/images/dream-slide-pool.jpg',
   '/images/dream-slide-lake2.jpg'
 ]
+
+// 第 1 张沿用原有 key（兼容已保存的覆盖项），第 2/3 张使用独立 key
+function slideText(t, i) {
+  if (i === 0) return { eyebrow: t.eyebrow, title: t.title, lede: t.lede, ek: 'v8.hero.eyebrow', tk: 'v8.hero.title', lk: 'v8.hero.lede' }
+  if (i === 1) return { eyebrow: t.s2Eyebrow, title: t.s2Title, lede: t.s2Lede, ek: 'v8.hero.s2Eyebrow', tk: 'v8.hero.s2Title', lk: 'v8.hero.s2Lede' }
+  return { eyebrow: t.s3Eyebrow, title: t.s3Title, lede: t.s3Lede, ek: 'v8.hero.s3Eyebrow', tk: 'v8.hero.s3Title', lk: 'v8.hero.s3Lede' }
+}
 
 export default function V8Hero() {
   const { c } = useIciI18n()
@@ -15,21 +22,22 @@ export default function V8Hero() {
   const [idx, setIdx] = useState(0)
 
   const prev = useCallback(() => {
-    setIdx((i) => (i - 1 + BG_IMAGES.length) % BG_IMAGES.length)
+    setIdx((i) => (i - 1 + SLIDES.length) % SLIDES.length)
   }, [])
 
   const next = useCallback(() => {
-    setIdx((i) => (i + 1) % BG_IMAGES.length)
+    setIdx((i) => (i + 1) % SLIDES.length)
   }, [])
 
   const t = c.v8?.hero || {}
+  const ot = slideText(t, idx)
 
   return (
     <section className="v8-hero" id="top">
       <div className="v8-hero-canvas">
         {/* 轮播背景图 */}
         <div className="v8-hero-videobg" aria-hidden="true">
-          {BG_IMAGES.map((src, i) => (
+          {SLIDES.map((src, i) => (
             <img
               key={src}
               src={src}
@@ -39,11 +47,11 @@ export default function V8Hero() {
           ))}
         </div>
 
-        {/* 图片上的文字层：上半部分居中白色 */}
-        <div className="v8-hero-overlay">
-          <p className="v8-hero-overlay__eyebrow" data-edit-key="v8.hero.eyebrow">{t.eyebrow}</p>
-          <h1 className="v8-hero-overlay__title" data-edit-key="v8.hero.title">{t.title || 'V PLUS'}</h1>
-          <p className="v8-hero-overlay__sub" data-edit-key="v8.hero.lede">{t.lede}</p>
+        {/* 图片上的文字层：随当前轮播图切换 */}
+        <div className="v8-hero-overlay" key={idx}>
+          <p className="v8-hero-overlay__eyebrow" data-edit-key={ot.ek}>{ot.eyebrow}</p>
+          <h1 className="v8-hero-overlay__title" data-edit-key={ot.tk}>{ot.title || 'V PLUS'}</h1>
+          <p className="v8-hero-overlay__sub" data-edit-key={ot.lk}>{ot.lede}</p>
         </div>
 
         {/* 左右切换箭头 */}
