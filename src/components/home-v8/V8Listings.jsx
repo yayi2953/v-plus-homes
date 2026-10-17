@@ -141,7 +141,7 @@ export default function V8Listings() {
 
         {/* 房源卡片网格：虚拟房源 + 后台真实房源 */}
         {items.length > 0 ? (
-          <div className="v8-featured__grid">
+          <div className="v8-listings__grid">
             {items.map((it, seq) => renderCard(it, seq + 1))}
           </div>
         ) : (
