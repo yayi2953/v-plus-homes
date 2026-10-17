@@ -33,6 +33,11 @@ export default function RegisterPage() {
   return (
     <div className="v8-auth">
       <div className="v8-auth__card">
+        <div className="v8-auth__logo">
+          <svg viewBox="0 0 342 35" xmlns="http://www.w3.org/2000/svg" aria-label="V PLUS">
+            <text x="0" y="28" fontFamily="Arial, Helvetica, sans-serif" fontSize="28" fontWeight="700" letterSpacing="2" fill="#171a20">V&nbsp;PLUS</text>
+          </svg>
+        </div>
         <h1 className="v8-auth__title">{t('注册', 'Sign Up')}</h1>
         <p className="v8-auth__sub">{t('创建您的 V PLUS 账户', 'Create your V PLUS account')}</p>
         <form onSubmit={onSubmit} className="v8-auth__form">

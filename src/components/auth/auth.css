@@ -1,117 +1,158 @@
+/* 特斯拉风格登录 / 注册页 */
 .v8-auth {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px 40px;
-  background: #f5f6f8;
+  padding: 60px 20px 40px;
+  background: #fff;
+  font-family: "Tesla", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #171a20;
 }
 
 .v8-auth__card {
   width: 100%;
-  max-width: 420px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 40px 32px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Tesla 风格 Logo */
+.v8-auth__logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+.v8-auth__logo svg {
+  width: 120px;
+  height: auto;
+  display: block;
 }
 
 .v8-auth__title {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
-  margin: 0;
-  color: #111;
+  margin: 0 0 8px;
+  color: #171a20;
+  letter-spacing: -0.01em;
 }
 
 .v8-auth__sub {
   font-size: 14px;
-  color: #6b7280;
-  margin: 6px 0 28px;
+  color: #5c5e62;
+  margin: 0 0 32px;
+  line-height: 1.5;
 }
 
 .v8-auth__form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 0;
 }
 
 .v8-auth__form label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #374151;
+  gap: 0;
+  margin-bottom: 8px;
 }
 
+.v8-auth__form label > span {
+  font-size: 13px;
+  font-weight: 500;
+  color: #5c5e62;
+  margin-bottom: 4px;
+}
+
+/* 特斯拉下划线式输入框：仅底部边框，无圆角 */
 .v8-auth__form input {
-  padding: 12px 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-bottom: 1px solid #d0d1d2;
+  border-radius: 0;
   font-size: 15px;
+  color: #171a20;
+  background: transparent;
   outline: none;
-  transition: border-color .15s, box-shadow .15s;
+  transition: border-color .15s ease;
+  box-sizing: border-box;
+}
+
+.v8-auth__form input::placeholder {
+  color: #b0b2b6;
 }
 
 .v8-auth__form input:focus {
-  border-color: #111;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+  border-bottom-color: #171a20;
 }
 
+/* 按钮：特斯拉实心黑，圆角胶囊 */
 .v8-auth__btn {
-  margin-top: 6px;
-  padding: 13px;
-  background: #111;
+  margin-top: 24px;
+  padding: 13px 24px;
+  background: #171a20;
   color: #fff;
   border: none;
-  border-radius: 10px;
-  font-size: 15px;
+  border-radius: 999px;
+  font-size: 14px;
   font-weight: 500;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: background .15s;
+  transition: background-color .2s ease, transform .1s ease;
 }
 
 .v8-auth__btn:hover:not(:disabled) {
-  background: #333;
+  background: #2c2e33;
+}
+
+.v8-auth__btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .v8-auth__btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .v8-auth__error {
-  background: #fef2f2;
+  margin-top: 16px;
   color: #b91c1c;
-  padding: 10px 12px;
-  border-radius: 8px;
   font-size: 13px;
+  line-height: 1.5;
 }
 
+/* 底部链接：居中文本，链接下划线 */
 .v8-auth__foot {
-  margin-top: 20px;
+  margin-top: 24px;
   text-align: center;
   font-size: 14px;
-  color: #6b7280;
+  color: #5c5e62;
 }
 
 .v8-auth__foot a {
-  color: #111;
+  color: #171a20;
   font-weight: 500;
-  text-decoration: none;
-  margin-left: 4px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  margin-left: 2px;
 }
 
 .v8-auth__foot a:hover {
-  text-decoration: underline;
+  opacity: 0.7;
 }
 
+/* 演示账号提示：浅灰小字 */
 .v8-auth__hint {
-  margin-top: 14px;
+  margin-top: 28px;
   text-align: center;
   font-size: 12px;
-  color: #9ca3af;
-  background: #f3f4f6;
-  padding: 8px 12px;
-  border-radius: 8px;
+  color: #a0a2a6;
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .v8-auth { padding: 40px 20px; }
+  .v8-auth__title { font-size: 24px; }
 }
