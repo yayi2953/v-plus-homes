@@ -311,15 +311,14 @@
   cursor: not-allowed;
 }
 
-/* 次按钮：白底 + Graphite 文字 + Pale 描边 */
+/* 次按钮：浅灰底色 + Graphite 文字，无边框 */
 .v8-auth__btn--outline {
-  background: var(--ts-white);
+  background: var(--ts-ash);
   color: var(--ts-graphite);
-  border-color: var(--ts-pale);
+  border-color: transparent;
 }
 .v8-auth__btn--outline:hover:not(:disabled) {
-  background: var(--ts-ash);
-  border-color: var(--ts-carbon);
+  background: var(--ts-cloud);
 }
 
 /* 返回链接按钮 */
@@ -350,8 +349,6 @@
   font-size: 14px;
   font-weight: 400;
   color: var(--ts-carbon);
-  text-decoration: underline;
-  text-underline-offset: 2px;
   cursor: pointer;
   background: none;
   border: none;
@@ -359,7 +356,7 @@
   margin: 20px 0 0;
   transition: color var(--ts-ease);
 }
-.v8-auth__help:hover { color: var(--ts-pewter); }
+.v8-auth__help:hover { color: var(--ts-pewter); text-decoration: underline; }
 
 /* ---------- 分隔线 + 或 ---------- */
 .v8-auth__divider {
