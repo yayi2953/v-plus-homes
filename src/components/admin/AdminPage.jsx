@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../contexts/AuthContext.jsx'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate } from '../../lib/router.mjs'
@@ -24,8 +24,72 @@ export default function AdminPage() {
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ ...EMPTY_LISTING })
   const [saving, setSaving] = useState(false)
+  // 房源图片本地上传
+  const [imgUploading, setImgUploading] = useState(false)
+  const [imgError, setImgError] = useState('')
+  const imgFileRef = useRef(null)
 
   const isAdmin = user?.role === 'admin'
+
+  // 选本地图片 → 压缩（>900KB 时缩到 1920 宽、JPEG 82% 质量推 GitHub
+  // → 返回 raw 直链填入图片 URL
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader()
+      r.onload = () => resolve(String(r.result).split(',')[1])
+      r.onerror = () => reject(new Error(t('读取文件失败', 'Failed to read file')))
+      r.readAsDataURL(file)
+    })
+  }
+
+  async function fileToUploadBase64(file) {
+    if (file.size <= 900 * 1024) return fileToBase64(file)
+    const dataUrl = await new Promise((resolve, reject) => {
+      const r = new FileReader()
+      r.onload = () => resolve(r.result)
+      r.onerror = () => reject(new Error(t('读取文件失败', 'Failed to read file')))
+      r.readAsDataURL(file)
+    })
+    const img = await new Promise((resolve, reject) => {
+      const im = new Image()
+      im.onload = () => resolve(im)
+      im.onerror = () => reject(new Error(t('图片解析失败', 'Failed to decode image')))
+      im.src = dataUrl
+    })
+    const scale = Math.min(1, 1920 / img.width)
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(img.width * scale)
+    canvas.height = Math.round(img.height * scale)
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+    return canvas.toDataURL('image/jpeg', 0.82).split(',')[1]
+  }
+
+  async function handleListingImageUpload(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setImgError(t('请选择图片文件', 'Please choose an image file'))
+      return
+    }
+    setImgError('')
+    setImgUploading(true)
+    try {
+      const dataBase64 = await fileToUploadBase64(file)
+      const res = await authFetch('/api/admin/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: file.name, dataBase64 })
+      })
+      const d = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`)
+      setForm((f) => ({ ...f, image: d.url }))
+    } catch (err) {
+      setImgError(err.message || t('上传失败', 'Upload failed'))
+    } finally {
+      setImgUploading(false)
+    }
+  }
 
   useEffect(() => {
     if (!isAdmin) return
@@ -171,7 +235,32 @@ export default function AdminPage() {
                 <label>{t('面积 (㎡)', 'Area (㎡)')}<input type="number" value={form.area} onChange={(e) => setForm({ ...form, area: e.target.value })} /></label>
               </div>
               <label>{t('描述', 'Description')}<textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} /></label>
-              <label>{t('图片 URL', 'Image URL')}<input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} /></label>
+              <label>{t('图片 URL', 'Image URL')}<input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder={t('https://... 或点击下方上传本地图片', 'https://... or upload a local image below')} /></label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="v8-admin__btn v8-admin__btn--ghost"
+                  disabled={imgUploading}
+                  onClick={() => imgFileRef.current?.click()}
+                >
+                  {imgUploading ? t('上传中...', 'Uploading...') : t('上传本地图片', 'Upload Image')}
+                </button>
+                <input
+                  ref={imgFileRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleListingImageUpload}
+                />
+                {form.image && (
+                  <img
+                    src={form.image}
+                    alt=""
+                    style={{ height: 44, borderRadius: 4, border: '1px solid rgba(0,0,0,.12)' }}
+                  />
+                )}
+              </div>
+              {imgError && <p style={{ color: '#c0392b', fontSize: 13, margin: 0 }}>{imgError}</p>}
               <label className="v8-admin__check">
                 <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
                 {t('发布（前端可见）', 'Published (visible on site)')}
