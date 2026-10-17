@@ -21,6 +21,7 @@ export default function TextEditor({ authFetch }) {
   const [editZh, setEditZh] = useState('')
   const [editEn, setEditEn] = useState('')
   const [saving, setSaving] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
   const iframeRef = useRef(null)
 
   // 合并默认 + 覆盖
@@ -85,7 +86,15 @@ export default function TextEditor({ authFetch }) {
         en: editEn
       }, '*')
       setClickInfo(null)
+      setErrorMsg('')
       reloadTexts()
+    } else {
+      try {
+        const d = await res.json()
+        setErrorMsg(d.error || '保存失败')
+      } catch {
+        setErrorMsg('保存失败（HTTP ' + res.status + '）')
+      }
     }
     setSaving(false)
   }
@@ -164,6 +173,11 @@ export default function TextEditor({ authFetch }) {
               {t('英文', 'English')}
               <textarea value={editEn} onChange={(e) => setEditEn(e.target.value)} rows={3} />
             </label>
+            {errorMsg && (
+              <p className="v8-admin__error" style={{ color: '#d93025', margin: '8px 0', fontSize: 13 }}>
+                {errorMsg}
+              </p>
+            )}
             <div className="v8-admin__modal-actions">
               <button className="v8-admin__btn" onClick={saveEdit} disabled={saving}>
                 {saving ? t('保存中...', 'Saving...') : t('保存', 'Save')}

@@ -87,18 +87,24 @@ function getMessages() { return load().messages }
 function getServices() { return load().services }
 // 通过 GitHub API 读取文案覆盖项（持久化到仓库）
 async function fetchTextsFromGitHub() {
+  if (!GITHUB_TOKEN) return {}
   try {
     const res = await fetch(
-      `https://raw.githubusercontent.com/${GITHUB_REPO}/main/${GITHUB_TEXTS_PATH}`,
-      { headers: { 'Cache-Control': 'no-cache' } }
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
+      { headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
     )
     if (res.ok) {
       const data = await res.json()
-      textsCache = data
+      const content = Buffer.from(data.content, 'base64').toString('utf-8')
+      const parsed = JSON.parse(content)
+      textsCache = parsed
       textsCacheTime = Date.now()
-      return data
+      return parsed
     }
-  } catch { /* ignore */ }
+    console.error('[texts] GitHub read failed:', res.status, res.statusText)
+  } catch (e) {
+    console.error('[texts] GitHub read error:', e.message)
+  }
   return {}
 }
 
@@ -114,90 +120,92 @@ async function updateTexts(updates) {
   const current = await getTexts()
   const next = { ...current, ...updates }
 
-  if (GITHUB_TOKEN) {
-    try {
-      // 获取当前文件的 sha
-      const metaRes = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
-        { headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
-      )
-      const meta = await metaRes.json()
-      const sha = meta.sha
-
-      // 提交更新
-      const content = Buffer.from(JSON.stringify(next, null, 2), 'utf-8').toString('base64')
-      const putRes = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `token ${GITHUB_TOKEN}`,
-            Accept: 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: 'update text overrides',
-            content,
-            sha
-          })
-        }
-      )
-      if (putRes.ok) {
-        textsCache = next
-        textsCacheTime = Date.now()
-        return next
-      }
-    } catch (e) {
-      console.error('GitHub update failed:', e.message)
-    }
+  if (!GITHUB_TOKEN) {
+    console.error('[texts] GITHUB_TOKEN not set, cannot persist')
+    throw new Error('GITHUB_TOKEN not configured')
   }
 
-  // 降级：写 /tmp（不持久，但至少当前实例可用）
-  const db = load()
-  db.texts = next
-  save(db)
-  textsCache = next
-  textsCacheTime = Date.now()
-  return next
+  try {
+    // 获取当前文件的 sha
+    const metaRes = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
+      { headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
+    )
+    if (!metaRes.ok) {
+      console.error('[texts] GitHub meta failed:', metaRes.status, metaRes.statusText)
+      throw new Error(`GitHub meta request failed: ${metaRes.status}`)
+    }
+    const meta = await metaRes.json()
+    if (!meta.sha) {
+      console.error('[texts] No sha in GitHub response:', JSON.stringify(meta).slice(0, 200))
+      throw new Error('GitHub response missing sha')
+    }
+
+    // 提交更新
+    const content = Buffer.from(JSON.stringify(next, null, 2), 'utf-8').toString('base64')
+    const putRes = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'update text overrides',
+          content,
+          sha: meta.sha
+        })
+      }
+    )
+    if (!putRes.ok) {
+      const errText = await putRes.text()
+      console.error('[texts] GitHub PUT failed:', putRes.status, errText.slice(0, 300))
+      throw new Error(`GitHub write failed: ${putRes.status}`)
+    }
+
+    textsCache = next
+    textsCacheTime = Date.now()
+    return next
+  } catch (e) {
+    console.error('[texts] updateTexts error:', e.message)
+    throw e
+  }
 }
 
 async function resetTexts() {
-  const next = {}
-  if (GITHUB_TOKEN) {
-    try {
-      const metaRes = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
-        { headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
-      )
-      const meta = await metaRes.json()
-      const content = Buffer.from(JSON.stringify({}, null, 2), 'utf-8').toString('base64')
-      const putRes = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `token ${GITHUB_TOKEN}`,
-            Accept: 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ message: 'reset text overrides', content, sha: meta.sha })
-        }
-      )
-      if (putRes.ok) {
-        textsCache = {}
-        textsCacheTime = Date.now()
-        return {}
-      }
-    } catch (e) {
-      console.error('GitHub reset failed:', e.message)
-    }
+  if (!GITHUB_TOKEN) {
+    throw new Error('GITHUB_TOKEN not configured')
   }
-  const db = load()
-  db.texts = {}
-  save(db)
-  textsCache = {}
-  textsCacheTime = Date.now()
-  return {}
+  try {
+    const metaRes = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
+      { headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
+    )
+    if (!metaRes.ok) throw new Error(`GitHub meta failed: ${metaRes.status}`)
+    const meta = await metaRes.json()
+    const content = Buffer.from(JSON.stringify({}, null, 2), 'utf-8').toString('base64')
+    const putRes = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_TEXTS_PATH}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: 'reset text overrides', content, sha: meta.sha })
+      }
+    )
+    if (!putRes.ok) throw new Error(`GitHub reset failed: ${putRes.status}`)
+    textsCache = {}
+    textsCacheTime = Date.now()
+    return {}
+  } catch (e) {
+    console.error('[texts] resetTexts error:', e.message)
+    throw e
+  }
 }
 
 function findUserByEmail(email) {

@@ -221,21 +221,31 @@ async function adminTexts(req, res) {
   if (req.method === 'PUT') {
     const { key, zh, en } = req.body || {}
     if (!key) return res.status(400).json({ error: '缺少 key' })
-    const updated = await updateTexts({ [key]: { zh, en } })
-    return res.status(200).json({ ok: true, texts: updated })
+    try {
+      const updated = await updateTexts({ [key]: { zh, en } })
+      return res.status(200).json({ ok: true, texts: updated })
+    } catch (e) {
+      console.error('adminTexts PUT error:', e.message)
+      return res.status(500).json({ error: '保存失败: ' + e.message })
+    }
   }
   if (req.method === 'DELETE') {
     const { key } = req.body || {}
-    if (key) {
-      // 重置单个 key：从覆盖项中删除
-      const db = await getTexts()
-      delete db[key]
-      await updateTexts(db)
+    try {
+      if (key) {
+        // 重置单个 key：从覆盖项中删除
+        const db = await getTexts()
+        delete db[key]
+        await updateTexts(db)
+        return res.status(200).json({ ok: true })
+      }
+      // 无 key 则全部重置
+      await resetTexts()
       return res.status(200).json({ ok: true })
+    } catch (e) {
+      console.error('adminTexts DELETE error:', e.message)
+      return res.status(500).json({ error: '重置失败: ' + e.message })
     }
-    // 无 key 则全部重置
-    await resetTexts()
-    return res.status(200).json({ ok: true })
   }
   return res.status(405).json({ error: 'Method not allowed' })
 }
