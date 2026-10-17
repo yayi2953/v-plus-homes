@@ -109,8 +109,8 @@ export function IciI18nProvider({ children }) {
         ? p.schoolKeys : (p.schoolKey ? [p.schoolKey] : [])
     }))
 
-    // 追加后台真实房源（index 全局唯一，详情页按 index 直接打开）
-    c.properties = [...c.properties, ...realListings]
+    // 真实房源置顶（index 全局唯一，详情页按 index 直接打开；首页精选优先展示真实房源）
+    c.properties = [...realListings, ...c.properties]
 
     // 应用后端文案覆盖项
     for (const [key, val] of Object.entries(overrides)) {
