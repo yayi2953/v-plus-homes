@@ -5,7 +5,7 @@ import { navigate, switchLang } from '../../lib/router.mjs'
 import CaptchaImage from './CaptchaImage.jsx'
 import './auth.css'
 
-const STEPS = 3
+const STEPS = 2
 
 // 生成 5 位随机验证码（字母+数字，排除易混淆字符）
 function genCaptcha() {
@@ -30,8 +30,6 @@ export default function RegisterPage() {
   const [confirm, setConfirm] = useState('')
   const [showPwd, setShowPwd] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [phone, setPhone] = useState('')
-  const [code, setCode] = useState(['', '', '', '', '', ''])
   const [captcha, setCaptcha] = useState(genCaptcha())
   const [captchaInput, setCaptchaInput] = useState('')
   const [error, setError] = useState('')
@@ -67,10 +65,6 @@ export default function RegisterPage() {
       if (!email.trim()) { setError(t('请输入邮箱', 'Please enter email')); return }
       if (password.length < 6) { setError(t('密码至少 6 位', 'Password must be at least 6 characters')); return }
       if (password !== confirm) { setError(t('两次密码不一致', 'Passwords do not match')); return }
-      setStep(3)
-    } else if (step === 3) {
-      if (!phone.trim()) { setError(t('请输入电话号码', 'Please enter phone number')); return }
-      // 直接提交注册（验证码步骤为视觉还原，实际由后端创建账户）
       doRegister()
     }
   }
@@ -87,9 +81,7 @@ export default function RegisterPage() {
   }
 
   const stepLabel = t(`第 ${step} 步（共 ${STEPS} 步）`, `Step ${step} of ${STEPS}`)
-  const title = step === 1 ? t('创建账户', 'Create Account')
-    : step === 2 ? t('创建账户', 'Create Account')
-    : t('添加登录手机号码', 'Add Login Phone Number')
+  const title = t('创建账户', 'Create Account')
 
   return (
     <div className="v8-auth">
@@ -179,27 +171,7 @@ export default function RegisterPage() {
 
               {error && <div className="v8-auth__error">{error}</div>}
               <button type="submit" className="v8-auth__btn" disabled={loading}>
-                {t('下一步', 'Next')}
-              </button>
-              <button type="button" className="v8-auth__back" onClick={prevStep}>{t('返回', 'Back')}</button>
-            </form>
-          )}
-
-          {/* Step 3: 电话号码 + 验证码 */}
-          {step === 3 && (
-            <form className="v8-auth__form" onSubmit={(e) => { e.preventDefault(); nextStep() }}>
-              <p className="v8-auth__desc">{t('添加一个手机号码用于账户登录', 'Add a phone number for account login')}</p>
-              <label>
-                <span className="v8-auth__label">{t('电话号码', 'Phone number')}</span>
-                <div className="v8-auth__phone">
-                  <span className="v8-auth__phone-prefix">CN +86</span>
-                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="" />
-                </div>
-              </label>
-
-              {error && <div className="v8-auth__error">{error}</div>}
-              <button type="submit" className="v8-auth__btn" disabled={loading}>
-                {loading ? t('注册中...', 'Signing up...') : t('下一步', 'Next')}
+                {loading ? t('注册中...', 'Signing up...') : t('注册', 'Sign Up')}
               </button>
               <button type="button" className="v8-auth__back" onClick={prevStep}>{t('返回', 'Back')}</button>
             </form>
