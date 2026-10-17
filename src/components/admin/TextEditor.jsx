@@ -90,10 +90,11 @@ export default function TextEditor({ authFetch }) {
   useEffect(() => {
     function onMessage(e) {
       if (e.data?.type === 'IMG_EDIT') {
-        const { imgKey, src, w, h } = e.data
+        const { imgKey, src, originalSrc, w, h } = e.data
         if (!imgKey) return
         setClickInfo(null)
-        setImgInfo({ imgKey, src })
+        // src 为当前实际显示的图（已替换时即上传图），预览以此为准
+        setImgInfo({ imgKey, src: src || originalSrc || '', originalSrc: originalSrc || '' })
         setImgUrl('')
         setImgErrorMsg('')
         // 初始定位沿用已保存的覆盖位置，否则居中；手机端未单独保存时沿用桌面端
@@ -261,6 +262,11 @@ export default function TextEditor({ authFetch }) {
         url = up.url || (up.path.startsWith('http')
           ? up.path
           : `https://raw.githubusercontent.com/yayi2953/v-plus-homes/main/${up.path}`)
+      }
+      if (!url) {
+        // 未选文件也未填 URL：仅调整位置时沿用当前已保存的图
+        const prev = overrides[`img:${imgInfo.imgKey}`]
+        if (prev?.url) url = prev.url
       }
       if (!url) throw new Error(t('请选择图片文件或填写图片 URL', 'Choose a file or enter an image URL'))
 

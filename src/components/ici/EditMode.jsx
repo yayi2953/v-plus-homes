@@ -189,11 +189,13 @@ export default function EditMode() {
       if (img && img.key) {
         e.preventDefault()
         e.stopPropagation()
-        // 附带元素显示框尺寸，供替换弹窗按真实比例预览拖动定位
+        // 附带元素显示框尺寸，供替换弹窗按真实比例预览拖动定位；
+        // src 为当前实际显示的图（已被替换时即上传图），originalSrc 为替换前原图
         window.parent.postMessage({
           type: 'IMG_EDIT',
           imgKey: img.key,
-          src: img.el.getAttribute('data-original-src') || img.el.getAttribute('src') || '',
+          src: img.el.getAttribute('src') || '',
+          originalSrc: img.el.getAttribute('data-original-src') || '',
           lang,
           w: img.el.clientWidth || 0,
           h: img.el.clientHeight || 0
