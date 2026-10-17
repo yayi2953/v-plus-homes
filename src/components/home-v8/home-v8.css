@@ -850,6 +850,24 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-nav__mega-sidelink:hover .v8-nav__mega-sidetitle {
   border-bottom-color: var(--v8n-ink);
 }
+.v8-nav__mega-legal {
+  display: flex; flex-direction: column; gap: 14px;
+  justify-content: flex-end;
+}
+.v8-nav__mega-copy {
+  font-size: 13px; color: var(--v8n-muted);
+}
+.v8-nav__mega-legallinks {
+  display: flex; flex-wrap: wrap; gap: 14px;
+}
+.v8-nav__mega-legallinks a {
+  font-size: 13px; color: var(--v8n-ink); text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .15s;
+}
+.v8-nav__mega-legallinks a:hover {
+  border-bottom-color: var(--v8n-ink);
+}
 
 /* 汉堡（桌面隐藏） */
 .v8-nav__burger {

@@ -4,12 +4,21 @@ import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate, switchLang } from '../../lib/router.mjs'
 import { useContact } from '../ici/contactContext.jsx'
 import { Mail, Phone, WhatsApp, WeChat } from '../ici/Icons.jsx'
+import LegalModal from '../ici/LegalModal.jsx'
 import './home-v8.css'
 
 /* 特斯拉风格导航：左 Logo + 居中菜单 + 右侧图标组 + 房源巨型下拉菜单。
    菜单数据、锚点/路由跳转、类型切换逻辑与经典版同源，仅替换视觉皮肤。 */
 
 const EASE_OUT = [0.22, 1, 0.36, 1]
+
+function matchLegal(label, index) {
+  const s = String(label).toLowerCase()
+  if (s.includes('隐私') || s.includes('privacy')) return 'privacy'
+  if (s.includes('cookie')) return 'cookies'
+  if (s.includes('条款') || s.includes('细则') || s.includes('term')) return 'terms'
+  return ['privacy', 'cookies', 'terms'][index] || null
+}
 
 // 房源类型 → 展示图映射（巨型菜单用）
 const TYPE_IMAGES = {
@@ -35,6 +44,7 @@ export default function V8Navbar({ solid = false }) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
+  const [legalDoc, setLegalDoc] = useState(null)
   const langRef = useRef(null)
 
   useEffect(() => {
@@ -223,20 +233,17 @@ export default function V8Navbar({ solid = false }) {
                             </a>
                           </>
                         ) : (
-                          <>
-                            <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
-                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '联系专属顾问' : 'Talk to an Advisor'}</span>
-                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '一站式安家服务，全程中英文对接' : 'One-stop relocation, bilingual support'}</span>
-                            </a>
-                            <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
-                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '预约咨询' : 'Book a Consultation'}</span>
-                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '根据需求定制服务方案' : 'Tailored service to your needs'}</span>
-                            </a>
-                            <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
-                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '更多需求' : 'More Requests'}</span>
-                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '签证、银行、保险等生活琐事' : 'Visa, banking, insurance & more'}</span>
-                            </a>
-                          </>
+                          <span className="v8-nav__mega-legal">
+                            <span className="v8-nav__mega-copy">{c.footer?.copyright}</span>
+                            <span className="v8-nav__mega-legallinks">
+                              {(c.footer?.legal || []).filter(Boolean).map((l, i) => {
+                                const key = matchLegal(l, i)
+                                return key ? (
+                                  <a key={l} href="#legal" onClick={(e) => { e.preventDefault(); setLegalDoc(key) }}>{l}</a>
+                                ) : null
+                              })}
+                            </span>
+                          </span>
                         )}
                       </span>
                     </span>
@@ -414,6 +421,7 @@ export default function V8Navbar({ solid = false }) {
           </motion.div>
         )}
       </AnimatePresence>
+      <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />
     </>
   )
 }
