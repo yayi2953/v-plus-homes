@@ -293,13 +293,14 @@ export default function V8Navbar({ solid = false }) {
                   >
                     {[
                       { key: 'en', name: 'English' },
-                      { key: 'zh', name: '中文' }
+                      { key: 'zh', name: '中文' },
+                      { key: 'ja', name: '日本語' }
                     ].map((l) => (
                       <button
                         key={l.key}
                         type="button"
                         role="menuitem"
-                        lang={l.key === 'zh' ? 'zh-CN' : 'en'}
+                        lang={l.key === 'zh' ? 'zh-CN' : l.key === 'ja' ? 'ja' : 'en'}
                         className={`v8-lang__item${lang === l.key ? ' is-active' : ''}`}
                         onClick={() => {
                           switchLang(l.key)

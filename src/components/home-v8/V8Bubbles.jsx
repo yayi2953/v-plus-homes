@@ -249,7 +249,8 @@ function makeRealMessage(w, lanes, realMsg) {
 export default function V8Bubbles() {
   const { lang } = useIciI18n()
   const zh = lang === 'zh'
-  const t = (zhStr, enStr) => (zh ? zhStr : enStr)
+  const ja = lang === 'ja'
+  const t = (zhStr, enStr, jaStr) => (zh ? zhStr : ja ? (jaStr || enStr) : enStr)
   const canvasRef = useRef(null)
   const wrapRef = useRef(null)
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
@@ -261,7 +262,7 @@ export default function V8Bubbles() {
     e.preventDefault()
     if (submitting) return
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
-      setFeedback({ type: 'err', text: t('请填写姓名、邮箱和留言内容', 'Please fill in name, email and message') })
+      setFeedback({ type: 'err', text: t('请填写姓名、邮箱和留言内容', 'Please fill in name, email and message', 'お名前、メール、メッセージをご記入ください') })
       return
     }
     setSubmitting(true)
@@ -279,8 +280,8 @@ export default function V8Bubbles() {
         })
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || t('提交失败', 'Submission failed'))
-      setFeedback({ type: 'ok', text: t('留言已提交，感谢您的反馈！', 'Message submitted, thanks for your feedback!') })
+      if (!res.ok) throw new Error(data.error || t('提交失败', 'Submission failed', '送信に失敗しました'))
+      setFeedback({ type: 'ok', text: t('留言已提交，感谢您的反馈！', 'Message submitted, thanks for your feedback!', 'メッセージを送信しました。ご意見ありがとうございます！') })
       setForm({ name: '', email: '', phone: '', message: '' })
       // 重新拉取真实留言，让弹幕尽快展示新提交的内容
       fetch('/api/messages')
@@ -288,7 +289,7 @@ export default function V8Bubbles() {
         .then((d) => { if (Array.isArray(d.messages)) realMessagesRef.current = d.messages })
         .catch(() => {})
     } catch (err) {
-      setFeedback({ type: 'err', text: err.message || t('提交失败，请稍后重试', 'Submission failed, please try again later') })
+      setFeedback({ type: 'err', text: err.message || t('提交失败，请稍后重试', 'Submission failed, please try again later', '送信に失敗しました。後でもう一度お試しください') })
     } finally {
       setSubmitting(false)
     }
@@ -418,8 +419,8 @@ export default function V8Bubbles() {
       <div className="v8-wrap">
         <div className="v8-bubbles v8-rise">
           <div className="v8-bubbles__head">
-            <p className="v8-eyebrow">{t('客户声音', 'CUSTOMER VOICES')}</p>
-            <h2 className="v8-h-sec" style={{ marginTop: 12 }}>{t('来自全球客户的真实留言', 'Real Messages from Customers Worldwide')}</h2>
+            <p className="v8-eyebrow">{t('客户声音', 'CUSTOMER VOICES', 'お客様の声')}</p>
+            <h2 className="v8-h-sec" style={{ marginTop: 12 }}>{t('来自全球客户的真实留言', 'Real Messages from Customers Worldwide', '世界中のお客様からのリアルなメッセージ')}</h2>
           </div>
           <div ref={wrapRef} className="v8-bubbles__wrap">
             <canvas ref={canvasRef} className="v8-bubbles__canvas" />
@@ -427,24 +428,24 @@ export default function V8Bubbles() {
 
           <div className="v8-msgform">
             <div className="v8-msgform__head">
-              <p className="v8-eyebrow">{t('留下您的留言', 'LEAVE A MESSAGE')}</p>
-              <h3 className="v8-msgform__title">{t('我要留言', 'Leave a Message')}</h3>
-              <p className="v8-msgform__sub">{t('告诉我们您的需求或疑问，我们会尽快与您联系。', 'Tell us your needs or questions, and we\'ll get back to you soon.')}</p>
+              <p className="v8-eyebrow">{t('留下您的留言', 'LEAVE A MESSAGE', 'メッセージを残す')}</p>
+              <h3 className="v8-msgform__title">{t('我要留言', 'Leave a Message', 'メッセージを送る')}</h3>
+              <p className="v8-msgform__sub">{t('告诉我们您的需求或疑问，我们会尽快与您联系。', 'Tell us your needs or questions, and we\'ll get back to you soon.', 'ご要望やご質問をお聞かせください。できるだけ早くご連絡します。')}</p>
             </div>
             <form className="v8-msgform__body" onSubmit={submitMessage}>
               <div className="v8-msgform__row">
                 <label className="v8-msgform__field">
-                  <span>{t('姓名 *', 'Name *')}</span>
+                  <span>{t('姓名 *', 'Name *', 'お名前 *')}</span>
                   <input
                     type="text"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder={t('您的姓名', 'Your name')}
+                    placeholder={t('您的姓名', 'Your name', 'お名前')}
                     required
                   />
                 </label>
                 <label className="v8-msgform__field">
-                  <span>{t('邮箱 *', 'Email *')}</span>
+                  <span>{t('邮箱 *', 'Email *', 'メール *')}</span>
                   <input
                     type="email"
                     value={form.email}
@@ -454,21 +455,21 @@ export default function V8Bubbles() {
                   />
                 </label>
                 <label className="v8-msgform__field">
-                  <span>{t('电话', 'Phone')}</span>
+                  <span>{t('电话', 'Phone', '電話')}</span>
                   <input
                     type="tel"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    placeholder={t('选填', 'Optional')}
+                    placeholder={t('选填', 'Optional', '任意')}
                   />
                 </label>
               </div>
               <label className="v8-msgform__field">
-                <span>{t('留言内容 *', 'Message *')}</span>
+                <span>{t('留言内容 *', 'Message *', 'メッセージ *')}</span>
                 <textarea
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  placeholder={t('请输入您想说的话...', 'Type your message...')}
+                  placeholder={t('请输入您想说的话...', 'Type your message...', 'メッセージをご記入ください...')}
                   rows={4}
                   required
                 />
@@ -479,7 +480,7 @@ export default function V8Bubbles() {
                 </div>
               )}
               <button type="submit" className="v8-btn v8-btn--dark" disabled={submitting}>
-                {submitting ? t('提交中...', 'Submitting...') : t('提交留言', 'Submit')}
+                {submitting ? t('提交中...', 'Submitting...', '送信中...') : t('提交留言', 'Submit', '送信する')}
               </button>
             </form>
           </div>

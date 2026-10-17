@@ -825,4 +825,408 @@ const zh = {
   }
 }
 
-export const iciContent = { en, zh }
+const ja = {
+  siteName: SITE_TITLE,
+  nav: {
+    logo: 'V Plus',
+    menus: [
+      { label: 'ホーム', href: '#top' },
+      {
+        label: '物件',
+        href: '/listings',
+        subs: [
+          { key: 'luxury', event: 'luxury', label: '高級住宅' },
+          { key: 'standard', event: 'standard', label: '一般住宅' },
+          { key: 'student', event: 'student', label: '学生マンション' },
+          { key: 'city', event: 'city', label: 'シティアパート' }
+        ]
+      },
+      { label: 'マップ検索', href: '/map' },
+      {
+        label: 'その他のサービス',
+        href: '#get-started',
+        subs: [
+          { key: 'video', label: 'オンライン内見', img: '/images/extras/video.jpg' },
+          { key: 'plane', label: '空港送迎', img: '/images/extras/plane.jpg' },
+          { key: 'passport', label: '宿泊登記手続き', img: '/images/extras/passport.jpg' },
+          { key: 'broom', label: 'ハウスクリーニング', img: '/images/extras/broom.jpg' },
+          { key: 'truck', label: '引越しサービス', img: '/images/extras/truck.jpg' },
+          { key: 'briefcase', label: 'オフィス賃貸', img: '/images/extras/briefcase.jpg' },
+          { key: 'house', label: '不動産売買', img: '/images/extras/house.jpg' }
+        ]
+      },
+      { label: '賃貸ガイド', href: '/guides' },
+      {
+        label: 'お問い合わせ',
+        href: '#get-started',
+        subs: [
+          { key: 'email', icon: 'mail', label: 'メール', value: 'hello@v-plus.house', href: 'mailto:hello@v-plus.house' },
+          { key: 'phone', icon: 'phone', label: '電話', value: '+352 621780307', href: 'tel:+352621780307' },
+          { key: 'whatsapp', icon: 'whatsapp', label: 'WhatsApp', value: '+352 621780307', href: 'https://wa.me/352621780307' },
+          { key: 'wechat', icon: 'wechat', label: 'WeChat', value: 'vplus-relocation' }
+        ]
+      }
+    ],
+    cta: 'コミュニティに参加'
+  },
+  dream: {
+    join: 'お問い合わせ',
+    view: '物件を見る',
+    slideAria: '{n}番目の物件へ',
+    features: [
+      {
+        title: 'モダンで贅沢な快適さ',
+        text: '洗練された内装、温かみのある照明、開放的な空間。休息とリラックスのためにデザインされた、上質な滞在をお楽しみください。'
+      },
+      {
+        title: '簡単でプライベートな予約',
+        text: '数分でアパートを予約。快適さ、プライバシー、利便性を追求した、スムーズな滞在を体験できます。'
+      }
+    ],
+    slides: [
+      {
+        rating: '',
+        img: HERO_HOME_IMG,
+        titleA: 'V PLUS·HOME',
+        titleB: 'Rentals for Expats',
+        desc: '広州発・外国人専門賃貸サービス\nLive Globally, Settle Local with V Plus',
+        feature: {
+          title: 'サービスの流れ',
+          text: 'ニーズヒアリング→物件提案→内見予約→仮予約→契約締結→引き渡し→アフターサポート'
+        }
+      },
+      {
+        rating: '4.8 / 5.0',
+        titleA: '森のコテージ',
+        titleB: '森を独り占め',
+        desc: '松の木々に夕暮れが差し込むと、原木造りのAフレームハウスが暖かく灯り始める。焚き火の音、星空のテラス、そして山の空気だけが、あなたを包み込む。',
+        feature: {
+          title: '森に囲まれて',
+          text: '高い松と遠くの山々がコテージを優しく囲む。テラスに出れば焚き火とヒノキの香り、夜空には星が一面に広がる。'
+        }
+      },
+      {
+        rating: '5.0 / 5.0',
+        titleA: '湖畔の灯火',
+        titleB: '灯りが映る帰り道',
+        desc: 'ボートで夕暮れの湖を漕ぎ進むと、岸辺の別荘の灯りが一つずつ点り、湖面を黄金色に染めていく——それはあなただけの帰宅の儀式。',
+        feature: {
+          title: '専用湖岸ドック',
+          text: 'ドアを出ればすぐ専用の湖岸とボートドック。朝は靄の中でボートを漕ぎ、夜は灯りが水面にゆらめく。'
+        }
+      },
+      {
+        rating: '4.9 / 5.0',
+        titleA: 'プール付き邸宅',
+        titleB: '毎晩が祝いの晩',
+        desc: '石張りの壁、暖かいランプ、専用プールに焚き火ボウル——リゾート級の邸宅で、日常の夜を祝いのひとときに変える。',
+        feature: {
+          title: '専用温水プール',
+          text: '温水プールは芝生の庭に面し、ラウンジャーと焚き火ボウルが常備。真夜中のスイムも庭でのパーティーも、すべてあなただけのもの。'
+        }
+      },
+      {
+        rating: '4.7 / 5.0',
+        titleA: '海辺の家',
+        titleB: '波の音に抱かれて眠る家',
+        desc: '砂浜の上、木道の突き当たりに佇む海の家。靄がかかった夕暮れに柔らかく灯りをともし、潮の音だけが背景音となる。',
+        feature: {
+          title: '完全なる海辺',
+          text: '高床式テラスから砂浜へ一歩。遮るもののない海を眺め、波に枕を寄せ、海を感じながら目覚める。'
+        }
+      }
+    ]
+  },
+  ui: { from: '月額', perMonth: '～', view: '詳細を見る' },
+  stats: [
+    { value: '5,000+', label: 'ご利用者数' },
+    { value: '98%', label: '顧客満足度' },
+    { value: '8', label: '対応言語' }
+  ],
+  team: {
+    title: 'ご質問は V PLUS へ',
+    sub: '担当者が直接、WhatsApp＆WeChatで素早く返信します',
+    whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
+  },
+  contactModal: {
+    title: 'どの方法でご連絡しますか？',
+    desc: 'カードをタップすると連絡先をコピーできます。WhatsAppはそのままチャットが開きます。',
+    tel: '電話',
+    tiktok: 'TikTok',
+    wechat: 'WeChat',
+    email: 'メール',
+    whatsapp: 'WhatsApp',
+    openWhatsapp: 'チャットを開く',
+    unavailable: 'このチャンネルは現在利用できません。別の方法をお選びください。',
+    cancel: 'キャンセル',
+    wechatTitle: 'WeChatを追加',
+    wechatDesc: 'QRコードをスキャンするか、WeChat IDをコピーして検索してください。',
+    qrAlt: 'V PLUS WeChat QRコード',
+    scanHint: 'WeChatでこのQRコードをスキャンして追加してください。',
+    longpressHint: 'コードを長押しして「QRコードを認識」を選択してください。',
+    copyId: 'IDをコピー',
+    copied: 'コピーしました',
+    pcHint: 'ヒント：IDをコピーしたら、WeChat → 連絡先 → 追加 → 検索に貼り付けてください。',
+    mobileHint: 'ヒント：コードを長押しして「認識」を選ぶか、IDをコピーして検索してください。',
+    back: '戻る'
+  },
+  teamIntro: {
+    overline: 'チーム紹介',
+    titleLead: 'あなたをサポートするのは',
+    titleAccent: '生身の人間です。',
+    desc: '顔の見えないプラットフォームではありません。少数精鋭の引越し専門チームが、あなたの言語で対応し、物件を一つひとつ直接確認。最初の内見から中国での最後の月まで、いつでも対応可能です。',
+    members: [
+      { index: '01', name: 'アレックス・ノヴィ', role: 'オペレーションマネージャー' },
+      { index: '02', name: 'ソフィー・シュエ', role: 'プロパティマネージャー' },
+      { index: '03', name: 'ダニエル・オカフォー', role: '内見スペシャリスト' },
+      { index: '04', name: 'ミア・ローラン', role: '賃貸コンサルタント' },
+      { index: '05', name: 'ルーカス・マイヤー', role: 'メンテナンス責任者' },
+      { index: '06', name: 'プリヤ・ナイル', role: 'カスタマーエクスペリエンス責任者' },
+      { index: '07', name: 'マルコ・ベリーニ', role: '入居アドバイザー' },
+      { index: '08', name: 'ユキ・タナカ', role: 'コミュニティマネージャー' }
+    ]
+  },
+  discover: {
+    title: '広州で厳選した物件を探す',
+    mobileKicker: '物件タイプ',
+    mobileTitle: 'ここから、あなたの家探しを始めよう',
+    mobileSub: 'カテゴリーを選んで、注目の物件をチェック',
+    mobileCount: '件の物件',
+    mobileBack: 'タイプ選択に戻る',
+    mobileAll: 'すべての物件を見る',
+    mobileAllHide: 'すべての物件を閉じる',
+    mobileAllCount: '件すべて',
+    tabs: [
+      { key: 'liwan', label: '荔湾区', desc: '' },
+      { key: 'tianhe', label: '天河区', desc: '珠江新城と天河路商圏があるCBDの中心地。外国人家庭や若手ビジネスパーソンに人気のエリア。' },
+      { key: 'yuexiu', label: '越秀区', desc: '歴史ある旧市街地で、公園や名門校が点在。地下鉄1号線・2号線が通り、広州らしい日常が楽しめる。' },
+      { key: 'haizhu', label: '海珠区', desc: '珠江の南に広がる緑豊かなエリア。大学が多く、閑静な団地が並ぶ。' },
+      { key: 'baiyun', label: '白云区', desc: '白云山の麓に広がるグリーンベルト。間取りが広くコスパが良く、ファミリーに人気。' },
+      { key: 'huangpu', label: '黄埔区', desc: '東部に位置する成長著しいテック拠点。近代的な高層団地と川沿いの物件が充実。' },
+      { key: 'panyu', label: '番禺区', desc: '南部の大学街・シェアハウスエリア。4号線沿いで、キャンパスからすぐのリーズナブルな物件が豊富。' },
+      { key: 'zengcheng', label: '增城区', desc: '東部の増江ハイテク回廊周辺に広がるグリーンエリア。新築団地が多く家賃が抑えめ。21号線で市中心まで直通。' }
+    ],
+    all: 'すべてのエリア',
+    allDesc: 'エリアを限定せず、広州全市の厳選物件を閲覧してから絞り込めます。',
+    types: [
+      { key: 'luxury', label: '高級住宅', desc: '高層階の眺望と上質な設備を備えた、ハイエンドなアパートやペントハウス。' },
+      { key: 'standard', label: '一般住宅', desc: '成熟した住宅街にある、ファミリー向けの広々とした物件。通勤にも便利。' },
+      { key: 'student', label: '学生マンション', desc: 'キャンパス周辺の個室・シェアハウス。家具付きで光熱費込み。' },
+      { key: 'city', label: 'シティアパート', desc: '市中心部のサービス付きワンルームやロフト。地下鉄やショッピングモールのすぐそば。' }
+    ],
+    schools: [
+      { key: 'scut-wushan', label: '華南理工大学（五山キャンパス）' },
+      { key: 'scut-intl', label: '華南理工大学（国際キャンパス）' },
+      { key: 'scnu-shipai', label: '華南師範大学（石牌キャンパス）' },
+      { key: 'gdut-dongfeng', label: '広東工業大学（東風路キャンパス）' },
+      { key: 'jnu-huawen', label: '暨南大学（華文学院）' },
+      { key: 'jnu-shipai', label: '暨南大学（石牌キャンパス）' },
+      { key: 'gzmu', label: '広州海事学院' },
+      { key: 'gdufs-baiyun', label: '広東外国語外貿大学（白云山キャンパス）' }
+    ],
+    schoolPickerTitle: 'キャンパスを選択',
+    schoolPickerSub: '通学・志望のキャンパスを選び、周辺の学生マンションを検索できます。',
+    schoolPickerAll: 'すべてのキャンパス',
+    schoolPickerClose: 'キャンパス選択を閉じる',
+    areaPickerTitle: 'エリアを選択',
+    areaPickerSub: 'エリアを選んで、その地域の{type}物件をご覧ください。',
+    areaPickerAll: 'すべてのエリア',
+    areaPickerClose: 'エリア選択を閉じる',
+    clearType: 'タイプの絞り込みを解除',
+    empty: 'このカテゴリーの物件は近日公開予定です。しばらくお待ちください。',
+    emptyCombo: 'このエリアには現在このタイプの物件がありません。タイプ絞り込みを解除するか、別のエリアをお選びください。',
+    emptySchool: 'このキャンパス周辺の物件は近日公開予定です。しばらくお待ちください。'
+  },
+  properties: [
+    { code: 'V PLUS-012', br: '4LDK', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '広州・天河区', districtKey: 'tianhe', metro: '3号線・五山駅', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
+    { code: 'FLEX-004', br: '5LDK', baths: 2, area: 156, amenities: ['furnished', 'wifi', 'ac', 'workspace', 'elevator', 'gym', 'tv', 'balcony', 'metro'], district: '広州・海珠区', districtKey: 'haizhu', metro: '8号線・中山大学駅', price: '¥4,150', fx: '$573 / €527', img: '/images/listing-urban2.jpg', categories: ['standard'] },
+    { code: 'V PLUS-014', br: '5LDK', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: '広州・天河区', districtKey: 'tianhe', metro: '3号線・石牌橋駅', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
+    { code: 'V PLUS-009', br: '4LDK', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: '広州・黄埔区', districtKey: 'huangpu', metro: '5号線・大沙東駅', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
+    { code: 'V PLUS-010', br: '4LDK', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: '広州・越秀区', districtKey: 'yuexiu', metro: '1/2号線・公園前駅', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
+    { code: 'FLEX-026', br: '4LDK', baths: 2, area: 132, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'elevator', 'workspace', 'gym', 'metro'], district: '広州・白云区', districtKey: 'baiyun', schoolKey: 'gdufs-baiyun', metro: '2号線・江夏駅', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-urban1.jpg', categories: ['student'] },
+    { code: 'FLEX-006', br: '4LDK', baths: 1, area: 96, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: '広州・番禺区', districtKey: 'panyu', schoolKey: 'scut-intl', metro: '4号線・大学城北駅', price: '¥4,050', fx: '$559 / €514', img: '/images/listing-student1.jpg', categories: ['student'] },
+    { code: 'FLEX-036', br: '6LDK', baths: 3, area: 185, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '広州・天河区', districtKey: 'tianhe', metro: '3号線・五山駅', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-student2.jpg', categories: ['standard'] },
+    { code: 'FLEX-041', br: '3LDK', baths: 1, area: 102, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '広州・增城区', districtKey: 'zengcheng', metro: '21号線・増城広場駅', price: '¥2,900', fx: '$400 / €368', img: '/images/listing-zengcheng.jpg', categories: ['standard'] },
+    { code: 'FLEX-048', br: '2DK', baths: 1, area: 68, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: '広州・增城区', districtKey: 'zengcheng', schoolKey: null, metro: '21号線・鳳崗駅', price: '¥2,200', fx: '$304 / €279', img: '/images/listing-zengcheng2.jpg', categories: ['student'] }
+  ],
+  detail: {
+    back: '物件一覧に戻る',
+    overview: '概要',
+    galleryTitle: '写真をもっと見る',
+    aboutTitle: 'この物件について',
+    aboutText:
+      'この{br}アパートは{district}に位置し、専有面積{area}㎡の明るく家具付きの住空間です。V Plusが一貫して管理し、最新の設備と洗練された内装、すべての公共料金を手配済み。{metro}が目の前で、街まですぐです。',
+    aboutTextNoArea:
+      'この{br}アパートは{district}に位置し、明るく家具付きの住空間です。V Plusが一貫して管理し、最新の設備と洗練された内装、すべての公共料金を手配済み。{metro}が目の前で、街まですぐです。',
+    amenitiesTitle: '設備・アメニティ',
+    locationTitle: '立地と交通',
+    locationText:
+      '{metro}のすぐ近く。スーパー、カフェ、24時間営業のコンビニも徒歩圏内で、日常の買い物に困りません。',
+    mapOpen: 'Googleマップで開く',
+    mapTitle: '周辺エリアの地図',
+    specs: {
+      beds: '間取り',
+      baths: 'バスルーム',
+      area: '専有面積',
+      minStay: '最短契約期間',
+      available: '入居可能時期'
+    },
+    minStay: '3ヶ月',
+    available: '即入居可',
+    depositLabel: '敷金',
+    depositValue: '家賃2ヶ月分',
+    leaseLabel: '契約',
+    leaseValue: 'フレキシブル契約',
+    ask: 'WhatsApp ＆ Tel ＆WeChat',
+    amenities: {
+      furnished: { icon: '🛋️', label: '家具付き' },
+      wifi: { icon: '📶', label: '高速Wi-Fi' },
+      ac: { icon: '❄️', label: 'エアコン' },
+      heating: { icon: '🔥', label: '暖房' },
+      kitchen: { icon: '🍳', label: 'キッチン設備' },
+      washer: { icon: '🧺', label: '洗濯機' },
+      workspace: { icon: '💻', label: 'ワークデスク' },
+      elevator: { icon: '🛗', label: 'エレベーター' },
+      gym: { icon: '🏋️', label: 'ジム利用可' },
+      tv: { icon: '📺', label: 'スマートTV' },
+      balcony: { icon: '🌇', label: 'バルコニー' },
+      metro: { icon: '🚇', label: '地下鉄駅近く' }
+    }
+  },
+  whyHere: {
+    eyebrow: 'V PLUSが選ばれる理由',
+    titleA: '外国人のための',
+    titleAccent: 'シームレスな',
+    titleB: '住まいソリューション。',
+    desc: 'V Plusは中国での引越しサービスのリーディングカンパニーとして、5,000名以上の外国人客户・学生をお迎えしてきました。専門チームが外国人コミュニティの特有のニーズを先回りし、家具の手配からアフターサポートまで、すべてのステップを効率化します。私たちはただアパートを探すだけでなく、中国での生活をシンプルにします。',
+    subTitle: '専門家が認めたサービス',
+    cards: [
+      { icon: 'globe', title: '国際色豊かなチーム', desc: '多様なメンバーが世界中の外国人のニーズを理解し、あなたの言語でサポートします。' },
+      { icon: 'doc', title: '柔軟な契約条件', desc: '短期滞在でも長期入居でも、あなたのプランに合わせた契約オプションを用意しています。' },
+      { icon: 'home', title: '家具付きアパート', desc: 'V Plus管理のアパートはすべて、現代的な必需品とおしゃれな内装付き。荷物を運ぶだけで快適に住めます。' },
+      { icon: 'chat', title: '継続的なサポート', desc: '専任サポートチームが滞在中ずっと対応。メンテナンスから現地のアドバイスまで、お任せください。' }
+    ]
+  },
+  getStarted: {
+    eyebrow: '始めよう',
+    titleA: '次の章を始める',
+    titleAccent: '準備はできていますか',
+    titleB: '？',
+    desc: '今すぐ引越しの専門家に相談するか、厳選された都市ガイドを読み続けてください——通常24時間以内に返信します。',
+    book: '今すぐ予約',
+    whatsapp: 'WhatsApp ＆ Tel ＆WeChat',
+    checks: ['義務なし', '日本語対応チーム', '5,000人以上の外国人が信頼']
+  },
+  extraServices: {
+    eyebrow: 'その他のサービス',
+    titleA: '賃貸だけでなく、',
+    titleAccent: 'ワンストップで。',
+    footnote: '一部サービスは有料のオプションです。詳細はお問い合わせください。',
+    moreTitle: '他に必要なものはありますか？',
+    moreDesc: 'ビザ、銀行、保険、日常の雑用まで——専属の引越しアドバイザーがすべてカバーします。',
+    moreCta: 'アドバイザーに相談',
+    cards: [
+      { icon: 'video', title: 'オンライン内見' },
+      { icon: 'plane', title: '空港送迎' },
+      { icon: 'passport', title: '宿泊登記手続き' },
+      { icon: 'broom', title: 'ハウスクリーニング' },
+      { icon: 'truck', title: '引越しサービス' },
+      { icon: 'briefcase', title: 'オフィス賃貸' },
+      { icon: 'house', title: '不動産売買' }
+    ]
+  },
+  footer: {
+    desc: '中国全土で、荷物を運ぶだけで住める物件と充実の引越しサポート——ビザ、銀行、その他の雑用もワンストップで。',
+    email: 'hello@v-plus.house',
+    phone: '+352 621780307',
+    groups: [
+      { title: 'サービス', links: ['バケーションレンタル', 'サービス付きアパート', 'シェアハウス・短期', '引越しサービス', 'オフィス・店舗', '不動産取引'] },
+      { title: 'ツール等', links: ['引越しプランナー', '引越しツール', '限定特典', 'インターンシップ', 'パートナー募集'] }
+    ],
+    legal: ['プライバシーポリシー', 'Cookieポリシー', '利用規約'],
+    copyright: '© 2026 V Plus. All rights reserved.',
+    language: 'English'
+  },
+  cookie: {
+    text: '🍪 当サイトでは、ブラウジング体験の向上、サイトトラフィックの分析、コンテンツのパーソナライズのためにCookieを使用しています。',
+    reject: '拒否する',
+    accept: 'すべて許可'
+  },
+  v8: {
+    hero: {
+      eyebrow: '広州の賃貸アパート – 外国人向け住まいソリューション',
+      lede: '広州全市の家具付きアパート、ヴィラ、サービス付き住宅。すべて実際に確認済み、家具完備、日本語対応チームがサポートします。',
+      browse: '物件を探す',
+      whatsapp: 'WhatsApp ＆ Tel ＆WeChat'
+    },
+    types: {
+      eyebrow: 'タイプから探す',
+      title: 'あなたの暮らしに合う家を選ぼう',
+      desc: 'ワンルームからファミリー向けヴィラまで、4タイプの厳選物件。すべてコンサルタントが直接確認しています。',
+      view: '物件を見る'
+    },
+    featured: {
+      eyebrow: '注目の物件',
+      title: '今週のセレクション',
+      desc: 'コンサルタントが市場から厳選した、立地とコスパに優れた物件。実際の写真、正直な価格。',
+      book: '内見予約',
+      allText: '全{n}件の物件',
+      more: 'もっと見る',
+      left: 'あと{n}件',
+      perMonth: '/ 月',
+      empty: '現在公開中の物件はありません。しばらくお待ちください。',
+      emptyFilter: '条件に合う物件が見つかりません。予算を上げるか、部屋数を増やすか、別のエリアをお試しください。',
+      subFallback: '{br} · {area} ㎡'
+    },
+    process: {
+      eyebrow: 'サービスの流れ',
+      title: 'お問い合わせから鍵の受け取りまで4ステップ',
+      steps: [
+        { title: 'ニーズを教えてください', desc: '予算、エリア、入居日、通学通勤路——10分のヒアリングで方向性を決めます。' },
+        { title: '厳選リストをお届け', desc: '24時間以内に、実際の写真と間取り図付きの物件リストをお送りします。' },
+        { title: '内見と価格交渉', desc: 'あなたの都合に合わせて内見を手配し、同行して家賃交渉も代行します。' },
+        { title: '入居とサポート', desc: '契約、支払い、宿泊登記、入居チェックまで一括対応。入居後も日本語でサポートします。' }
+      ]
+    },
+    finder: {
+      eyebrow: 'ひとことで家探し',
+      line: ['で', 'district', 'の', 'beds', 'を借りたい。予算は月', 'budget', 'です。'],
+      districtAny: 'エリア指定なし',
+      bedsAny: '間取り指定なし',
+      budgetAny: '予算指定なし',
+      beds: [
+        { v: 1, label: '1ベッドルーム' },
+        { v: 2, label: '2ベッドルーム' },
+        { v: 3, label: '3ベッドルーム' },
+        { v: 4, label: '4ベッドルーム以上' }
+      ],
+      budgets: [
+        { v: 6000, label: '¥6,000' },
+        { v: 10000, label: '¥10,000' },
+        { v: 15000, label: '¥15,000' },
+        { v: 25000, label: '¥25,000' },
+        { v: 40000, label: '¥40,000' }
+      ],
+      count: '{n}件の物件が見つかりました',
+      clear: '条件をクリア',
+      typeAsk: 'タイプの希望はありますか？',
+      typeAny: 'タイプ指定なし',
+      findBtn: '物件を探す'
+    },
+    listings: {
+      back: 'ホームに戻る',
+      title: 'あなたのための物件',
+      empty: '条件に合う物件が見つかりません。検索条件を調整してみてください。'
+    },
+    team: {
+      eyebrow: 'あなたのコンサルタント',
+      title: '最後まであなたを支える人たち',
+      desc: '広州各地に在籍する8人の多言語対応コンサルタント。外国人向け住まいの経験は平均6年以上です。'
+    },
+    cta: {
+      footnote: '平均返信時間2時間以内 · 日本語 / 英語 / 広東語 / 北京語'
+    }
+  }
+}
+
+export const iciContent = { en, zh, ja }

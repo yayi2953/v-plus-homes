@@ -15,10 +15,10 @@ const DEFAULT_SECTIONS = {
 
 function getInitialLang() {
   const fromUrl = urlLang()
-  if (fromUrl === 'zh' || fromUrl === 'en') return fromUrl
+  if (fromUrl === 'zh' || fromUrl === 'en' || fromUrl === 'ja') return fromUrl
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved === 'zh' || saved === 'en') return saved
+    if (saved === 'zh' || saved === 'en' || saved === 'ja') return saved
   } catch { /* ignore */ }
   return 'en'
 }
@@ -36,7 +36,7 @@ export function IciI18nProvider({ children }) {
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY, lang) } catch { /* ignore */ }
-    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en'
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en'
     resyncSeo()
   }, [lang])
 

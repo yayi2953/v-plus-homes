@@ -87,9 +87,9 @@ export default function RegisterPage() {
     <div className="v8-auth">
       <div className="v8-auth__topbar">
         <a className="v8-auth__topbar-logo" href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>V&nbsp;PLUS</a>
-        <button className="v8-auth__topbar-lang" onClick={() => switchLang(zh ? 'en' : 'zh')}>
+        <button className="v8-auth__topbar-lang" onClick={() => switchLang(lang === 'zh' ? 'en' : lang === 'en' ? 'ja' : 'zh')}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3c2.5 2.6 2.5 15.4 0 18-2.5-2.6-2.5-15.4 0-18Z" /></svg>
-          {zh ? 'zh-CN' : 'en-US'}
+          {lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en-US'}
         </button>
       </div>
 

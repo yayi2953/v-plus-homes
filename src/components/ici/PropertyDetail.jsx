@@ -265,7 +265,7 @@ function DetailPanel({ active, closeProperty }) {
     mapZoom = 15
     mapLabel = station
   }
-  const mapSrc = mapsEmbedSrc(mapQuery, { zoom: mapZoom, lang: lang === 'zh' ? 'zh-CN' : 'en' })
+  const mapSrc = mapsEmbedSrc(mapQuery, { zoom: mapZoom, lang: lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en' })
   const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
 
   // 独立房源 URL 的 SEO：动态 title/描述/canonical/OG + Apartment 结构化数据；
@@ -303,7 +303,7 @@ function DetailPanel({ active, closeProperty }) {
   }, [lang, p])
   const specs = [
     { icon: SPEC_ICONS.bed, label: d.specs.beds, value: p.br },
-    { icon: SPEC_ICONS.shower, label: d.specs.baths, value: lang === 'zh' ? `${p.baths} 卫` : p.baths },
+    { icon: SPEC_ICONS.shower, label: d.specs.baths, value: lang === 'zh' ? `${p.baths} 卫` : lang === 'ja' ? `${p.baths}バス` : p.baths },
     // 建筑面积仅豪华住宅展示与录入，其它分类不出现该数据
     ...(p.categories?.includes('luxury')
       ? [{ icon: SPEC_ICONS.ruler, label: d.specs.area, value: `${p.area} m²` }]
@@ -334,10 +334,10 @@ function DetailPanel({ active, closeProperty }) {
     L.push(p.metro)
     if (p.address) L.push(p.address)
     L.push(
-      `${d.specs.beds}: ${p.br}  ·  ${d.specs.baths}: ${lang === 'zh' ? `${p.baths} 卫` : p.baths}` +
+      `${d.specs.beds}: ${p.br}  ·  ${d.specs.baths}: ${lang === 'zh' ? `${p.baths} 卫` : lang === 'ja' ? `${p.baths}バス` : p.baths}` +
       (p.categories?.includes('luxury') ? `  ·  ${d.specs.area}: ${p.area} m²` : '')
     )
-    L.push(`${lang === 'zh' ? '租金' : 'Rent'}: ${p.price}${c.ui.perMonth}${p.fx ? ` (≈ ${p.fx})` : ''}`)
+    L.push(`${lang === 'zh' ? '租金' : lang === 'ja' ? '家賃' : 'Rent'}: ${p.price}${c.ui.perMonth}${p.fx ? ` (≈ ${p.fx})` : ''}`)
     L.push(`${d.specs.available}: ${d.available}`)
     if (amenities.length) L.push(`${d.amenitiesTitle}: ${amenities.map(([, label]) => label).join(lang === 'zh' ? '、' : ', ')}`)
     L.push(`${d.depositLabel}: ${d.depositValue}  ·  ${d.leaseLabel}: ${d.leaseValue}`)
@@ -345,7 +345,7 @@ function DetailPanel({ active, closeProperty }) {
     return L.join('\n')
   }
 
-  const copyOkText = lang === 'zh' ? '房源信息已复制' : 'Details copied'
+  const copyOkText = lang === 'zh' ? '房源信息已复制' : lang === 'ja' ? '物件情報をコピーしました' : 'Details copied'
 
   // 点击咨询：先把该房源详情复制到剪贴板（方便直接粘贴到 WhatsApp/微信），再打开咨询入口
   const onCtaClick = async () => {

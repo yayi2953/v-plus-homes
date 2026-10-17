@@ -6,8 +6,8 @@
 // /properties/:code       → 房源详情（深链可分享，服务端 rewrite 到 /api/page）
 // /guides                 → 租房指南列表
 // /guides/:slug           → 指南文章
-export const LANGS = ['zh', 'en']
-const LANG_PREFIX_RE = /^\/(zh|en)(?=\/|$)/
+export const LANGS = ['zh', 'en', 'ja']
+const LANG_PREFIX_RE = /^\/(zh|en|ja)(?=\/|$)/
 
 // 当前位置的语言前缀（由 syncRouter 在导航/popstate 时维护，供 propertyPath 等使用）
 let activePrefix = null
