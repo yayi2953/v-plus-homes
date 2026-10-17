@@ -42,6 +42,7 @@ export default function V8Hero() {
               key={src}
               src={src}
               alt=""
+              data-edit-img={`v8.hero.slide${i + 1}`}
               className={`v8-hero-slide${i === idx ? ' is-active' : ''}`}
             />
           ))}

@@ -3,6 +3,7 @@ import { iciContent } from './iciContent.js'
 import { setDefaultTitle, resyncSeo } from '../lib/seo.mjs'
 import { urlLang, syncRouter } from '../lib/router.mjs'
 import { setByPath } from './flatten.js'
+import { collectImageOverrides, startImageOverrides } from './imageOverrides.js'
 
 const IciI18nContext = createContext(null)
 const STORAGE_KEY = 'hereici-lang'
@@ -52,6 +53,12 @@ export function IciI18nProvider({ children }) {
   }, [])
 
   useEffect(() => { loadOverrides() }, [loadOverrides])
+
+  // 应用图片覆盖项：立即应用 + 监听 DOM 变化持续再应用
+  const imgMap = useMemo(() => collectImageOverrides(overrides), [overrides])
+  useEffect(() => {
+    return startImageOverrides(() => imgMap)
+  }, [imgMap])
 
   const value = useMemo(() => {
     const c = deepClone(iciContent[lang])

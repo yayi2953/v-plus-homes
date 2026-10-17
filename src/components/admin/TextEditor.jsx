@@ -7,8 +7,38 @@ import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
  * 可视化文案编辑器：
  * - iframe 嵌入首页（?edit=1）
  * - 点击页面中的文字 → 弹出编辑框
+ * - 点击页面中的图片 → 弹出替换框（URL 或上传文件）
  * - 保存后实时同步到 iframe
  */
+
+// 图片压缩：超过 900KB 的图缩到 maxDim 内并转 JPEG 逐级降质，确保 GitHub Contents API 可提交
+async function prepareImageFile(file) {
+  const readBase64 = (blob) => new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result).split(',')[1])
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+  if (file.size <= 900 * 1024) {
+    return { dataBase64: await readBase64(file), name: file.name }
+  }
+  const bitmap = await createImageBitmap(file)
+  const qualities = [0.85, 0.72, 0.6, 0.45]
+  for (const q of qualities) {
+    const scale = Math.min(1, 1920 / Math.max(bitmap.width, bitmap.height))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(bitmap.width * scale)
+    canvas.height = Math.round(bitmap.height * scale)
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    const blob = await new Promise((r) => canvas.toBlob(r, 'image/jpeg', q))
+    if (blob.size <= 900 * 1024) {
+      const base = file.name.replace(/\.[^.]+$/, '')
+      return { dataBase64: await readBase64(blob), name: `${base}.jpg` }
+    }
+  }
+  throw new Error('图片压缩后仍过大，请换一张较小的图片')
+}
+
 export default function TextEditor({ authFetch }) {
   const { lang, reloadTexts } = useIciI18n()
   const zh = lang === 'zh'
@@ -22,6 +52,10 @@ export default function TextEditor({ authFetch }) {
   const [editEn, setEditEn] = useState('')
   const [saving, setSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const [imgInfo, setImgInfo] = useState(null) // { imgKey, src }
+  const [imgUrl, setImgUrl] = useState('')
+  const [imgSaving, setImgSaving] = useState(false)
+  const [imgErrorMsg, setImgErrorMsg] = useState('')
   const iframeRef = useRef(null)
 
   // 合并默认 + 覆盖
@@ -46,7 +80,17 @@ export default function TextEditor({ authFetch }) {
   // 监听 iframe 的 postMessage
   useEffect(() => {
     function onMessage(e) {
+      if (e.data?.type === 'IMG_EDIT') {
+        const { imgKey, src } = e.data
+        if (!imgKey) return
+        setClickInfo(null)
+        setImgInfo({ imgKey, src })
+        setImgUrl('')
+        setImgErrorMsg('')
+        return
+      }
       if (e.data?.type !== 'EDIT_TEXT') return
+      setImgInfo(null)
       const { text, keys } = e.data
       if (!keys || keys.length === 0) return
       setClickInfo({ text, keys })
@@ -126,12 +170,83 @@ export default function TextEditor({ authFetch }) {
     }
   }
 
+  const imgOverrideKey = imgInfo ? `img:${imgInfo.imgKey}` : ''
+  const imgHasOverride = !!(imgOverrideKey && overrides[imgOverrideKey]?.url)
+
+  // 保存图片替换：优先本地上传的文件，否则用填写的 URL
+  async function saveImage() {
+    if (!imgInfo) return
+    setImgSaving(true)
+    setImgErrorMsg('')
+    try {
+      let url = imgUrl.trim()
+      const fileInput = document.getElementById('v8-img-file-input')
+      const file = fileInput?.files?.[0]
+      if (file) {
+        const { dataBase64, name } = await prepareImageFile(file)
+        const upRes = await authFetch('/api/admin/images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, dataBase64 })
+        })
+        if (!upRes.ok) {
+          let msg = `上传失败（HTTP ${upRes.status}）`
+          try { msg = (await upRes.json()).error || msg } catch { /* ignore */ }
+          throw new Error(msg)
+        }
+        const up = await upRes.json()
+        url = up.path
+      }
+      if (!url) throw new Error(t('请选择图片文件或填写图片 URL', 'Choose a file or enter an image URL'))
+
+      const res = await authFetch('/api/admin/texts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: `img:${imgInfo.imgKey}`, url })
+      })
+      if (!res.ok) {
+        let msg = `保存失败（HTTP ${res.status}）`
+        try { msg = (await res.json()).error || msg } catch { /* ignore */ }
+        throw new Error(msg)
+      }
+      setOverrides((prev) => ({ ...prev, [`img:${imgInfo.imgKey}`]: { url } }))
+      if (fileInput) fileInput.value = ''
+      iframeRef.current?.contentWindow?.postMessage({ type: 'IMG_UPDATED' }, '*')
+      setImgInfo(null)
+      reloadTexts()
+    } catch (err) {
+      setImgErrorMsg(err.message || '保存失败')
+    }
+    setImgSaving(false)
+  }
+
+  // 恢复默认图片
+  async function resetImage() {
+    if (!imgInfo) return
+    if (!confirm(t('恢复该图片为默认值？', 'Reset this image to default?'))) return
+    const res = await authFetch('/api/admin/texts', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: `img:${imgInfo.imgKey}` })
+    })
+    if (res.ok) {
+      setOverrides((prev) => {
+        const next = { ...prev }
+        delete next[`img:${imgInfo.imgKey}`]
+        return next
+      })
+      iframeRef.current?.contentWindow?.postMessage({ type: 'IMG_UPDATED' }, '*')
+      setImgInfo(null)
+      reloadTexts()
+    }
+  }
+
   return (
     <div className="v8-admin__panel v8-admin__visual">
       <div className="v8-admin__texts-head">
         <h2>{t('可视化编辑', 'Visual Editor')}</h2>
         <div className="v8-admin__texts-tools">
-          <span className="v8-admin__hint">{t('点击页面中的文字即可编辑', 'Click any text on the page to edit')}</span>
+          <span className="v8-admin__hint">{t('点击文字编辑文案，点击图片替换图片', 'Click text to edit, click an image to replace')}</span>
         </div>
       </div>
 
@@ -188,6 +303,66 @@ export default function TextEditor({ authFetch }) {
                 </button>
               )}
               <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => setClickInfo(null)}>
+                {t('取消', 'Cancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {imgInfo && (
+        <div className="v8-admin__modal" onClick={() => setImgInfo(null)}>
+          <div className="v8-admin__modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3>{t('替换图片', 'Replace Image')}</h3>
+            <p className="v8-admin__text-key-full">{imgInfo.imgKey}</p>
+
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', margin: '10px 0' }}>
+              <div>
+                <p style={{ fontSize: 12, color: '#76767d', margin: '0 0 4px' }}>{t('当前图片', 'Current')}</p>
+                {imgInfo.src ? (
+                  <img src={imgInfo.src} alt="" style={{ maxWidth: 180, maxHeight: 110, borderRadius: 8, border: '1px solid rgba(0,0,0,.1)', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: 120, height: 80, borderRadius: 8, background: '#f2f2f4' }} />
+                )}
+              </div>
+              {imgHasOverride && (
+                <div>
+                  <p style={{ fontSize: 12, color: '#76767d', margin: '0 0 4px' }}>{t('已替换为', 'Replaced with')}</p>
+                  <img src={overrides[`img:${imgInfo.imgKey}`].url} alt="" style={{ maxWidth: 180, maxHeight: 110, borderRadius: 8, border: '1px solid rgba(0,0,0,.1)', objectFit: 'cover' }} />
+                </div>
+              )}
+            </div>
+
+            <label>
+              {t('上传本地图片（自动压缩，存入网站仓库）', 'Upload a local image (auto-compressed, stored in the site repo)')}
+              <input id="v8-img-file-input" type="file" accept="image/*" />
+            </label>
+
+            <label style={{ marginTop: 10 }}>
+              {t('或填写图片 URL', 'Or enter an image URL')}
+              <input
+                type="text"
+                value={imgUrl}
+                onChange={(e) => setImgUrl(e.target.value)}
+                placeholder="https://... 或 /images/..."
+              />
+            </label>
+
+            {imgErrorMsg && (
+              <p className="v8-admin__error" style={{ color: '#d93025', margin: '8px 0', fontSize: 13 }}>
+                {imgErrorMsg}
+              </p>
+            )}
+            <div className="v8-admin__modal-actions">
+              <button className="v8-admin__btn" onClick={saveImage} disabled={imgSaving}>
+                {imgSaving ? t('保存中...', 'Saving...') : t('保存', 'Save')}
+              </button>
+              {imgHasOverride && (
+                <button className="v8-admin__btn v8-admin__btn--ghost" onClick={resetImage}>
+                  {t('恢复默认', 'Reset')}
+                </button>
+              )}
+              <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => setImgInfo(null)}>
                 {t('取消', 'Cancel')}
               </button>
             </div>

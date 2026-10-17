@@ -174,6 +174,41 @@ async function updateTexts(updates) {
   }
 }
 
+// 上传图片到仓库 public/images/uploads/（GitHub Contents API 新建文件）
+async function uploadImageToGitHub(name, dataBase64) {
+  if (!GITHUB_TOKEN) {
+    throw new Error('GITHUB_TOKEN not configured')
+  }
+  const safe = String(name || 'image').replace(/[^\w.-]+/g, '-').slice(-80) || 'image'
+  const path = `public/images/uploads/${Date.now().toString(36)}-${safe}`
+  try {
+    const putRes = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: `upload image ${safe}`,
+          content: dataBase64
+        })
+      }
+    )
+    if (!putRes.ok) {
+      const errText = await putRes.text()
+      console.error('[images] GitHub upload failed:', putRes.status, errText.slice(0, 300))
+      throw new Error(`GitHub upload failed: ${putRes.status}`)
+    }
+    return path
+  } catch (e) {
+    console.error('[images] uploadImageToGitHub error:', e.message)
+    throw e
+  }
+}
+
 async function resetTexts() {
   if (!GITHUB_TOKEN) {
     throw new Error('GITHUB_TOKEN not configured')
@@ -279,5 +314,5 @@ export {
   findUserByEmail, createUser,
   createListing, updateListing, deleteListing,
   createMessage, markMessageRead, deleteMessage,
-  updateTexts, resetTexts
+  updateTexts, resetTexts, uploadImageToGitHub
 }

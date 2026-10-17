@@ -52,6 +52,7 @@ export default function EditMode() {
     window.__EDIT_MODE__ = true
 
     let highlighted = null
+    let highlightedImg = null
     const highlightStyle = document.createElement('style')
     highlightStyle.textContent = `
       [data-edit-highlight="1"] {
@@ -79,6 +80,25 @@ export default function EditMode() {
         overflow: hidden;
         text-overflow: ellipsis;
       }
+      /* 图片可替换：hover 高亮 + 放开被 pointer-events:none 容器挡住的图 */
+      img[data-edit-highlight-img="1"] {
+        outline: 2px solid #1a73e8 !important;
+        outline-offset: -2px !important;
+        cursor: pointer !important;
+      }
+      .v8-hero-videobg img, .v8-hero-videobg {
+        pointer-events: auto !important;
+      }
+      /* 轮播堆叠：只允许当前激活的图接收点击，避免点到隐藏层 */
+      .v8-hero-videobg img:not(.is-active) {
+        pointer-events: none !important;
+      }
+      .v8-hero-dots, .v8-hero-arrow {
+        pointer-events: auto !important;
+      }
+      .v8-hero-videobg img[data-edit-highlight-img="1"] {
+        outline: 2px dashed #1a73e8 !important;
+      }
     `
     document.head.appendChild(highlightStyle)
 
@@ -105,7 +125,37 @@ export default function EditMode() {
       return null
     }
 
+    // 目标是否为可替换图片：img 元素或带 data-edit-img 声明的元素
+    function findEditableImg(target) {
+      const img = target.closest?.('img, [data-edit-img]')
+      if (!img) return null
+      const el = img.tagName === 'IMG' ? img : img.querySelector('img')
+      if (!el) return null
+      const key = img.getAttribute('data-edit-img')
+        || el.getAttribute('data-original-src')
+        || el.getAttribute('src')
+        || ''
+      // 无 key 或内联 base64 图不作为可替换目标
+      if (!key || key.startsWith('data:')) return null
+      return { el, key }
+    }
+
+    function clearImgHighlight() {
+      if (highlightedImg) {
+        highlightedImg.removeAttribute('data-edit-highlight-img')
+        highlightedImg = null
+      }
+    }
+
     function onMouseMove(e) {
+      // 图片优先：命中图片时不高亮文字
+      const img = findEditableImg(e.target)
+      clearImgHighlight()
+      if (img) {
+        highlightedImg = img.el
+        img.el.setAttribute('data-edit-highlight-img', '1')
+        return
+      }
       const found = findEditableAncestor(e.target)
       if (highlighted && (!found || found.el !== highlighted)) {
         highlighted.removeAttribute('data-edit-highlight')
@@ -134,6 +184,19 @@ export default function EditMode() {
     }
 
     function onClick(e) {
+      // 图片优先：点击图片（即使包在链接里）进入图片替换，编辑优先于跳转
+      const img = findEditableImg(e.target)
+      if (img && img.key) {
+        e.preventDefault()
+        e.stopPropagation()
+        window.parent.postMessage({
+          type: 'IMG_EDIT',
+          imgKey: img.key,
+          src: img.el.getAttribute('data-original-src') || img.el.getAttribute('src') || '',
+          lang
+        }, '*')
+        return
+      }
       // 如果点击的是链接/按钮/表单元素，允许正常跳转，不拦截
       if (isInteractive(e.target)) return
 
@@ -155,6 +218,11 @@ export default function EditMode() {
 
     // 监听父窗口的更新消息，实时修改 DOM
     function onMessage(e) {
+      // 图片替换完成：覆盖项由 imageOverrides 的 MutationObserver 自动应用
+      if (e.data?.type === 'IMG_UPDATED') {
+        reloadTexts()
+        return
+      }
       if (e.data?.type !== 'TEXT_UPDATED') return
       const { key, zh, en } = e.data
       const newVal = lang === 'zh' ? zh : en
@@ -185,6 +253,7 @@ export default function EditMode() {
       document.removeEventListener('click', onClick, true)
       window.removeEventListener('message', onMessage)
       highlightStyle.remove()
+      clearImgHighlight()
       if (highlighted) {
         highlighted.removeAttribute('data-edit-highlight')
         highlighted.removeAttribute('data-edit-key')

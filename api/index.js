@@ -4,7 +4,7 @@ import {
   findUserByEmail, createUser,
   createListing, updateListing, deleteListing,
   createMessage, markMessageRead, deleteMessage,
-  getTexts, updateTexts, resetTexts
+  getTexts, updateTexts, resetTexts, uploadImageToGitHub
 } from './lib/store.js'
 
 // 统一入口：所有 /api/* 路由在此函数内分发，共享同一个 /tmp/db.json
@@ -48,6 +48,9 @@ export default async function handler(req, res) {
     }
     if (rel === '/admin/texts') {
       return adminTexts(req, res)
+    }
+    if (rel === '/admin/images' && req.method === 'POST') {
+      return adminImageUpload(req, res)
     }
 
     // ---------- Public ----------
@@ -180,6 +183,23 @@ async function adminMessages(req, res) {
   return res.status(405).json({ error: 'Method not allowed' })
 }
 
+// 上传图片：body { name, dataBase64 }（纯 base64，无 data: 前缀），推到仓库 public/images/uploads/
+async function adminImageUpload(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  const { name, dataBase64 } = req.body || {}
+  if (!name || !dataBase64) return res.status(400).json({ error: '缺少 name 或 dataBase64' })
+  if (typeof dataBase64 !== 'string' || dataBase64.length > 1_400_000) {
+    return res.status(413).json({ error: '图片过大，请压缩后重试（< 1MB）' })
+  }
+  try {
+    const path = await uploadImageToGitHub(name, dataBase64)
+    return res.status(200).json({ ok: true, path })
+  } catch (e) {
+    console.error('adminImageUpload error:', e.message)
+    return res.status(500).json({ error: '上传失败: ' + e.message })
+  }
+}
+
 // ============ Public handlers ============
 async function contact(req, res) {
   const { name, email, phone, message, type } = req.body || {}
@@ -219,10 +239,12 @@ async function adminTexts(req, res) {
     return res.status(200).json({ texts: await getTexts() })
   }
   if (req.method === 'PUT') {
-    const { key, zh, en } = req.body || {}
+    const { key, zh, en, url } = req.body || {}
     if (!key) return res.status(400).json({ error: '缺少 key' })
     try {
-      const updated = await updateTexts({ [key]: { zh, en } })
+      // 图片覆盖项：值形如 { url }；文案覆盖项：{ zh, en }
+      const value = url !== undefined ? { url } : { zh, en }
+      const updated = await updateTexts({ [key]: value })
       return res.status(200).json({ ok: true, texts: updated })
     } catch (e) {
       console.error('adminTexts PUT error:', e.message)

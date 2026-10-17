@@ -346,6 +346,26 @@
   outline: none;
   border-color: #3e6ae1;
 }
+/* 图片替换弹窗：URL 输入框与文件选择 */
+.v8-admin__modal-box input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  margin-top: 4px;
+  box-sizing: border-box;
+}
+.v8-admin__modal-box input[type="text"]:focus {
+  outline: none;
+  border-color: #3e6ae1;
+}
+.v8-admin__modal-box input[type="file"] {
+  width: 100%;
+  margin-top: 4px;
+  font-size: 13px;
+}
 .v8-admin__modal-actions {
   display: flex;
   gap: 10px;
