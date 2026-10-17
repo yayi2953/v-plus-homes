@@ -202,7 +202,9 @@ async function uploadImageToGitHub(name, dataBase64) {
       console.error('[images] GitHub upload failed:', putRes.status, errText.slice(0, 300))
       throw new Error(`GitHub upload failed: ${putRes.status}`)
     }
-    return path
+    // 返回可直接访问的 raw 直链（仓库路径不是网页 URL，直接用会 404）
+    const url = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/${path}`
+    return { path, url }
   } catch (e) {
     console.error('[images] uploadImageToGitHub error:', e.message)
     throw e

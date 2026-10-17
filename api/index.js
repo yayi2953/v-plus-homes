@@ -192,8 +192,8 @@ async function adminImageUpload(req, res) {
     return res.status(413).json({ error: '图片过大，请压缩后重试（< 1MB）' })
   }
   try {
-    const path = await uploadImageToGitHub(name, dataBase64)
-    return res.status(200).json({ ok: true, path })
+    const { path, url } = await uploadImageToGitHub(name, dataBase64)
+    return res.status(200).json({ ok: true, path, url })
   } catch (e) {
     console.error('adminImageUpload error:', e.message)
     return res.status(500).json({ error: '上传失败: ' + e.message })

@@ -195,7 +195,10 @@ export default function TextEditor({ authFetch }) {
           throw new Error(msg)
         }
         const up = await upRes.json()
-        url = up.path
+        // 使用服务端返回的 raw 直链；旧版仅返回 path 时拼接 raw 域名兜底
+        url = up.url || (up.path.startsWith('http')
+          ? up.path
+          : `https://raw.githubusercontent.com/yayi2953/v-plus-homes/main/${up.path}`)
       }
       if (!url) throw new Error(t('请选择图片文件或填写图片 URL', 'Choose a file or enter an image URL'))
 
