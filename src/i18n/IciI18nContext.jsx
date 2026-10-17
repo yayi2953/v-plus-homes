@@ -32,6 +32,7 @@ function deepClone(obj) {
 export function IciI18nProvider({ children }) {
   const [lang, setLang] = useState(getInitialLang)
   const [overrides, setOverrides] = useState({})
+  const [realListings, setRealListings] = useState([])
 
   useEffect(() => { syncRouter(window.location.pathname) }, [])
 
@@ -54,6 +55,41 @@ export function IciI18nProvider({ children }) {
 
   useEffect(() => { loadOverrides() }, [loadOverrides])
 
+  // 从后端拉取真实房源（管理后台创建），追加到虚拟房源列表之后
+  const TYPE_MAP = { luxury: 'luxury', standard: 'standard', student: 'student', city: 'city' }
+  const loadRealListings = useCallback(async () => {
+    try {
+      const res = await fetch('/api/listings')
+      if (!res.ok) return
+      const data = await res.json()
+      const normalized = (data.listings || [])
+        .filter((l) => l.published !== false)
+        .map((l) => {
+          const imgs = (Array.isArray(l.images) && l.images.length ? l.images : (l.image ? [l.image] : [])).filter(Boolean)
+          const beds = parseInt(l.bedrooms, 10) || 1
+          return {
+            code: l.code || l.id,
+            br: `${beds} BR`,
+            baths: parseInt(l.bathrooms, 10) || 1,
+            area: parseInt(l.area, 10) || 0,
+            amenities: [],
+            district: [l.address, l.city].filter(Boolean).join(' · ') || l.city || '',
+            districtKey: null,
+            price: `¥${l.price}`,
+            img: imgs[0] || '/images/listing-family.jpg',
+            gallery: imgs.slice(1),
+            categories: [TYPE_MAP[l.type] || 'standard'],
+            schoolKeys: [],
+            metro: '',
+            _real: true
+          }
+        })
+      setRealListings(normalized)
+    } catch { /* ignore */ }
+  }, [])
+
+  useEffect(() => { loadRealListings() }, [loadRealListings])
+
   // 应用图片覆盖项：立即应用 + 监听 DOM 变化持续再应用
   const imgMap = useMemo(() => collectImageOverrides(overrides), [overrides])
   useEffect(() => {
@@ -72,6 +108,9 @@ export function IciI18nProvider({ children }) {
       schoolKeys: Array.isArray(p.schoolKeys) && p.schoolKeys.length
         ? p.schoolKeys : (p.schoolKey ? [p.schoolKey] : [])
     }))
+
+    // 追加后台真实房源（index 全局唯一，详情页按 index 直接打开）
+    c.properties = [...c.properties, ...realListings]
 
     // 应用后端文案覆盖项
     for (const [key, val] of Object.entries(overrides)) {
@@ -93,7 +132,7 @@ export function IciI18nProvider({ children }) {
       remoteReady: true,
       reloadTexts: loadOverrides
     }
-  }, [lang, overrides, loadOverrides])
+  }, [lang, overrides, realListings, loadOverrides])
 
   return <IciI18nContext.Provider value={value}>{children}</IciI18nContext.Provider>
 }
