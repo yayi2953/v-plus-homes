@@ -210,31 +210,31 @@ async function messagesPublic(req, res) {
 // ============ Texts handlers ============
 async function textsPublic(req, res) {
   // 公开接口：返回所有文案覆盖项（前端合并到默认翻译）
-  return res.status(200).json({ texts: getTexts() })
+  return res.status(200).json({ texts: await getTexts() })
 }
 
 async function adminTexts(req, res) {
   if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   if (req.method === 'GET') {
-    return res.status(200).json({ texts: getTexts() })
+    return res.status(200).json({ texts: await getTexts() })
   }
   if (req.method === 'PUT') {
     const { key, zh, en } = req.body || {}
     if (!key) return res.status(400).json({ error: '缺少 key' })
-    const updated = updateTexts({ [key]: { zh, en } })
+    const updated = await updateTexts({ [key]: { zh, en } })
     return res.status(200).json({ ok: true, texts: updated })
   }
   if (req.method === 'DELETE') {
     const { key } = req.body || {}
     if (key) {
       // 重置单个 key：从覆盖项中删除
-      const db = getTexts()
+      const db = await getTexts()
       delete db[key]
-      updateTexts(db)
+      await updateTexts(db)
       return res.status(200).json({ ok: true })
     }
     // 无 key 则全部重置
-    resetTexts()
+    await resetTexts()
     return res.status(200).json({ ok: true })
   }
   return res.status(405).json({ error: 'Method not allowed' })
