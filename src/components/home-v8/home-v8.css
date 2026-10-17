@@ -690,7 +690,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   --v8n-muted: #76767d;
   --v8n-line: rgba(0, 0, 0, .08);
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  height: 56px;
+  height: 72px;
   background: rgba(255, 255, 255, .96);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
   backdrop-filter: saturate(180%) blur(12px);
@@ -727,12 +727,13 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 /* V 字母 Logo 图片 */
 .v8-wordmark__img {
   display: block;
-  height: 34px;
+  height: 64px;
   width: auto;
   object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.08));
 }
 @media (max-width: 680px) {
-  .v8-wordmark__img { height: 28px; }
+  .v8-wordmark__img { height: 44px; }
 }
 /* 居中导航（不能用 transform，否则 fixed 子菜单会被限制宽度） */
 .v8-nav__links {
