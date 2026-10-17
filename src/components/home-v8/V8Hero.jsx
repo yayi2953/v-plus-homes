@@ -13,14 +13,18 @@ export default function V8Hero() {
   return (
     <section className="v8-hero" id="top">
       <div className="v8-hero-canvas">
-        {/* 静态背景图 + 灰色毛玻璃 + 四周白色渐变羽化揉进页面背景 */}
+        {/* 静态背景图 */}
         <div className="v8-hero-videobg" aria-hidden="true">
           <img src={BG_IMAGE_SRC} alt="" />
         </div>
+        {/* 图片上的文字层：居中白色，小标题 + 大粗体标题 + 副标题 */}
+        <div className="v8-hero-overlay">
+          <p className="v8-hero-overlay__eyebrow">{t.eyebrow}</p>
+          <h1 className="v8-hero-overlay__title">V&nbsp;PLUS</h1>
+          <p className="v8-hero-overlay__sub">{t.lede}</p>
+        </div>
       </div>
       <div className="v8-hero-body">
-        <p className="v8-eyebrow">{t.eyebrow}</p>
-        <p className="v8-lede">{t.lede}</p>
         <div className="v8-hero-cta">
           <button type="button" className="v8-tlink" onClick={openContact}>
             {t.whatsapp}
