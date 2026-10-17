@@ -14,7 +14,11 @@
   "img:v8.hero.slide2": {
     "url": "https://raw.githubusercontent.com/yayi2953/v-plus-homes/main/public/images/uploads/mvco7aoz-111111.jpg",
     "posX": 50.390625,
-    "posY": 58.31979200519987
+    "posY": 58.31979200519987,
+    "scale": 1,
+    "posXm": 76.58110119047619,
+    "posYm": 58.08169676710463,
+    "scaleM": 1.7
   },
   "v8.hero.s2Title": {
     "zh": "广州",
@@ -31,7 +35,11 @@
   "img:v8.hero.slide3": {
     "url": "https://raw.githubusercontent.com/yayi2953/v-plus-homes/main/public/images/uploads/mvcob3lq-2222.jpg",
     "posX": 50.5859375,
-    "posY": 59.70642400606651
+    "posY": 59.70642400606651,
+    "scale": 1,
+    "posXm": 0.288318452380949,
+    "posYm": 54.23023352987604,
+    "scaleM": 1.5
   },
   "v8.hero.s3Title": {
     "zh": "广州",
