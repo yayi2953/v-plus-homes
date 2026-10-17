@@ -169,13 +169,23 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .home-v8 .v8-hero-arrow svg {
   width: 22px; height: 22px;
 }
-.home-v8 .v8-hero-arrow:hover {
-  background: rgba(255, 255, 255, .25);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-}
 .home-v8 .v8-hero-arrow:active {
   transform: translateY(-50%) scale(.92);
+}
+.home-v8 .v8-hero-arrow:focus {
+  outline: none;
+}
+.home-v8 .v8-hero-arrow:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, .9);
+  outline-offset: 2px;
+}
+/* 触摸设备可能会保留 :hover 状态，悬停背景只应用于真正支持悬停的设备。 */
+@media (hover: hover) and (pointer: fine) {
+  .home-v8 .v8-hero-arrow:hover {
+    background: rgba(255, 255, 255, .25);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
 }
 .home-v8 .v8-hero-arrow--prev { left: 20px; }
 .home-v8 .v8-hero-arrow--next { right: 20px; }
