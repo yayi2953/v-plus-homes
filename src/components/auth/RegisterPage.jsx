@@ -67,7 +67,7 @@ export default function RegisterPage() {
         <a className="v8-auth__topbar-logo" href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>V&nbsp;PLUS</a>
         <button className="v8-auth__topbar-lang" onClick={() => switchLang(zh ? 'en' : 'zh')}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3c2.5 2.6 2.5 15.4 0 18-2.5-2.6-2.5-15.4 0-18Z" /></svg>
-          {zh ? '中文' : 'English'}
+          {zh ? 'zh-CN' : 'en-US'}
         </button>
       </div>
 
@@ -80,14 +80,17 @@ export default function RegisterPage() {
           {step === 1 && (
             <form className="v8-auth__form" onSubmit={(e) => { e.preventDefault(); nextStep() }}>
               <label>
-                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder={t('姓', 'Last name')} required />
+                <span className="v8-auth__field-label">{t('姓', 'Last name')}</span>
+                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
               </label>
               <label>
-                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder={t('名', 'First name')} required />
+                <span className="v8-auth__field-label">{t('名', 'First name')}</span>
+                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
               </label>
 
               {/* 验证码（视觉还原） */}
               <label>
+                <span className="v8-auth__field-label">{t('验证码', 'Verification code')}</span>
                 <div className="v8-auth__captcha">
                   <span className="v8-auth__captcha-text">p2fmh</span>
                   <button type="button" className="v8-auth__captcha-refresh" aria-label="refresh">
@@ -96,7 +99,8 @@ export default function RegisterPage() {
                 </div>
               </label>
               <label>
-                <input type="text" placeholder={t('请输入图片中的字符', 'Enter the characters above')} />
+                <span className="v8-auth__field-label">{t('请输入图片中的字符', 'Enter the characters above')}</span>
+                <input type="text" />
               </label>
 
               <label className="v8-auth__check">
@@ -115,25 +119,32 @@ export default function RegisterPage() {
           {step === 2 && (
             <form className="v8-auth__form" onSubmit={(e) => { e.preventDefault(); nextStep() }}>
               <label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('邮箱', 'Email')} required autoComplete="email" />
+                <span className="v8-auth__field-label">{t('邮箱', 'Email')}</span>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
               </label>
               <label className="v8-auth__pwd">
-                <input type={showPwd ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('密码', 'Password')} required minLength={6} autoComplete="new-password" />
-                <button type="button" className="v8-auth__eye" onClick={() => setShowPwd(!showPwd)} aria-label="toggle password">
-                  {showPwd
-                    ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /><path d="m2 2 20 20" /></svg>
-                    : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
-                  }
-                </button>
+                <span className="v8-auth__field-label">{t('密码', 'Password')}</span>
+                <span className="v8-auth__input-wrap">
+                  <input type={showPwd ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} autoComplete="new-password" />
+                  <button type="button" className="v8-auth__eye" onClick={() => setShowPwd(!showPwd)} aria-label="toggle password">
+                    {showPwd
+                      ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /><path d="m2 2 20 20" /></svg>
+                      : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                    }
+                  </button>
+                </span>
               </label>
               <label className="v8-auth__pwd">
-                <input type={showConfirm ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={t('确认密码', 'Confirm password')} required minLength={6} autoComplete="new-password" />
-                <button type="button" className="v8-auth__eye" onClick={() => setShowConfirm(!showConfirm)} aria-label="toggle confirm password">
-                  {showConfirm
-                    ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /><path d="m2 2 20 20" /></svg>
-                    : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
-                  }
-                </button>
+                <span className="v8-auth__field-label">{t('确认密码', 'Confirm password')}</span>
+                <span className="v8-auth__input-wrap">
+                  <input type={showConfirm ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={6} autoComplete="new-password" />
+                  <button type="button" className="v8-auth__eye" onClick={() => setShowConfirm(!showConfirm)} aria-label="toggle confirm password">
+                    {showConfirm
+                      ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /><path d="m2 2 20 20" /></svg>
+                      : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                    }
+                  </button>
+                </span>
               </label>
 
               {error && <div className="v8-auth__error">{error}</div>}

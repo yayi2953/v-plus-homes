@@ -65,13 +65,34 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48px 20px 60px;
+  justify-content: center;
+  padding: 40px 20px;
 }
 
 .v8-auth__card {
   width: 100%;
   max-width: 340px;
 }
+
+/* 字段标签：输入框上方的灰色小字 */
+.v8-auth__field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ts-pewter);
+  margin-bottom: 6px;
+  line-height: 20px;
+}
+
+/* 信息图标 ⓘ */
+.v8-auth__info-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ts-pewter);
+}
+.v8-auth__info-icon svg { width: 14px; height: 14px; }
 
 /* 步骤指示 */
 .v8-auth__step {
@@ -201,10 +222,12 @@
 .v8-auth__captcha-refresh svg { width: 18px; height: 18px; }
 
 /* ---------- 密码可见性切换 ---------- */
-.v8-auth__pwd {
+.v8-auth__input-wrap {
   position: relative;
+  display: block;
 }
-.v8-auth__pwd input {
+.v8-auth__input-wrap input {
+  width: 100%;
   padding-right: 40px;
 }
 .v8-auth__eye {

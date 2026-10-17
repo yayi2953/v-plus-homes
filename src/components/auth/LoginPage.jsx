@@ -34,7 +34,7 @@ export default function LoginPage() {
         <a className="v8-auth__topbar-logo" href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>V&nbsp;PLUS</a>
         <button className="v8-auth__topbar-lang" onClick={() => switchLang(zh ? 'en' : 'zh')}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3c2.5 2.6 2.5 15.4 0 18-2.5-2.6-2.5-15.4 0-18Z" /></svg>
-          {zh ? '中文' : 'English'}
+          {zh ? 'zh-CN' : 'en-US'}
         </button>
       </div>
 
@@ -43,21 +43,26 @@ export default function LoginPage() {
           <h1 className="v8-auth__title">{t('登录', 'Sign In')}</h1>
           <form onSubmit={onSubmit} className="v8-auth__form">
             <label>
+              <span className="v8-auth__field-label">
+                {t('电子邮箱地址或登录手机号码', 'Email or phone number')}
+                <span className="v8-auth__info-icon" aria-label="info">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+                </span>
+              </span>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('电子邮箱地址或登录手机号码', 'Email or phone number')}
                 required
                 autoComplete="email"
               />
             </label>
             <label>
+              <span className="v8-auth__field-label">{t('密码', 'Password')}</span>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('密码', 'Password')}
                 required
                 autoComplete="current-password"
               />
@@ -75,10 +80,6 @@ export default function LoginPage() {
           <button className="v8-auth__btn v8-auth__btn--outline" onClick={() => navigate('/register')}>
             {t('创建账户', 'Create Account')}
           </button>
-
-          <p className="v8-auth__hint">
-            {t('演示管理员：admin@v-plus.house / admin123', 'Demo admin: admin@v-plus.house / admin123')}
-          </p>
         </div>
       </div>
 
