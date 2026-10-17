@@ -73,8 +73,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <button className="v8-auth__help">{t('无法登录？', 'Trouble signing in?')}</button>
-
           <div className="v8-auth__divider"><span>{t('或', 'or')}</span></div>
 
           <button className="v8-auth__btn v8-auth__btn--outline" onClick={() => navigate('/register')}>
