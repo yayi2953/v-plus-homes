@@ -1,31 +1,48 @@
 import { useEffect, useMemo } from 'react'
 import { iciContent } from '../../i18n/iciContent.js'
-import { flattenTexts } from '../../i18n/flatten.js'
+import { flattenTexts, setByPath, getByPath } from '../../i18n/flatten.js'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
+
+// 规范化空白：合并连续空白为单个空格，去除首尾
+function norm(s) {
+  return (s || '').replace(/\s+/g, ' ').trim()
+}
+
+// 遍历对象，收集所有字符串值的路径（用于从 c 构建反向映射）
+function walk(obj, prefix, out) {
+  if (Array.isArray(obj)) {
+    obj.forEach((item, i) => walk(item, `${prefix}.${i}`, out))
+  } else if (obj && typeof obj === 'object') {
+    for (const k of Object.keys(obj)) {
+      walk(obj[k], prefix ? `${prefix}.${k}` : k, out)
+    }
+  } else if (typeof obj === 'string' && obj.trim()) {
+    out.push([prefix, obj])
+  }
+}
 
 /**
  * 可视化编辑模式：当 URL 包含 ?edit=1 时激活。
- * - 鼠标悬停文本时高亮
- * - 点击文本时，通过 postMessage 将匹配到的 i18n key 发送给父窗口（后台）
- * - 监听父窗口的更新消息，实时修改 DOM 文本
  */
 export default function EditMode() {
   const { lang, c } = useIciI18n()
 
-  // 扁平化文案：key -> { zh, en }
+  // 默认文案（用于 key → {zh, en} 的完整映射）
   const flat = useMemo(() => flattenTexts(iciContent.zh, iciContent.en), [])
 
-  // 反向映射：文本值 -> [keys]（当前语言的值）
+  // 反向映射：显示文本 → [keys]（基于实际显示的 c，包含覆盖项）
   const reverseMap = useMemo(() => {
+    const entries = []
+    walk(c, '', entries)
     const map = new Map()
-    for (const [key, val] of Object.entries(flat)) {
-      const text = (val[lang] || '').trim()
+    for (const [key, val] of entries) {
+      const text = norm(val)
       if (!text) continue
       if (!map.has(text)) map.set(text, [])
       map.get(text).push(key)
     }
     return map
-  }, [flat, lang])
+  }, [c])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -55,31 +72,25 @@ export default function EditMode() {
         pointer-events: none;
         z-index: 99999;
         font-family: monospace;
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     `
     document.head.appendChild(highlightStyle)
 
-    function getTextOfElement(el) {
-      // 获取元素的直接文本内容（不包含子元素文本）
-      let text = ''
-      for (const node of el.childNodes) {
-        if (node.nodeType === Node.TEXT_NODE) text += node.textContent
-      }
-      return text.trim()
+    // 获取元素的可见文本（规范化空白）
+    function getElText(el) {
+      return norm(el.textContent || '')
     }
 
     function findEditableAncestor(target) {
       let el = target
-      while (el && el !== document.body) {
-        const text = getTextOfElement(el)
-        if (text && reverseMap.has(text)) return { el, text }
-        el = el.parentElement
-      }
-      // 兜底：用元素的全部文本
-      el = target
-      while (el && el !== document.body) {
-        const text = (el.textContent || '').trim()
-        if (text && reverseMap.has(text)) return { el, text }
+      while (el && el !== document.body && el !== document.documentElement) {
+        const text = getElText(el)
+        if (text && reverseMap.has(text)) {
+          return { el, text }
+        }
         el = el.parentElement
       }
       return null
@@ -106,7 +117,6 @@ export default function EditMode() {
       e.preventDefault()
       e.stopPropagation()
       const keys = reverseMap.get(found.text)
-      // 发送给父窗口
       window.parent.postMessage({
         type: 'EDIT_TEXT',
         text: found.text,
@@ -123,15 +133,15 @@ export default function EditMode() {
       if (e.data?.type !== 'TEXT_UPDATED') return
       const { key, zh, en } = e.data
       const newVal = lang === 'zh' ? zh : en
-      if (newVal === undefined) return
-      // 在 flat 中找旧值
-      const oldVal = (flat[key]?.[lang] || '').trim()
+      if (newVal === undefined || newVal === null) return
+      // 用当前显示值（来自 c，含覆盖项）作为旧值来匹配 DOM
+      const oldVal = norm(getByPath(c, key))
       if (!oldVal) return
-      // 替换页面中所有匹配旧值的文本节点
+      // 替换页面中所有匹配旧值的文本节点（按规范化后的值比较）
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null)
       let node
       while ((node = walker.nextNode())) {
-        if (node.textContent.trim() === oldVal) {
+        if (norm(node.textContent) === oldVal) {
           node.textContent = newVal
         }
       }
@@ -148,7 +158,7 @@ export default function EditMode() {
         highlighted.removeAttribute('data-edit-key')
       }
     }
-  }, [reverseMap, flat, lang])
+  }, [reverseMap, c, lang])
 
   return null
 }

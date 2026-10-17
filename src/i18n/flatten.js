@@ -53,7 +53,7 @@ export function flattenTexts(zhObj, enObj) {
   return result
 }
 
-function getByPath(obj, path) {
+export function getByPath(obj, path) {
   const parts = path.split('.')
   let cur = obj
   for (const p of parts) {
