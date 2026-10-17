@@ -136,10 +136,7 @@ export default function V8Listings() {
           </p>
         </div>
 
-        {/* 客户留言弹幕 */}
-        <V8Bubbles />
-
-        {/* 房源卡片网格：虚拟房源 + 后台真实房源 */}
+        {/* 房源卡片网格：虚拟房源 + 后台真实房源（置于弹幕上方，进页即见） */}
         {items.length > 0 ? (
           <div className="v8-listings__grid">
             {items.map((it, seq) => renderCard(it, seq + 1))}
@@ -149,6 +146,9 @@ export default function V8Listings() {
             {lang === 'zh' ? '暂无符合条件的房源，请调整筛选条件' : lang === 'ja' ? '条件に合う物件はまだありません。絞り込み条件をご調整ください。' : 'No homes match your filters yet — try adjusting them.'}
           </p>
         )}
+
+        {/* 客户留言弹幕 */}
+        <V8Bubbles />
       </div>
     </div>
   )
