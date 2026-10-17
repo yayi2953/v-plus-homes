@@ -2,7 +2,7 @@ import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useContact } from '../ici/contactContext.jsx'
 
 // 首屏静态背景图
-const BG_IMAGE_SRC = '/images/listing-family.jpg'
+const BG_IMAGE_SRC = '/images/hero-cityscape.jpg'
 
 export default function V8Hero() {
   const { c } = useIciI18n()
