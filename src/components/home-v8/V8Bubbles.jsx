@@ -74,8 +74,19 @@ const NAMES = [
 ]
 
 const COLORS = ['#1e40af', '#0f766e', '#b91c1c', '#6d28d9', '#0369a1', '#9f1239']
+const LANE_HEIGHT = 42
 
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)] }
+
+function makeMessage(w, lanes) {
+  const lane = lanes[Math.floor(Math.random() * lanes.length)]
+  const text = rand(MESSAGES)
+  const name = rand(NAMES)
+  const color = rand(COLORS)
+  const speed = 1.2 + Math.random() * 1.4
+  const fontSize = 14 + Math.floor(Math.random() * 4)
+  return { y: lane.y, text: `${name}: ${text}`, color, speed, fontSize }
+}
 
 export default function V8Bubbles() {
   const canvasRef = useRef(null)
@@ -86,118 +97,98 @@ export default function V8Bubbles() {
     const wrap = wrapRef.current
     if (!canvas || !wrap) return
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
-    let w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2)
+    let w = 0, h = 0
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
     const lanes = []
-    const LANE_HEIGHT = 42
     const messages = []
-
-    const resize = () => {
-      const rect = wrap.getBoundingClientRect()
-      w = rect.width
-      h = rect.height
-      canvas.width = w * dpr
-      canvas.height = h * dpr
-      canvas.style.width = w + 'px'
-      canvas.style.height = h + 'px'
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      lanes.length = 0
-      const laneCount = Math.max(4, Math.floor(h / LANE_HEIGHT))
-      for (let i = 0; i < laneCount; i++) {
-        lanes.push({ y: 28 + i * LANE_HEIGHT, lastEnd: -9999 })
-      }
-    }
-    resize()
-    window.addEventListener('resize', resize)
-
-    const spawn = () => {
-      const lane = lanes[Math.floor(Math.random() * lanes.length)]
-      if (lane.lastEnd > w - 120) return
-      const text = rand(MESSAGES)
-      const name = rand(NAMES)
-      const color = rand(COLORS)
-      const speed = 1.2 + Math.random() * 1.4
-      const fontSize = 14 + Math.floor(Math.random() * 4)
-      const display = `${name}: ${text}`
-      ctx.font = `500 ${fontSize}px "PingFang SC", "Microsoft YaHei", Arial, sans-serif`
-      const textWidth = ctx.measureText(display).width
-      messages.push({
-        x: w + 20,
-        y: lane.y,
-        text: display,
-        color,
-        speed,
-        fontSize,
-        width: textWidth
-      })
-      lane.lastEnd = w + 20 + textWidth
-    }
-
-    // 预生成
-    for (let i = 0; i < 12; i++) {
-      const lane = lanes[i % lanes.length]
-      const text = rand(MESSAGES)
-      const name = rand(NAMES)
-      const color = rand(COLORS)
-      const speed = 1.2 + Math.random() * 1.4
-      const fontSize = 14 + Math.floor(Math.random() * 4)
-      const display = `${name}: ${text}`
-      ctx.font = `500 ${fontSize}px "PingFang SC", "Microsoft YaHei", Arial, sans-serif`
-      const textWidth = ctx.measureText(display).width
-      messages.push({
-        x: Math.random() * w,
-        y: lane.y,
-        text: display,
-        color,
-        speed,
-        fontSize,
-        width: textWidth
-      })
-    }
-
     let spawnTimer = 0
     let raf
 
-    const tick = () => {
-      ctx.clearRect(0, 0, w, h)
-      spawnTimer++
-      if (spawnTimer > 25) {
-        spawn()
-        spawnTimer = 0
-      }
-
-      for (let i = messages.length - 1; i >= 0; i--) {
-        const m = messages[i]
-        m.x -= m.speed
-
-        // 半透明背景胶囊，保证文字可读
-        ctx.font = `500 ${m.fontSize}px "PingFang SC", "Microsoft YaHei", Arial, sans-serif`
-        const padX = 10, padY = 5
-        const bx = m.x - padX
-        const by = m.y - m.fontSize * 0.75
-        const bw = m.width + padX * 2
-        const bh = m.fontSize + padY * 2
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.82)'
-        roundRect(ctx, bx, by, bw, bh, bh / 2)
-        ctx.fill()
-
-        // 文字
-        ctx.fillStyle = m.color
-        ctx.textBaseline = 'middle'
-        ctx.fillText(m.text, m.x, m.y)
-
-        if (m.x + m.width < -40) {
-          messages.splice(i, 1)
+    const measure = () => {
+      const rect = wrap.getBoundingClientRect()
+      w = rect.width
+      h = rect.height
+      if (w > 0 && h > 0) {
+        canvas.width = Math.round(w * dpr)
+        canvas.height = Math.round(h * dpr)
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+        lanes.length = 0
+        const laneCount = Math.max(4, Math.floor(h / LANE_HEIGHT))
+        for (let i = 0; i < laneCount; i++) {
+          lanes.push({ y: 28 + i * LANE_HEIGHT })
+        }
+        // 预填充
+        if (messages.length === 0) {
+          for (let i = 0; i < 14; i++) {
+            const m = makeMessage(w, lanes)
+            ctx.font = `500 ${m.fontSize}px "PingFang SC", "Microsoft YaHei", Arial, sans-serif`
+            const textWidth = ctx.measureText(m.text).width
+            messages.push({ ...m, x: Math.random() * w, width: textWidth })
+          }
         }
       }
+    }
 
+    const spawn = () => {
+      if (lanes.length === 0 || w <= 0) return
+      const m = makeMessage(w, lanes)
+      ctx.font = `500 ${m.fontSize}px "PingFang SC", "Microsoft YaHei", Arial, sans-serif`
+      const textWidth = ctx.measureText(m.text).width
+      messages.push({ ...m, x: w + 20, width: textWidth })
+    }
+
+    const tick = () => {
+      if (w <= 0 || h <= 0) {
+        measure()
+      } else {
+        ctx.clearRect(0, 0, w, h)
+        spawnTimer++
+        if (spawnTimer > 25) {
+          spawn()
+          spawnTimer = 0
+        }
+
+        for (let i = messages.length - 1; i >= 0; i--) {
+          const m = messages[i]
+          m.x -= m.speed
+
+          ctx.font = `500 ${m.fontSize}px "PingFang SC", "Microsoft YaHei", Arial, sans-serif`
+          const padX = 10, padY = 5
+          const bx = m.x - padX
+          const by = m.y - m.fontSize * 0.75
+          const bw = m.width + padX * 2
+          const bh = m.fontSize + padY * 2
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
+          roundRect(ctx, bx, by, bw, bh, bh / 2)
+          ctx.fill()
+
+          ctx.fillStyle = m.color
+          ctx.textBaseline = 'middle'
+          ctx.fillText(m.text, m.x, m.y)
+
+          if (m.x + m.width < -40) {
+            messages.splice(i, 1)
+          }
+        }
+      }
       raf = requestAnimationFrame(tick)
     }
+
+    measure()
     tick()
+
+    const ro = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(() => measure())
+      : null
+    if (ro) ro.observe(wrap)
+    window.addEventListener('resize', measure)
 
     return () => {
       cancelAnimationFrame(raf)
-      window.removeEventListener('resize', resize)
+      window.removeEventListener('resize', measure)
+      if (ro) ro.disconnect()
     }
   }, [])
 
