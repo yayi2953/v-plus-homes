@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // 多语言虚拟留言池（英 / 法 / 日 / 韩 / 印地 / 泰）
 // 80% 负面抱怨（为什么没有房子租）、20% 期待（希望能开启租房）
@@ -238,6 +238,41 @@ function makeMessage(w, lanes) {
 export default function V8Bubbles() {
   const canvasRef = useRef(null)
   const wrapRef = useRef(null)
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
+  const [submitting, setSubmitting] = useState(false)
+  const [feedback, setFeedback] = useState(null) // { type: 'ok'|'err', text }
+
+  async function submitMessage(e) {
+    e.preventDefault()
+    if (submitting) return
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      setFeedback({ type: 'err', text: '请填写姓名、邮箱和留言内容' })
+      return
+    }
+    setSubmitting(true)
+    setFeedback(null)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          message: form.message.trim(),
+          type: 'message-board'
+        })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || '提交失败')
+      setFeedback({ type: 'ok', text: '留言已提交，感谢您的反馈！' })
+      setForm({ name: '', email: '', phone: '', message: '' })
+    } catch (err) {
+      setFeedback({ type: 'err', text: err.message || '提交失败，请稍后重试' })
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -349,6 +384,65 @@ export default function V8Bubbles() {
           </div>
           <div ref={wrapRef} className="v8-bubbles__wrap">
             <canvas ref={canvasRef} className="v8-bubbles__canvas" />
+          </div>
+
+          <div className="v8-msgform">
+            <div className="v8-msgform__head">
+              <p className="v8-eyebrow">LEAVE A MESSAGE</p>
+              <h3 className="v8-msgform__title">我要留言</h3>
+              <p className="v8-msgform__sub">告诉我们您的需求或疑问，我们会尽快与您联系。</p>
+            </div>
+            <form className="v8-msgform__body" onSubmit={submitMessage}>
+              <div className="v8-msgform__row">
+                <label className="v8-msgform__field">
+                  <span>姓名 *</span>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="您的姓名"
+                    required
+                  />
+                </label>
+                <label className="v8-msgform__field">
+                  <span>邮箱 *</span>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="you@example.com"
+                    required
+                  />
+                </label>
+                <label className="v8-msgform__field">
+                  <span>电话</span>
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="选填"
+                  />
+                </label>
+              </div>
+              <label className="v8-msgform__field">
+                <span>留言内容 *</span>
+                <textarea
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  placeholder="请输入您想说的话..."
+                  rows={4}
+                  required
+                />
+              </label>
+              {feedback && (
+                <div className={`v8-msgform__feedback v8-msgform__feedback--${feedback.type}`}>
+                  {feedback.text}
+                </div>
+              )}
+              <button type="submit" className="v8-btn v8-btn--dark" disabled={submitting}>
+                {submitting ? '提交中...' : '提交留言'}
+              </button>
+            </form>
           </div>
         </div>
       </div>
