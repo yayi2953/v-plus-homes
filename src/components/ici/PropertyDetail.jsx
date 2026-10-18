@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useProperty } from './propertyContext.jsx'
 import { Metro, FX, WhatsApp, ChevronLeft } from './Icons.jsx'
-import { useContact } from './contactContext.jsx'
 import { mapsEmbedSrc } from '../../config/maps.js'
 import { propertyPath, navigate } from '../../lib/router.mjs'
 import { setSeo, clearSeo, SITE_ORIGIN } from '../../lib/seo.mjs'
@@ -100,7 +99,6 @@ function DetailPanel({ active, closeProperty }) {
   const { c, lang } = useIciI18n()
   const p = c.properties[active.index]
   const d = c.detail
-  const { openContact } = useContact()
   const scrollRef = useRef(null)
   const trackRef = useRef(null)
   const rafRef = useRef(0)
@@ -347,7 +345,7 @@ function DetailPanel({ active, closeProperty }) {
 
   const copyOkText = lang === 'zh' ? '房源信息已复制' : lang === 'ja' ? '物件情報をコピーしました' : 'Details copied'
 
-  // 点击咨询：先把该房源详情复制到剪贴板（方便直接粘贴到 WhatsApp/微信），再打开咨询入口
+  // 点击咨询：把该房源详情复制到剪贴板（方便直接粘贴到 WhatsApp/微信）
   const onCtaClick = async () => {
     const ok = await copyToClipboard(buildShareText())
     if (ok) {
@@ -355,7 +353,6 @@ function DetailPanel({ active, closeProperty }) {
       clearTimeout(copiedTimer.current)
       copiedTimer.current = setTimeout(() => setCopied(false), 2000)
     }
-    openContact()
   }
 
   const ctaButton = (

@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
-import { WhatsApp } from './Icons.jsx'
-import { useContact } from './contactContext.jsx'
 
 export default function FloatingActions() {
   const { c } = useIciI18n()
-  const { openContact } = useContact()
   const [showTop, setShowTop] = useState(false)
   const [cookie, setCookie] = useState(true)
 
@@ -18,10 +15,6 @@ export default function FloatingActions() {
 
   return (
     <>
-      <button className="fab-whatsapp" aria-label="WhatsApp" onClick={openContact}>
-        <WhatsApp size={26} />
-      </button>
-
       <AnimatePresence>
         {showTop && (
           <motion.button

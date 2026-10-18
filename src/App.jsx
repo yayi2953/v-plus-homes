@@ -1,6 +1,5 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { PropertyProvider, useProperty } from './components/ici/propertyContext.jsx'
-import { ContactProvider } from './components/ici/contactContext.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 import { useIciI18n } from './i18n/IciI18nContext.jsx'
 import { readRoute, syncRouter } from './lib/router.mjs'
@@ -101,9 +100,7 @@ export default function App() {
   return (
     <AuthProvider>
       <PropertyProvider>
-        <ContactProvider>
-          <Site />
-        </ContactProvider>
+        <Site />
       </PropertyProvider>
     </AuthProvider>
   )

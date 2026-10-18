@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
-import { useContact } from '../ici/contactContext.jsx'
 
 // 首屏轮播背景图（每张配独立文案组，切换图片时文字跟随变化）
 const SLIDES = [
@@ -18,7 +17,6 @@ function slideText(t, i) {
 
 export default function V8Hero({ hideBody = false }) {
   const { c } = useIciI18n()
-  const { openContact } = useContact()
   const [idx, setIdx] = useState(0)
 
   const prev = useCallback(() => {
@@ -88,7 +86,7 @@ export default function V8Hero({ hideBody = false }) {
           <p className="v8-eyebrow" data-edit-key="v8.hero.bodyEyebrow">{t.bodyEyebrow}</p>
           <p className="v8-lede" data-edit-key="v8.hero.bodyLede">{t.bodyLede}</p>
           <div className="v8-hero-cta">
-            <button type="button" className="v8-tlink" onClick={openContact}>
+            <button type="button" className="v8-tlink">
               {t.whatsapp}
             </button>
           </div>

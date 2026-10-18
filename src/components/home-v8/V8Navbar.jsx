@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate, switchLang, parsePath } from '../../lib/router.mjs'
-import { useContact } from '../ici/contactContext.jsx'
 import { Mail, Phone, WhatsApp, WeChat } from '../ici/Icons.jsx'
 import LegalModal from '../ici/LegalModal.jsx'
 import { useAuth } from '../../contexts/AuthContext.jsx'
@@ -33,7 +32,6 @@ const ICON_MAP = { mail: Mail, phone: Phone, whatsapp: WhatsApp, wechat: WeChat 
 
 export default function V8Navbar({ solid = false }) {
   const { c, lang } = useIciI18n()
-  const { openContact } = useContact()
   const { user, isAuthenticated, isAdmin, logout } = useAuth()
   const { nav } = c
   const residenceTypes = c.discover.types ?? []
@@ -171,11 +169,6 @@ export default function V8Navbar({ solid = false }) {
   const showAll = (e) => {
     e?.preventDefault()
     goType('all')
-  }
-
-  const book = () => {
-    closeMenu()
-    openContact()
   }
 
   return (
@@ -479,7 +472,7 @@ export default function V8Navbar({ solid = false }) {
               </nav>
 
               <div className="v8-drawer__foot">
-                <button type="button" className="v8-btn v8-btn--dark v8-drawer__book" onClick={book}>
+                <button type="button" className="v8-btn v8-btn--dark v8-drawer__book">
                   {c.getStarted?.book || nav.cta}
                 </button>
               </div>

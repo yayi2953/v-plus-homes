@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useProperty } from '../ici/propertyContext.jsx'
-import { useContact } from '../ici/contactContext.jsx'
 import SmartImage from '../common/SmartImage.jsx'
 
 /* 区域找房板（参考电商分区频道式样）：
@@ -33,7 +32,6 @@ function buildGroups(items, tabs) {
 export default function V8RegionBoard({ items, onOpen }) {
   const { c, lang } = useIciI18n()
   const { openProperty } = useProperty()
-  const { openContact } = useContact()
   const tabs = c.discover?.tabs ?? []
   const featured = c.v8?.featured || {}
   const groups = buildGroups(items, tabs)
@@ -46,7 +44,7 @@ export default function V8RegionBoard({ items, onOpen }) {
   return (
     <div className="v8-regionboard">
       {groups.map((g) => (
-        <RegionGroup key={g.key} group={g} lang={lang} label={label} fromText={fromText} perMonth={featured.perMonth} onOpen={onOpen || ((index) => openProperty(index, 'g'))} openContact={openContact} />
+        <RegionGroup key={g.key} group={g} lang={lang} label={label} fromText={fromText} perMonth={featured.perMonth} onOpen={onOpen || ((index) => openProperty(index, 'g'))} />
       ))}
     </div>
   )
@@ -56,7 +54,7 @@ export default function V8RegionBoard({ items, onOpen }) {
 
 const ROW_STEP = 2 // 横滑触底每次追加的房源小卡片数
 
-function RegionGroup({ group, lang, label, fromText, perMonth, onOpen, openContact }) {
+function RegionGroup({ group, lang, label, fromText, perMonth, onOpen }) {
   const rowRef = useRef(null)
   const fullRef = useRef(null)
   const [visible, setVisible] = useState(4)
@@ -134,7 +132,7 @@ function RegionGroup({ group, lang, label, fromText, perMonth, onOpen, openConta
           <span className="v8-mcard__cta-q">
             {label('哪套房源适合你？', 'Which home suits you?', 'どの物件が合う？')}
           </span>
-          <button type="button" className="v8-mcard__cta-btn" onClick={openContact}>
+          <button type="button" className="v8-mcard__cta-btn">
             {label('预约看房', 'Book a viewing', '内見予約')}
           </button>
         </div>
