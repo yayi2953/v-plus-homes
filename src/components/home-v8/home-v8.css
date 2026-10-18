@@ -443,6 +443,58 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   .home-v8 .v8-fcard__go { opacity: .5; transform: none; }
   .home-v8 .v8-fcard:hover { transform: none; }
 }
+
+/* ---------- 一四式房源卡：顶部风景大图 + 数据小卡片横滑（滑动触底才加载更多） ---------- */
+.home-v8 .v8-fcard--quad {
+  flex-direction: column; gap: 0; padding: 10px 10px 13px;
+}
+.home-v8 .v8-fcard--quad .v8-fcard__hero {
+  position: relative; display: block; width: 100%;
+  border-radius: 10px; overflow: hidden; background: #f0f0f2;
+  box-shadow: inset 0 0 0 1px rgba(22, 22, 26, .07);
+}
+.home-v8 .v8-fcard--quad .v8-fcard__hero::before { content: ""; display: block; padding-top: 62%; }
+.home-v8 .v8-fcard--quad .v8-fcard__hero img {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  width: 100%; height: 100%; object-fit: cover; filter: saturate(.92);
+  transition: transform .7s var(--v8-ease);
+}
+.home-v8 .v8-fcard--quad:hover .v8-fcard__hero img { transform: scale(1.06); }
+/* 圆形箭头叠于大图右上角，hover 滑入 */
+.home-v8 .v8-fcard--quad .v8-fcard__go {
+  position: absolute; top: 10px; right: 10px; align-self: auto;
+  opacity: 0; transform: translateY(-6px);
+}
+.home-v8 .v8-fcard--quad:hover .v8-fcard__go,
+.home-v8 .v8-fcard--quad:focus-visible .v8-fcard__go { opacity: 1; transform: none; }
+@media (hover: none) {
+  .home-v8 .v8-fcard--quad .v8-fcard__go { opacity: .55; transform: none; }
+}
+.home-v8 .v8-fcard--quad .v8-fcard__body { padding: 11px 4px 0; justify-content: flex-start; }
+/* 数据小卡片轨道：横向滑动、snap 吸附、隐藏滚动条；chip 固定 27% 宽保证
+   初始 4 个即轻微溢出（可滑），触底后按需追加渲染 */
+.home-v8 .v8-fcard__rail {
+  display: flex; gap: 8px; overflow-x: auto; margin-top: 11px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none; -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+.home-v8 .v8-fcard__rail::-webkit-scrollbar { display: none; }
+.home-v8 .v8-fcard__chip {
+  flex: 0 0 27%; min-width: 0; scroll-snap-align: start;
+  display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  padding: 9px 11px; border-radius: 10px;
+  background: #f5f6f8; border: 1px solid rgba(22, 22, 26, .06);
+}
+.home-v8 .v8-fcard__chip-k {
+  font-size: 10px; letter-spacing: .08em; white-space: nowrap;
+  color: var(--v8-muted);
+}
+.home-v8 .v8-fcard__chip-v {
+  font-size: 13px; font-weight: 600; color: var(--v8-ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums lining-nums;
+}
 .home-v8 .v8-fmore-wrap { display: flex; justify-content: center; margin-top: 28px; }
 .home-v8 .v8-featured .v8-wrap { padding-bottom: 96px; }
 /* v8-wrap 本身无横向内边距（桌面靠 max-width 居中留白），屏宽小于容器时必须补边距，

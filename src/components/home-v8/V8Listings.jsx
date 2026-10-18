@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useProperty } from '../ici/propertyContext.jsx'
 import { navigate } from '../../lib/router.mjs'
-import SmartImage from '../common/SmartImage.jsx'
+import PropertyQuadCard from './PropertyQuadCard.jsx'
 import V8Bubbles from './V8Bubbles.jsx'
 
 /* 房源结果页：根据 URL 查询参数（district/beds/budget/type/school）
@@ -75,38 +75,14 @@ export default function V8Listings() {
     activeSchool ? activeSchool.label : null
   ].filter(Boolean)
 
-  const featured = c.v8?.featured || {}
-
   const renderCard = ({ p, index }, seq) => (
-    <button
-      type="button"
+    <PropertyQuadCard
       key={`${p.code}-${index}`}
-      className="v8-fcard"
-      onClick={() => openProperty(index, 'v8')}
-    >
-      <span className="v8-fcard__media">
-        <SmartImage src={p.img} alt="" />
-      </span>
-      <span className="v8-fcard__body">
-        <span className="v8-fcard__top">
-          <span className="v8-fcard__no">NO.{String(seq).padStart(2, '0')}</span>
-          <span className="v8-fcard__price">
-            {p.price}
-            <small>{featured.perMonth}</small>
-          </span>
-        </span>
-        <span className="v8-fcard__name">{p.district}</span>
-        <span className="v8-fcard__sub">
-          <i aria-hidden="true" />
-          <span className="v8-fcard__sub-t">
-            {[p.br, p.metro].filter(Boolean).join(' · ')}
-          </span>
-        </span>
-      </span>
-      <span className="v8-fcard__go" aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-      </span>
-    </button>
+      p={p}
+      seq={seq}
+      lang={lang}
+      onOpen={() => openProperty(index, 'v8')}
+    />
   )
 
   return (
