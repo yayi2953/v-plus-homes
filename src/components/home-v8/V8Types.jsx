@@ -21,9 +21,8 @@ export default function V8Types() {
 
   const pick = (key, i) => {
     setActive(i)
-    // 与 Navbar 同一事件契约：Discover 监听后切到该户型
-    window.dispatchEvent(new CustomEvent('ici:switch-tab', { detail: key }))
-    document.getElementById('listings')?.scrollIntoView({ behavior: 'smooth' })
+    // 不再跳转 /listings：通知首页内嵌展示区（V8TypeResults）展开该类型房源并滚动到位
+    window.dispatchEvent(new CustomEvent('v8:show-type', { detail: { type: key } }))
   }
 
   return (

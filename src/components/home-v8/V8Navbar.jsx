@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
-import { navigate, switchLang } from '../../lib/router.mjs'
+import { navigate, switchLang, parsePath } from '../../lib/router.mjs'
 import { useContact } from '../ici/contactContext.jsx'
 import { Mail, Phone, WhatsApp, WeChat } from '../ici/Icons.jsx'
 import LegalModal from '../ici/LegalModal.jsx'
@@ -110,6 +110,11 @@ export default function V8Navbar({ solid = false }) {
       return
     }
     e?.preventDefault()
+    // 「房源」主链接：与其他类型入口一致，就地展开全部房源，不再跳独立列表页
+    if (m.href === '/listings') {
+      goType('all')
+      return
+    }
     if (m.href && m.href.startsWith('/')) {
       navigate(m.href)
       closeMenu()
@@ -128,26 +133,44 @@ export default function V8Navbar({ solid = false }) {
     document.activeElement?.blur()
   }
 
+  // 类型展示：不再跳转 /listings —— 首页内嵌展示区（V8TypeResults）就地展开；
+  // 当前不在首页时带 ?type=（&school=）回首页，由展示区挂载时读取并展开
+  const goType = (type, school) => {
+    const { bare } = parsePath(window.location.pathname)
+    if (bare === '/') {
+      window.dispatchEvent(new CustomEvent('v8:show-type', { detail: { type, school } }))
+    } else {
+      const params = new URLSearchParams()
+      params.set('type', type)
+      if (school) params.set('school', school)
+      navigate(`/?${params.toString()}`)
+    }
+    closeMenu()
+    document.activeElement?.blur()
+  }
+
   const pickSub = (s, e) => {
     e?.preventDefault()
-    const params = new URLSearchParams()
     const key = typeof s.key === 'string' ? s.key : ''
     const isStudentMenu = key === 'student' || key === 'student-all' || key.startsWith('student-')
     if (isStudentMenu) {
       // 学生公寓菜单：key 形如 student / student-all / student-<校区>
-      params.set('type', 'student')
-      if (key !== 'student' && key !== 'student-all') params.set('school', key)
+      goType('student', key !== 'student' && key !== 'student-all' ? key : undefined)
     } else if (s.event) {
       // 四大类（豪华/普通/学生/城市）：event 即类型 key
-      params.set('type', s.event)
+      goType(s.event)
     } else if (s.href && s.href.startsWith('/')) {
       navigate(s.href)
       closeMenu()
-      return
+      document.activeElement?.blur()
+    } else {
+      goType('all')
     }
-    navigate(`/listings${params.toString() ? `?${params}` : ''}`)
-    closeMenu()
-    document.activeElement?.blur()
+  }
+
+  const showAll = (e) => {
+    e?.preventDefault()
+    goType('all')
   }
 
   const book = () => {
@@ -190,7 +213,7 @@ export default function V8Navbar({ solid = false }) {
                             <a
                               className="v8-nav__mega-item"
                               key={s.key}
-                              href={s.event ? '#listings' : (s.href || m.href)}
+                              href={s.event ? '#type-results' : (s.href || m.href)}
                               target={external ? '_blank' : undefined}
                               rel={external ? 'noopener noreferrer' : undefined}
                               onClick={(e) => s.event ? pickSub(s, e) : go({ href: s.href || m.href }, e)}
@@ -214,7 +237,7 @@ export default function V8Navbar({ solid = false }) {
                       <span className="v8-nav__mega-side">
                         {m.subs[0]?.event ? (
                           <>
-                            <a className="v8-nav__mega-sidelink" href="#listings" onClick={(e) => go({ href: '/listings' }, e)}>
+                            <a className="v8-nav__mega-sidelink" href="#type-results" onClick={showAll}>
                               <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '全部房源' : 'All Listings'}</span>
                               <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '浏览广州全部精选房源' : 'Browse all curated homes'}</span>
                             </a>
@@ -233,7 +256,7 @@ export default function V8Navbar({ solid = false }) {
                               <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '预约咨询' : 'Book a Consultation'}</span>
                               <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '根据需求定制服务方案' : 'Tailored service to your needs'}</span>
                             </a>
-                            <a className="v8-nav__mega-sidelink" href="#listings" onClick={(e) => go({ href: '/listings' }, e)}>
+                            <a className="v8-nav__mega-sidelink" href="#type-results" onClick={showAll}>
                               <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '浏览房源' : 'Browse Listings'}</span>
                               <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '查看精选在售房源' : 'Explore curated homes'}</span>
                             </a>
@@ -433,7 +456,7 @@ export default function V8Navbar({ solid = false }) {
                           <a
                             key={s.key || s.label}
                             className="v8-drawer__link v8-drawer__link--sub"
-                            href={s.event ? '#listings' : (s.href || m.href)}
+                            href={s.event ? '#type-results' : (s.href || m.href)}
                             onClick={(e) => s.event ? pickSub(s, e) : go({ href: s.href || m.href }, e)}
                           >
                             {s.label}

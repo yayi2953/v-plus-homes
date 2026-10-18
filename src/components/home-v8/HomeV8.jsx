@@ -4,6 +4,7 @@ import { useRise } from './useRise.mjs'
 import V8Hero from './V8Hero.jsx'
 import V8Stats from './V8Stats.jsx'
 import V8Types from './V8Types.jsx'
+import V8TypeResults from './V8TypeResults.jsx'
 import V8Process from './V8Process.jsx'
 import V8Bubbles from './V8Bubbles.jsx'
 import V8CTA from './V8CTA.jsx'
@@ -23,6 +24,8 @@ export default function HomeV8() {
         {sections.hero !== false && <V8Hero />}
         <V8Stats />
         {sections.types !== false && <V8Types />}
+        {/* 点击类型后就地展开的房源展示区（不跳转 /listings） */}
+        <V8TypeResults />
         {sections.why !== false && <V8Process />}
         {sections.bubbles !== false && <V8Bubbles />}
         {sections.getstarted !== false && <V8CTA />}

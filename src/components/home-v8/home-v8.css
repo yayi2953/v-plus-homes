@@ -1161,6 +1161,30 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-listings__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
 .v8-listings-page .v8-featured-empty { min-height: 320px; }
 
+/* ---------- 首页内嵌类型房源展示区（点击类型后就地展开） ---------- */
+.v8-typeres__head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 24px; margin-bottom: 28px;
+}
+.v8-typeres__title {
+  margin: 0; font-size: clamp(24px, 3vw, 34px); font-weight: 600;
+  letter-spacing: -.02em; color: var(--v8-ink, #16161a);
+}
+.v8-typeres__count {
+  margin: 10px 0 0; font-size: 14px; color: var(--v8-muted, #76767d);
+  font-variant-numeric: tabular-nums;
+}
+.v8-typeres__clear {
+  flex: none; padding: 0; border: 0; background: none; cursor: pointer;
+  font-size: 13.5px; color: var(--v8-muted, #76767d);
+  text-decoration: underline; text-underline-offset: 3px;
+  transition: color .2s;
+}
+.v8-typeres__clear:hover { color: var(--v8-ink, #16161a); }
+@media (max-width: 768px) {
+  .v8-typeres__head { flex-direction: column; align-items: flex-start; gap: 10px; }
+}
+
 @media (max-width: 768px) {
   .v8-listings { padding: 96px 16px 64px; }
   .v8-listings__title { font-size: 24px; }
