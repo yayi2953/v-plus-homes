@@ -1125,13 +1125,13 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   --v8n-line: rgba(0, 0, 0, .08);
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   height: 72px;
-  background: rgba(255, 255, 255, .96);
+  background: rgba(245, 246, 248, .96);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
   backdrop-filter: saturate(180%) blur(12px);
   font-family: "Universal Sans Text", "PingFang SC", "Microsoft YaHei", -apple-system, Arial, sans-serif;
 }
 .v8-nav.is-solid {
-  background: rgba(255, 255, 255, .98);
+  background: rgba(245, 246, 248, .98);
 }
 /* v8 导航用于地图/指南页（贴顶 64px，区别于经典版悬浮导航）：收紧这两个页面的顶部留白。
    :has 不被老内核识别时自动回退原留白，不影响功能 */
