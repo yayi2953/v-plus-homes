@@ -74,7 +74,6 @@ export function IciI18nProvider({ children }) {
             area: parseInt(l.area, 10) || 0,
             amenities: [],
             district: [l.address, l.city].filter(Boolean).join(' · ') || l.city || '',
-            city: l.city || '',
             districtKey: null,
             price: `¥${l.price}`,
             img: imgs[0] || '/images/listing-family.jpg',
@@ -90,6 +89,58 @@ export function IciI18nProvider({ children }) {
   }, [])
 
   useEffect(() => { loadRealListings() }, [loadRealListings])
+
+  // vivagz.com 开放房源 API（公开无需鉴权，边缘缓存 5 分钟）
+  // 响应字段与站内房源模型一致，按语言拉取（API 仅支持 zh/en，日语回退中文数据）
+  const [vivaListings, setVivaListings] = useState([])
+  const VIVA_TTL = 5 * 60 * 1000
+  const vivaCache = new Map() // lang -> { ts, items }
+  const loadVivaListings = useCallback(async (cur) => {
+    const l = cur === 'en' ? 'en' : 'zh'
+    const hit = vivaCache.get(l)
+    if (hit && Date.now() - hit.ts < VIVA_TTL) {
+      setVivaListings(hit.items)
+      return
+    }
+    try {
+      const res = await fetch(`https://www.vivagz.com/api/properties?lang=${l}&limit=200`)
+      if (!res.ok) throw new Error(String(res.status))
+      const data = await res.json()
+      const items = (data.items || []).map((p) => ({
+        code: p.code,
+        br: p.br,
+        beds: p.beds,
+        baths: p.baths ?? 1,
+        area: p.area ?? 0,
+        amenities: Array.isArray(p.amenities) ? p.amenities : [],
+        district: p.district,
+        districtKey: p.districtKey || null,
+        schoolKeys: Array.isArray(p.schoolKeys) ? p.schoolKeys : [],
+        schoolKey: p.schoolKey || null,
+        metro: p.metro || '',
+        price: p.price,
+        fx: p.fx || '',
+        img: p.img,
+        gallery: Array.isArray(p.gallery) ? p.gallery : [],
+        categories: Array.isArray(p.categories) && p.categories.length ? p.categories : ['standard'],
+        intro: p.intro,
+        locationText: p.locationText,
+        lat: p.lat,
+        lng: p.lng,
+        address: p.address,
+        priceValue: p.priceValue,
+        copyHidden: !!p.copyHidden,
+        _viva: true
+      }))
+      vivaCache.set(l, { ts: Date.now(), items })
+      setVivaListings(items)
+    } catch {
+      // 拉取失败：保留上一次数据（如有），否则留空
+      if (hit) setVivaListings(hit.items)
+    }
+  }, [])
+
+  useEffect(() => { loadVivaListings(lang) }, [lang, loadVivaListings])
 
   // 应用图片覆盖项：立即应用 + 监听 DOM 变化持续再应用
   const imgMap = useMemo(() => collectImageOverrides(overrides), [overrides])
@@ -110,8 +161,9 @@ export function IciI18nProvider({ children }) {
         ? p.schoolKeys : (p.schoolKey ? [p.schoolKey] : [])
     }))
 
-    // 真实房源置顶（index 全局唯一，详情页按 index 直接打开；首页精选优先展示真实房源）
-    c.properties = [...realListings, ...c.properties]
+    // 真实房源置顶（后台管理房源优先），其后为 vivagz 开放 API 房源；
+    // 模拟房源已移除，index 全局唯一，详情页按 index 直接打开
+    c.properties = [...realListings, ...vivaListings]
 
     // 应用后端文案覆盖项
     for (const [key, val] of Object.entries(overrides)) {
@@ -133,7 +185,7 @@ export function IciI18nProvider({ children }) {
       remoteReady: true,
       reloadTexts: loadOverrides
     }
-  }, [lang, overrides, realListings, loadOverrides])
+  }, [lang, overrides, realListings, vivaListings, loadOverrides])
 
   return <IciI18nContext.Provider value={value}>{children}</IciI18nContext.Provider>
 }

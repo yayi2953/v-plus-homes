@@ -223,18 +223,7 @@ const en = {
     emptyCombo: 'No homes of this type in this district yet — clear the type filter or pick another district.',
     emptySchool: 'Homes near this campus are coming soon — please check back shortly.'
   },
-  properties: [
-    { code: 'V PLUS-012', br: '4 BR', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Wushan', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
-    { code: 'FLEX-004', br: '5 BR', baths: 2, area: 156, amenities: ['furnished', 'wifi', 'ac', 'workspace', 'elevator', 'gym', 'tv', 'balcony', 'metro'], district: 'Haizhu, Guangzhou', districtKey: 'haizhu', metro: 'Line 8 · Sun Yat-sen Univ.', price: '¥4,150', fx: '$573 / €527', img: '/images/listing-urban2.jpg', categories: ['standard'] },
-    { code: 'V PLUS-014', br: '5 BR', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Shipaiqiao', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
-    { code: 'V PLUS-009', br: '4 BR', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: 'Huangpu, Guangzhou', districtKey: 'huangpu', metro: 'Line 5 · Dashadong', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
-    { code: 'V PLUS-010', br: '4 BR', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: 'Yuexiu, Guangzhou', districtKey: 'yuexiu', metro: 'Line 1/2 · Gongyuanqian', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
-    { code: 'FLEX-026', br: '4 BR', baths: 2, area: 132, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'elevator', 'workspace', 'gym', 'metro'], district: 'Baiyun, Guangzhou', districtKey: 'baiyun', schoolKey: 'gdufs-baiyun', metro: 'Line 2 · Jiangxia', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-urban1.jpg', categories: ['student'] },
-    { code: 'FLEX-006', br: '4 BR', baths: 1, area: 96, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: 'Panyu, Guangzhou', districtKey: 'panyu', schoolKey: 'scut-intl', metro: 'Line 4 · HE Mega Center North', price: '¥4,050', fx: '$559 / €514', img: '/images/listing-student1.jpg', categories: ['student'] },
-    { code: 'FLEX-036', br: '6 BR', baths: 3, area: 185, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: 'Tianhe, Guangzhou', districtKey: 'tianhe', metro: 'Line 3 · Wushan', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-student2.jpg', categories: ['standard'] },
-    { code: 'FLEX-041', br: '3 BR', baths: 1, area: 102, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: 'Zengcheng, Guangzhou', districtKey: 'zengcheng', metro: 'Line 21 · Zengcheng Square', price: '¥2,900', fx: '$400 / €368', img: '/images/listing-zengcheng.jpg', categories: ['standard'] },
-    { code: 'FLEX-048', br: '2 BR', baths: 1, area: 68, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: 'Zengcheng, Guangzhou', districtKey: 'zengcheng', schoolKey: null, metro: 'Line 21 · Fenggang', price: '¥2,200', fx: '$304 / €279', img: '/images/listing-zengcheng2.jpg', categories: ['student'] }
-  ],
+  properties: [],
   detail: {
     back: 'Back to all homes',
     overview: 'Overview',
@@ -640,18 +629,7 @@ const zh = {
     emptyCombo: '当前区域暂无此类房源，可清除类型筛选或切换其他区域。',
     emptySchool: '该校区周边房源即将上线，敬请期待。'
   },
-  properties: [
-    { code: 'V PLUS-012', br: '4 室', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 五山站', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
-    { code: 'FLEX-004', br: '5 室', baths: 2, area: 156, amenities: ['furnished', 'wifi', 'ac', 'workspace', 'elevator', 'gym', 'tv', 'balcony', 'metro'], district: '广州 · 海珠区', districtKey: 'haizhu', metro: '8 号线 · 中大站', price: '¥4,150', fx: '$573 / €527', img: '/images/listing-urban2.jpg', categories: ['standard'] },
-    { code: 'V PLUS-014', br: '5 室', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 石牌桥站', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
-    { code: 'V PLUS-009', br: '4 室', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: '广州 · 黄埔区', districtKey: 'huangpu', metro: '5 号线 · 大沙东站', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
-    { code: 'V PLUS-010', br: '4 室', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: '广州 · 越秀区', districtKey: 'yuexiu', metro: '1/2 号线 · 公园前站', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
-    { code: 'FLEX-026', br: '4 室', baths: 2, area: 132, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'elevator', 'workspace', 'gym', 'metro'], district: '广州 · 白云区', districtKey: 'baiyun', schoolKey: 'gdufs-baiyun', metro: '2 号线 · 江夏站', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-urban1.jpg', categories: ['student'] },
-    { code: 'FLEX-006', br: '4 室', baths: 1, area: 96, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: '广州 · 番禺区', districtKey: 'panyu', schoolKey: 'scut-intl', metro: '4 号线 · 大学城北站', price: '¥4,050', fx: '$559 / €514', img: '/images/listing-student1.jpg', categories: ['student'] },
-    { code: 'FLEX-036', br: '6 室', baths: 3, area: 185, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '广州 · 天河区', districtKey: 'tianhe', metro: '3 号线 · 五山站', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-student2.jpg', categories: ['standard'] },
-    { code: 'FLEX-041', br: '3 室', baths: 1, area: 102, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '广州 · 增城区', districtKey: 'zengcheng', metro: '21 号线 · 增城广场站', price: '¥2,900', fx: '$400 / €368', img: '/images/listing-zengcheng.jpg', categories: ['standard'] },
-    { code: 'FLEX-048', br: '2 室', baths: 1, area: 68, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: '广州 · 增城区', districtKey: 'zengcheng', schoolKey: null, metro: '21 号线 · 凤岗站', price: '¥2,200', fx: '$304 / €279', img: '/images/listing-zengcheng2.jpg', categories: ['student'] }
-  ],
+  properties: [],
   detail: {
     back: '返回房源列表',
     overview: '概览',
@@ -1055,18 +1033,7 @@ const ja = {
     emptyCombo: 'このエリアには現在このタイプの物件がありません。タイプ絞り込みを解除するか、別のエリアをお選びください。',
     emptySchool: 'このキャンパス周辺の物件は近日公開予定です。しばらくお待ちください。'
   },
-  properties: [
-    { code: 'V PLUS-012', br: '4LDK', baths: 2, area: 128, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '広州・天河区', districtKey: 'tianhe', metro: '3号線・五山駅', price: '¥5,900', fx: '$814 / €749', img: '/images/listing-family.jpg', categories: ['luxury'] },
-    { code: 'FLEX-004', br: '5LDK', baths: 2, area: 156, amenities: ['furnished', 'wifi', 'ac', 'workspace', 'elevator', 'gym', 'tv', 'balcony', 'metro'], district: '広州・海珠区', districtKey: 'haizhu', metro: '8号線・中山大学駅', price: '¥4,150', fx: '$573 / €527', img: '/images/listing-urban2.jpg', categories: ['standard'] },
-    { code: 'V PLUS-014', br: '5LDK', baths: 2, area: 148, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'elevator', 'metro'], district: '広州・天河区', districtKey: 'tianhe', metro: '3号線・石牌橋駅', price: '¥4,500', fx: '$621 / €572', img: '/images/listing-loft.jpg', categories: ['city'] },
-    { code: 'V PLUS-009', br: '4LDK', baths: 2, area: 135, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'gym', 'balcony', 'metro'], district: '広州・黄埔区', districtKey: 'huangpu', metro: '5号線・大沙東駅', price: '¥3,850', fx: '$531 / €489', img: '/images/listing-penthouse.jpg', categories: ['luxury'] },
-    { code: 'V PLUS-010', br: '4LDK', baths: 1, area: 118, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'workspace', 'tv', 'metro'], district: '広州・越秀区', districtKey: 'yuexiu', metro: '1/2号線・公園前駅', price: '¥4,650', fx: '$642 / €591', img: '/images/listing-studio.jpg', categories: ['city'] },
-    { code: 'FLEX-026', br: '4LDK', baths: 2, area: 132, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'elevator', 'workspace', 'gym', 'metro'], district: '広州・白云区', districtKey: 'baiyun', schoolKey: 'gdufs-baiyun', metro: '2号線・江夏駅', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-urban1.jpg', categories: ['student'] },
-    { code: 'FLEX-006', br: '4LDK', baths: 1, area: 96, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: '広州・番禺区', districtKey: 'panyu', schoolKey: 'scut-intl', metro: '4号線・大学城北駅', price: '¥4,050', fx: '$559 / €514', img: '/images/listing-student1.jpg', categories: ['student'] },
-    { code: 'FLEX-036', br: '6LDK', baths: 3, area: 185, amenities: ['furnished', 'wifi', 'ac', 'heating', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '広州・天河区', districtKey: 'tianhe', metro: '3号線・五山駅', price: '¥4,200', fx: '$580 / €533', img: '/images/listing-student2.jpg', categories: ['standard'] },
-    { code: 'FLEX-041', br: '3LDK', baths: 1, area: 102, amenities: ['furnished', 'wifi', 'ac', 'kitchen', 'washer', 'elevator', 'tv', 'metro'], district: '広州・增城区', districtKey: 'zengcheng', metro: '21号線・増城広場駅', price: '¥2,900', fx: '$400 / €368', img: '/images/listing-zengcheng.jpg', categories: ['standard'] },
-    { code: 'FLEX-048', br: '2DK', baths: 1, area: 68, amenities: ['furnished', 'wifi', 'ac', 'washer', 'workspace', 'elevator', 'metro'], district: '広州・增城区', districtKey: 'zengcheng', schoolKey: null, metro: '21号線・鳳崗駅', price: '¥2,200', fx: '$304 / €279', img: '/images/listing-zengcheng2.jpg', categories: ['student'] }
-  ],
+  properties: [],
   detail: {
     back: '物件一覧に戻る',
     overview: '概要',
