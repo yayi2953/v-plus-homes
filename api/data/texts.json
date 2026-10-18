@@ -52,5 +52,14 @@
   "v8.hero.s3Lede": {
     "zh": "云台花园位于白云山入口处，是一座大型的花卉花园，被誉为“花城之珠”。",
     "en": "Yuntai Garden is a large floral garden at the entrance of Baiyun Mountain, known as the “Pearl of the Flower City.”"
+  },
+  "img:/images/photographer.jpg": {
+    "url": "https://raw.githubusercontent.com/yayi2953/v-plus-homes/main/public/images/uploads/mvdybp7w-29daa31d0a13c905144a30fe6b1f1af0.jpg",
+    "posX": 72.44438628631248,
+    "posY": 0,
+    "scale": 1.3,
+    "posXm": 50,
+    "posYm": 50,
+    "scaleM": 1
   }
 }
