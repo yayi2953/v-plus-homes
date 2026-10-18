@@ -267,12 +267,18 @@
           "from": "admin",
           "text": "1111",
           "at": 1792344998749
+        },
+        {
+          "id": "m-mve42f5r-eujg37",
+          "from": "user",
+          "text": "【物件問い合わせ】\nVIVA0001 · 广州 · 海珠区\n3号线-广州塔\n珠江帝景\n間取り: 三房两厅  ·  バスルーム: 3バス  ·  専有面積: 238 m²\n家賃: 26,800～ (≈ 3,970$)\nhttps://www.vplushomes.com/ja/properties/VIVA0001\nこんにちは、この物件について相談したいです。内見を手配してください。",
+          "at": 1792345220415
         }
       ],
       "lastReadAdmin": 1792344987004,
-      "lastReadUser": 1792344818110,
+      "lastReadUser": 1792345220415,
       "createdAt": 1792340820343,
-      "updatedAt": 1792344998749
+      "updatedAt": 1792345220415
     }
   ]
 }
