@@ -107,12 +107,18 @@
           "from": "user",
           "text": "滚底测试",
           "at": 1792342238677
+        },
+        {
+          "id": "m-mve2cpba-9wejy9",
+          "from": "user",
+          "text": "押金和付款方式是什么？",
+          "at": 1792342340902
         }
       ],
       "lastReadAdmin": 1792340983789,
-      "lastReadUser": 1792342238677,
+      "lastReadUser": 1792342340902,
       "createdAt": 1792340490629,
-      "updatedAt": 1792342238677
+      "updatedAt": 1792342340902
     },
     {
       "id": "c-mve1g41j-xdxz6a",
