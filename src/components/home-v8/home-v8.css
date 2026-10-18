@@ -449,7 +449,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-region:last-child { margin-bottom: 0; }
 /* 区域大图卡片：宽幅 banner，左下角区域名/副标题/起价/查看按钮 */
 .v8-region__banner {
-  position: relative; border-radius: 18px; overflow: hidden;
+  position: relative; border-radius: 4px; overflow: hidden;
   background: #eef0f2; box-shadow: inset 0 0 0 1px rgba(22, 22, 26, .06);
 }
 .v8-region__banner::before { content: ""; display: block; padding-top: 34%; }
@@ -506,8 +506,8 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   display: flex; flex-direction: column; align-items: stretch;
   padding: 0; text-align: left; font: inherit; color: inherit;
   background: #fff; border: 0;
-  /* 图片铺满卡片上/左/右；卡片下方（底部）不采用圆角 */
-  border-radius: 16px 16px 0 0;
+  /* 微圆角统一（四角 4px）；图片仍铺满卡片上/左/右 */
+  border-radius: 4px;
   overflow: hidden;
   cursor: pointer; min-width: 0; scroll-snap-align: start;
   box-shadow: 0 2px 10px rgba(22, 22, 26, .06);
