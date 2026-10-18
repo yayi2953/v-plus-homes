@@ -527,14 +527,14 @@
   white-space: pre-wrap;
 }
 .v8-cw__row--me .v8-cw__bubble p { color: #fff; }
-.v8-cw__bubble time {
-  display: block;
-  margin-top: 3px;
-  font-size: 10px;
+
+/* 居中时间分隔标签 */
+.v8-cw__time {
+  text-align: center;
+  font-size: 11px;
   color: #9ca3af;
-  text-align: right;
+  margin-bottom: -5px;
 }
-.v8-cw__row--me .v8-cw__bubble time { color: rgba(255, 255, 255, .55); }
 .v8-cw__inputbar {
   display: flex;
   gap: 10px;

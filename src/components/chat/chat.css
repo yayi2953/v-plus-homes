@@ -286,14 +286,14 @@
   white-space: pre-wrap;
 }
 .v8-chat__row--me .v8-chat__bubble p { color: #fff; }
-.v8-chat__bubble time {
-  display: block;
-  margin-top: 4px;
-  font-size: 10.5px;
+
+/* 居中时间分隔标签 */
+.v8-chat__time {
+  text-align: center;
+  font-size: 11px;
   color: #9aa0a6;
-  text-align: right;
+  margin-bottom: -6px;
 }
-.v8-chat__row--me .v8-chat__bubble time { color: rgba(255, 255, 255, 0.65); }
 .v8-chat__err {
   margin: 0 auto;
   font-size: 12px;

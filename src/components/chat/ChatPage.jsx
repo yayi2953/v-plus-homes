@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 import { useAuth } from '../../contexts/AuthContext.jsx'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate } from '../../lib/router.mjs'
@@ -335,15 +335,20 @@ export default function ChatPage() {
                 <span className="v8-chat__promo-sub">{T.promoSub}</span>
               </button>
 
-              {/* 会话消息 */}
-              {messages.map((m) => (
-                <div key={m.id} className={`v8-chat__row v8-chat__row--${m.from === 'user' ? 'me' : 'agent'}`}>
-                  <div className="v8-chat__bubble">
-                    <p>{m.text}</p>
-                    <time>{fmtTime(m.at, lang)}</time>
-                  </div>
-                </div>
-              ))}
+              {/* 会话消息（时间以居中分隔标签显示，间隔 ≥3 分钟才出现） */}
+              {messages.map((m, i) => {
+                const showTime = i === 0 || m.at - messages[i - 1].at >= 3 * 60 * 1000
+                return (
+                  <Fragment key={m.id}>
+                    {showTime && <div className="v8-chat__time">{fmtTime(m.at, lang)}</div>}
+                    <div className={`v8-chat__row v8-chat__row--${m.from === 'user' ? 'me' : 'agent'}`}>
+                      <div className="v8-chat__bubble">
+                        <p>{m.text}</p>
+                      </div>
+                    </div>
+                  </Fragment>
+                )
+              })}
               {netErr && <p className="v8-chat__err">{T.loadErr}</p>}
             </div>
 

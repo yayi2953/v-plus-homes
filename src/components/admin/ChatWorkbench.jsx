@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
 
 const POLL_MS = 3000 // 轮询间隔：实时接收用户消息
 
@@ -145,14 +145,19 @@ export default function ChatWorkbench({ authFetch }) {
               {activeChat?.userEmail && <span>{activeChat.userEmail}</span>}
             </header>
             <div className="v8-cw__messages" ref={listRef}>
-              {(activeChat?.messages || []).map((m) => (
-                <div key={m.id} className={`v8-cw__row v8-cw__row--${m.from === 'admin' ? 'me' : 'user'}`}>
-                  <div className="v8-cw__bubble">
-                    <p>{m.text}</p>
-                    <time>{fmtTime(m.at)}</time>
-                  </div>
-                </div>
-              ))}
+              {(activeChat?.messages || []).map((m, i, arr) => {
+                const showTime = i === 0 || m.at - arr[i - 1].at >= 3 * 60 * 1000
+                return (
+                  <Fragment key={m.id}>
+                    {showTime && <div className="v8-cw__time">{fmtTime(m.at)}</div>}
+                    <div className={`v8-cw__row v8-cw__row--${m.from === 'admin' ? 'me' : 'user'}`}>
+                      <div className="v8-cw__bubble">
+                        <p>{m.text}</p>
+                      </div>
+                    </div>
+                  </Fragment>
+                )
+              })}
               {activeChat && activeChat.messages.length === 0 && (
                 <p className="v8-cw__none">{t('该会话暂无消息', 'No messages in this chat')}</p>
               )}
