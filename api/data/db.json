@@ -59,6 +59,24 @@
       "lastReadUser": 1792340590398,
       "createdAt": 1792340490629,
       "updatedAt": 1792340590398
+    },
+    {
+      "id": "c-mve1g41j-xdxz6a",
+      "userId": "u-admin",
+      "userName": "管理员",
+      "userEmail": "admin@v-plus.house",
+      "messages": [
+        {
+          "id": "m-mve1g41j-5w7tcp",
+          "from": "user",
+          "text": "你好",
+          "at": 1792340820343
+        }
+      ],
+      "lastReadAdmin": 0,
+      "lastReadUser": 1792340820343,
+      "createdAt": 1792340820343,
+      "updatedAt": 1792340820343
     }
   ]
 }
