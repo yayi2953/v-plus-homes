@@ -55,10 +55,11 @@ export default function V8ServiceCards({ lang = 'zh' }) {
           </div>
         </div>
 
-        {/* 列 3：上卡(50) + 矮卡(50)，对勾图形 */}
+        {/* 列 3：上卡(50) 文案置顶+顾问半身照，矮卡(50) 对勾图形 */}
         <div className="v8-svc__col">
-          <div className="v8-svc__card v8-svc__card--img">
+          <div className="v8-svc__card v8-svc__card--img v8-svc__card--person">
             <span className="v8-svc__card-t">{t.c3a}</span>
+            <span className="v8-svc__imgbox"><img src="/images/consultant.jpg" alt="" loading="lazy" /></span>
           </div>
           <div className="v8-svc__card v8-svc__card--mini">
             <span className="v8-svc__card-t">{t.c3b}</span>

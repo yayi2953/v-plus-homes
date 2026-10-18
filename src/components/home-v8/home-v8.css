@@ -565,6 +565,11 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 /* 无图片版：图卡仅剩标题，垂直居中 */
 .v8-svc__card--img { justify-content: center; }
 .v8-svc__card--img .v8-svc__card-t { padding: 0; }
+/* 顾问卡：文案置顶，下方填充半身照 */
+.v8-svc__card--person { justify-content: flex-start; }
+.v8-svc__card--person .v8-svc__card-t { padding: 16px 12px 0; z-index: 1; }
+.v8-svc__imgbox { position: relative; flex: 1; min-height: 0; margin-top: 12px; }
+.v8-svc__imgbox img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .v8-svc__card-t {
   display: block; padding: 16px 12px 12px; font-size: 14px; font-weight: 600;
   letter-spacing: -.01em; color: rgba(0, 0, 0, .85);
