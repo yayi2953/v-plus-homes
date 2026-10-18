@@ -89,12 +89,18 @@
           "from": "admin",
           "text": "测试2222",
           "at": 1792341060455
+        },
+        {
+          "id": "m-mve1rnsm-9r6soz",
+          "from": "user",
+          "text": "请介绍一下当前的房源信息",
+          "at": 1792341359158
         }
       ],
       "lastReadAdmin": 1792340987064,
-      "lastReadUser": 1792340995018,
+      "lastReadUser": 1792341359158,
       "createdAt": 1792340820343,
-      "updatedAt": 1792341060455
+      "updatedAt": 1792341359158
     }
   ]
 }
