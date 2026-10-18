@@ -451,8 +451,8 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 /* 展示区 section 清除默认大间距，使精选条紧贴 Hero 大图下方 */
 .v8-typeres.v8-section { padding-top: 0; }
 .v8-fstrip {
-  margin: 0 auto 56px; padding: 36px clamp(16px, 4vw, 56px) 48px;
-  background: #f5f6f8;
+  margin: 0 auto 56px; padding: 36px clamp(16px, 4vw, 56px) 0;
+  background: none;
 }
 .v8-fstrip__title {
   margin: 0 0 22px; font-size: clamp(19px, 2.2vw, 25px); font-weight: 700;
