@@ -2935,6 +2935,7 @@ button.extras-card--more:focus-visible .extras-card__pill--solid svg {
 .pd-cta-group .pd-cta {
   width: auto;
   min-width: 0;
+  box-sizing: border-box;
 }
 .pd-cta--main {
   flex: 2 1 0;
