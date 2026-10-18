@@ -15,6 +15,7 @@ const GITHUB_TEXTS_PATH = 'api/data/texts.json'
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''
 const GH_API = (p) => `https://api.github.com/repos/${GITHUB_REPO}/contents/${p}`
 const DB_TTL = 10_000 // 读缓存 10 秒；写操作始终先拉远端最新数据，不受缓存影响
+const CHAT_TTL = 2_000 // 聊天轮询强制刷新的最小间隔（节流，省 GitHub API 配额）
 
 // 默认管理员账号
 const ADMIN_EMAIL = 'admin@v-plus.house'
@@ -26,6 +27,7 @@ const SEED = {
   listings: [],
   messages: [],
   services: [],
+  chats: [],
   texts: {}
 }
 
@@ -132,8 +134,12 @@ async function pushDb(db) {
 }
 
 // 首次调用预热：把远端数据库加载进内存缓存
-export async function initDb() {
-  if (cache && Date.now() - cacheTime < DB_TTL) return cache
+// force=true：聊天轮询用的强制刷新（带 CHAT_TTL 节流，避免烧 GitHub API 配额）
+export async function initDb(force = false) {
+  if (cache) {
+    const ttl = force ? CHAT_TTL : DB_TTL
+    if (Date.now() - cacheTime < ttl) return cache
+  }
   const remote = await fetchRemoteDb()
   if (remote) {
     if (remote.db) {
@@ -150,6 +156,7 @@ export async function initDb() {
     // GitHub 不可用：降级本地 /tmp
     cache = loadLocal()
   }
+  if (!Array.isArray(cache.chats)) cache.chats = [] // 旧数据兼容
   seedAdmin(cache)
   cacheTime = Date.now()
   saveLocal(cache)
@@ -178,12 +185,14 @@ async function mutateDb(fn, retries = 3) {
       db = structuredClone(cache || loadLocal()) // GitHub 不可用时基于内存降级
     }
     const result = fn(db)
+    if (!Array.isArray(db.chats)) db.chats = []
     seedAdmin(db)
     if (await pushDb(db)) return result
   }
   // 重试耗尽：至少写入本地/内存，尽力而为
   const db = structuredClone(cache || loadLocal())
   const result = fn(db)
+  if (!Array.isArray(db.chats)) db.chats = []
   seedAdmin(db)
   saveLocal(db)
   return result
@@ -357,6 +366,61 @@ async function deleteMessage(id) {
   })
 }
 
+// ---------- 在线客服（会话存 db.chats，用户/管理员通过轮询收发） ----------
+function getChats() {
+  const db = cache || loadLocal()
+  if (!Array.isArray(db.chats)) db.chats = []
+  return db.chats
+}
+
+// 用户发消息：无会话则自动创建，同时视为用户端已读
+async function userSendMessage(userId, userName, userEmail, text) {
+  return mutateDb((db) => {
+    let chat = db.chats.find((c) => c.userId === userId)
+    if (!chat) {
+      chat = {
+        id: genId('c'),
+        userId,
+        userName,
+        userEmail,
+        messages: [],
+        lastReadAdmin: 0,
+        lastReadUser: Date.now(),
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      }
+      db.chats.push(chat)
+    }
+    const msg = { id: genId('m'), from: 'user', text, at: Date.now() }
+    chat.messages.push(msg)
+    chat.updatedAt = msg.at
+    chat.lastReadUser = msg.at
+    return chat
+  })
+}
+
+// 管理员回复
+async function adminReplyMessage(chatId, text) {
+  return mutateDb((db) => {
+    const chat = db.chats.find((c) => c.id === chatId)
+    if (!chat) return null
+    const msg = { id: genId('m'), from: 'admin', text, at: Date.now() }
+    chat.messages.push(msg)
+    chat.updatedAt = msg.at
+    return chat
+  })
+}
+
+// 管理员打开会话 → 标记用户消息已读（用于会话列表未读徽标）
+async function markChatReadAdmin(chatId) {
+  return mutateDb((db) => {
+    const chat = db.chats.find((c) => c.id === chatId)
+    if (!chat) return null
+    chat.lastReadAdmin = Date.now()
+    return chat
+  })
+}
+
 // ---------- 图片上传（存入仓库 public/images/uploads/，返回 raw 直链） ----------
 async function uploadImageToGitHub(name, dataBase64) {
   if (!GITHUB_TOKEN) throw new Error('未配置 GITHUB_TOKEN')
@@ -384,9 +448,10 @@ async function uploadImageToGitHub(name, dataBase64) {
 
 export {
   genId,
-  getUsers, getListings, getMessages, getServices, getTexts,
+  getUsers, getListings, getMessages, getServices, getTexts, getChats,
   findUserByEmail, createUser,
   createListing, updateListing, deleteListing,
   createMessage, markMessageRead, deleteMessage,
+  userSendMessage, adminReplyMessage, markChatReadAdmin,
   updateTexts, resetTexts, uploadImageToGitHub
 }

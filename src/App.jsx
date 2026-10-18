@@ -15,6 +15,7 @@ const V8Listings = lazy(() => import('./components/home-v8/V8Listings.jsx'))
 const LoginPage = lazy(() => import('./components/auth/LoginPage.jsx'))
 const RegisterPage = lazy(() => import('./components/auth/RegisterPage.jsx'))
 const AdminPage = lazy(() => import('./components/admin/AdminPage.jsx'))
+const ChatPage = lazy(() => import('./components/chat/ChatPage.jsx'))
 
 function Site() {
   const { c, lang, setLang } = useIciI18n()
@@ -23,6 +24,7 @@ function Site() {
   const isListings = route.type === 'listings'
   const isAuth = route.type === 'login' || route.type === 'register'
   const isAdmin = route.type === 'admin'
+  const isChat = route.type === 'chat'
 
   // History API 路由同步
   useEffect(() => {
@@ -50,7 +52,7 @@ function Site() {
     window.scrollTo(0, 0)
   }, [route.type, route.slug])
 
-  const showNav = !isAuth && !isAdmin
+  const showNav = !isAuth && !isAdmin && !isChat
 
   return (
     <div className="ici-page">
@@ -63,6 +65,12 @@ function Site() {
         <main>
           <Suspense fallback={<div style={{ minHeight: '100vh', background: '#f5f6f8' }} />}>
             {route.type === 'login' ? <LoginPage /> : <RegisterPage />}
+          </Suspense>
+        </main>
+      ) : isChat ? (
+        <main>
+          <Suspense fallback={<div style={{ minHeight: '100vh', background: '#f5f6f8' }} />}>
+            <ChatPage />
           </Suspense>
         </main>
       ) : isAdmin ? (

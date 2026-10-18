@@ -1,10 +1,11 @@
 import { sign, verify, hashPassword, verifyPassword } from './lib/auth.js'
 import {
   initDb,
-  getUsers, getListings, getMessages,
+  getUsers, getListings, getMessages, getChats,
   findUserByEmail, createUser,
   createListing, updateListing, deleteListing,
   createMessage, markMessageRead, deleteMessage,
+  userSendMessage, adminReplyMessage, markChatReadAdmin,
   getTexts, updateTexts, resetTexts, uploadImageToGitHub
 } from './lib/store.js'
 
@@ -27,7 +28,9 @@ export default async function handler(req, res) {
 
   try {
     // 预热：从 GitHub 加载数据库到内存（后续读接口走缓存）
-    await initDb()
+    // 聊天轮询路由强制刷新（带 2 秒节流），保证 3 秒轮询能及时收到对方新消息
+    const chatFresh = rel === '/chat' || rel === '/admin/chats'
+    await initDb(chatFresh)
 
     // ---------- Auth ----------
     if (rel === '/auth/register' && req.method === 'POST') {
@@ -40,6 +43,14 @@ export default async function handler(req, res) {
       return me(req, res)
     }
 
+    // ---------- Chat ----------
+    if (rel === '/chat' && req.method === 'GET') {
+      return chatGet(req, res)
+    }
+    if (rel === '/chat/send' && req.method === 'POST') {
+      return chatSend(req, res)
+    }
+
     // ---------- Admin ----------
     if (rel === '/admin/listings') {
       return adminListings(req, res)
@@ -49,6 +60,15 @@ export default async function handler(req, res) {
     }
     if (rel === '/admin/messages') {
       return adminMessages(req, res)
+    }
+    if (rel === '/admin/chats') {
+      return adminChats(req, res)
+    }
+    if (rel === '/admin/chats/reply' && req.method === 'POST') {
+      return adminChatReply(req, res)
+    }
+    if (rel === '/admin/chats/read' && req.method === 'POST') {
+      return adminChatRead(req, res)
     }
     if (rel === '/admin/texts') {
       return adminTexts(req, res)
@@ -132,6 +152,75 @@ async function me(req, res) {
   const user = requireAuth(req)
   if (!user) return res.status(401).json({ error: '未登录或登录已过期' })
   return res.status(200).json({ user: { id: user.id, email: user.email, name: user.name, role: user.role } })
+}
+
+// ============ Chat handlers ============
+// 用户端：获取自己的会话（3 秒轮询；入口已按 /chat 强制刷新缓存）
+async function chatGet(req, res) {
+  const user = requireAuth(req)
+  if (!user) return res.status(401).json({ error: '未登录或登录已过期' })
+  const chat = getChats().find((c) => c.userId === user.id)
+  return res.status(200).json({
+    chat: chat
+      ? { id: chat.id, messages: chat.messages, updatedAt: chat.updatedAt }
+      : { id: null, messages: [], updatedAt: 0 }
+  })
+}
+
+// 用户端：发送消息
+async function chatSend(req, res) {
+  const user = requireAuth(req)
+  if (!user) return res.status(401).json({ error: '未登录或登录已过期' })
+  const { text } = req.body || {}
+  const content = String(text || '').trim()
+  if (!content) return res.status(400).json({ error: '消息不能为空' })
+  const chat = await userSendMessage(user.id, user.name, user.email, content.slice(0, 1000))
+  return res.status(201).json({
+    chat: { id: chat.id, messages: chat.messages, updatedAt: chat.updatedAt }
+  })
+}
+
+// 管理端：会话列表（GET /admin/chats?id=xx 返回单会话详情）
+async function adminChats(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  const { id } = req.query || {}
+  if (id) {
+    const chat = getChats().find((c) => c.id === id)
+    if (!chat) return res.status(404).json({ error: '会话不存在' })
+    return res.status(200).json({ chat })
+  }
+  const chats = getChats().map((c) => ({
+    id: c.id,
+    userId: c.userId,
+    userName: c.userName,
+    userEmail: c.userEmail,
+    lastMessage: c.messages[c.messages.length - 1] || null,
+    messageCount: c.messages.length,
+    unread: c.messages.filter((m) => m.from === 'user' && m.at > (c.lastReadAdmin || 0)).length,
+    updatedAt: c.updatedAt
+  }))
+  chats.sort((a, b) => b.updatedAt - a.updatedAt)
+  return res.status(200).json({ chats })
+}
+
+// 管理端：回复
+async function adminChatReply(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  const { chatId, text } = req.body || {}
+  const content = String(text || '').trim()
+  if (!chatId || !content) return res.status(400).json({ error: '缺少 chatId 或消息为空' })
+  const chat = await adminReplyMessage(chatId, content.slice(0, 1000))
+  if (!chat) return res.status(404).json({ error: '会话不存在' })
+  return res.status(201).json({ chat })
+}
+
+// 管理端：标记会话已读（打开会话时调用，清未读徽标）
+async function adminChatRead(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  const { chatId } = req.body || {}
+  if (!chatId) return res.status(400).json({ error: '缺少 chatId' })
+  const chat = await markChatReadAdmin(chatId)
+  return res.status(chat ? 200 : 404).json({ ok: !!chat })
 }
 
 // ============ Admin handlers ============

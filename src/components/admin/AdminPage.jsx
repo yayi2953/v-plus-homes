@@ -3,9 +3,10 @@ import { useAuth } from '../../contexts/AuthContext.jsx'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { navigate } from '../../lib/router.mjs'
 import TextEditor from './TextEditor.jsx'
+import ChatWorkbench from './ChatWorkbench.jsx'
 import './admin.css'
 
-const TABS = ['listings', 'messages', 'users', 'texts']
+const TABS = ['listings', 'messages', 'chat', 'users', 'texts']
 
 const EMPTY_LISTING = {
   title: '', type: 'luxury', price: '', city: '', bedrooms: '', bathrooms: '',
@@ -237,7 +238,7 @@ export default function AdminPage() {
             className={`v8-admin__tab${tab === tb ? ' is-active' : ''}`}
             onClick={() => setTab(tb)}
           >
-            {tb === 'listings' ? t('房源管理', 'Listings') : tb === 'messages' ? t('客户留言', 'Messages') : tb === 'users' ? t('注册用户', 'Users') : t('文案管理', 'Content')}
+            {tb === 'listings' ? t('房源管理', 'Listings') : tb === 'messages' ? t('客户留言', 'Messages') : tb === 'chat' ? t('在线客服', 'Live Chat') : tb === 'users' ? t('注册用户', 'Users') : t('文案管理', 'Content')}
           </button>
         ))}
       </div>
@@ -452,6 +453,8 @@ export default function AdminPage() {
       )}
 
       {tab === 'texts' && <TextEditor authFetch={authFetch} />}
+
+      {tab === 'chat' && <ChatWorkbench authFetch={authFetch} />}
     </div>
   )
 }
