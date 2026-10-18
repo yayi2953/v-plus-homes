@@ -37,7 +37,7 @@ export default function V8ServiceCards({ lang = 'zh' }) {
         <div className="v8-svc__col">
           <div className="v8-svc__card v8-svc__card--img v8-svc__card--photog">
             <span className="v8-svc__card-t">{t.c1a}</span>
-            <span className="v8-svc__imgbox"><img src="/images/photographer.jpg?v=3" alt="" loading="lazy" /></span>
+            <span className="v8-svc__imgbox"><img src="/images/photographer.jpg?v=4" alt="" loading="lazy" /></span>
           </div>
           <div className="v8-svc__card v8-svc__card--mini">
             <span className="v8-svc__card-t">{t.c1b}</span>
