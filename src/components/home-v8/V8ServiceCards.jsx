@@ -71,8 +71,9 @@ export default function V8ServiceCards({ lang = 'zh' }) {
 
         {/* 列 4：高卡(67) + 矮卡(33)，斜体大字图形 */}
         <div className="v8-svc__col">
-          <div className="v8-svc__card v8-svc__card--img">
+          <div className="v8-svc__card v8-svc__card--img v8-svc__card--gift">
             <span className="v8-svc__card-t">{t.c4a}</span>
+            <span className="v8-svc__imgbox"><img src="/images/gift.jpg?v=1" alt="" loading="lazy" /></span>
           </div>
           <div className="v8-svc__card v8-svc__card--mini">
             <span className="v8-svc__card-t">{t.c4b}</span>
