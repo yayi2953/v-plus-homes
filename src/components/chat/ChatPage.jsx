@@ -228,15 +228,18 @@ export default function ChatPage() {
     } catch {
       payload = { text: pending }
     }
-    // 稍等首屏历史消息加载完成，再自动发出问询，保证排序在最后
-    const timer = setTimeout(() => send(payload.text, payload.card), 800)
+    // 稍等首屏历史消息加载完成，再自动发送：先发大圆角房源卡片（纯卡片、无对话框），再发问询话术
+    const timer = setTimeout(async () => {
+      if (payload.card) await send('', payload.card)
+      await send(payload.text)
+    }, 800)
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, token])
 
   async function send(textArg, cardArg) {
     const text = (textArg ?? draft).trim()
-    if (!text || sending) return
+    if ((!text && !cardArg) || sending) return
     setSending(true)
     setDraft('')
     // 乐观更新：先本地展示，服务器响应后校正（不改动计数，避免失败后漏计新消息）
@@ -326,7 +329,7 @@ export default function ChatPage() {
                   <Fragment key={m.id}>
                     {showTime && <div className="v8-chat__time">{fmtTime(m.at, lang)}</div>}
                     <div className={`v8-chat__row v8-chat__row--${m.from === 'user' ? 'me' : 'agent'}`}>
-                      <div className={`v8-chat__bubble${m.card ? ' v8-chat__bubble--card' : ''}`}>
+                      <div className={`v8-chat__bubble${m.card ? ' v8-chat__bubble--card' : ''}${m.card && !m.text ? ' v8-chat__bubble--cardonly' : ''}`}>
                         {m.card && (
                           <a className="v8-chat__propcard" href={m.card.url} target="_blank" rel="noopener noreferrer">
                             {m.card.img && <img className="v8-chat__propcard-img" src={m.card.img} alt={m.card.title} loading="lazy" />}
@@ -338,7 +341,7 @@ export default function ChatPage() {
                             </span>
                           </a>
                         )}
-                        <p>{m.text}</p>
+                        {m.text && <p>{m.text}</p>}
                       </div>
                     </div>
                   </Fragment>

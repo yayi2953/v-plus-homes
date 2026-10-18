@@ -538,6 +538,13 @@
   overflow: hidden;
   max-width: 248px;
 }
+/* 纯卡片消息：去掉对话框底色，只留大圆角卡片本身 */
+.v8-cw__bubble--card.v8-cw__bubble--cardonly {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 16px;
+}
 .v8-cw__bubble--card p {
   padding: 10px 12px;
 }
@@ -547,6 +554,8 @@
   width: 248px;
   text-decoration: none;
   cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
 }
 .v8-cw__propcard-img {
   display: block;

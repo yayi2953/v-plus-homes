@@ -173,7 +173,6 @@ async function chatSend(req, res) {
   if (!user) return res.status(401).json({ error: '未登录或登录已过期' })
   const { text, card } = req.body || {}
   const content = String(text || '').trim()
-  if (!content) return res.status(400).json({ error: '消息不能为空' })
   // 卡片白名单：仅接受字符串字段，url 必须为 http(s) 链接，防注入与超长
   let cardSafe = null
   if (card && typeof card === 'object') {
@@ -189,6 +188,8 @@ async function chatSend(req, res) {
       }
     }
   }
+  // 纯卡片消息（card 消息 text 为空、话术单独一条）也允许发送；两者皆空才拒绝
+  if (!content && !cardSafe) return res.status(400).json({ error: '消息不能为空' })
   const chat = await userSendMessage(user.id, user.name, user.email, content.slice(0, 1000), cardSafe)
   return res.status(201).json({
     chat: { id: chat.id, messages: chat.messages, updatedAt: chat.updatedAt }

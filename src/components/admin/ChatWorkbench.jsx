@@ -123,7 +123,9 @@ export default function ChatWorkbench({ authFetch }) {
             </div>
             <div className="v8-cw__item-bottom">
               <span className="v8-cw__preview">
-                {c.lastMessage ? `${c.lastMessage.from === 'admin' ? t('我: ', 'Me: ') : ''}${c.lastMessage.text}` : t('（无消息）', '(no messages)')}
+                {c.lastMessage
+                  ? `${c.lastMessage.from === 'admin' ? t('我: ', 'Me: ') : ''}${c.lastMessage.card && !c.lastMessage.text ? t('[房源卡片]', '[Listing card]') : c.lastMessage.text}`
+                  : t('（无消息）', '(no messages)')}
               </span>
               {c.unread > 0 && <span className="v8-cw__badge">{c.unread}</span>}
             </div>
@@ -151,7 +153,7 @@ export default function ChatWorkbench({ authFetch }) {
                   <Fragment key={m.id}>
                     {showTime && <div className="v8-cw__time">{fmtTime(m.at)}</div>}
                     <div className={`v8-cw__row v8-cw__row--${m.from === 'admin' ? 'me' : 'user'}`}>
-                      <div className={`v8-cw__bubble${m.card ? ' v8-cw__bubble--card' : ''}`}>
+                      <div className={`v8-cw__bubble${m.card ? ' v8-cw__bubble--card' : ''}${m.card && !m.text ? ' v8-cw__bubble--cardonly' : ''}`}>
                         {m.card && (
                           <a className="v8-cw__propcard" href={m.card.url} target="_blank" rel="noopener noreferrer">
                             {m.card.img && <img className="v8-cw__propcard-img" src={m.card.img} alt={m.card.title} loading="lazy" />}
@@ -163,7 +165,7 @@ export default function ChatWorkbench({ authFetch }) {
                             </span>
                           </a>
                         )}
-                        <p>{m.text}</p>
+                        {m.text && <p>{m.text}</p>}
                       </div>
                     </div>
                   </Fragment>
