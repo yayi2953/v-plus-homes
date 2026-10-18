@@ -570,6 +570,11 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-svc__card--person .v8-svc__card-t { padding: 16px 12px 0; z-index: 1; }
 .v8-svc__imgbox { position: relative; flex: 1; min-height: 0; margin-top: 12px; }
 .v8-svc__imgbox img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+/* 天际线卡：白底 contain 贴卡底，与白卡无缝 */
+.v8-svc__card--skyline { justify-content: flex-start; }
+.v8-svc__card--skyline .v8-svc__card-t { padding: 16px 12px 0; }
+.v8-svc__card--skyline .v8-svc__imgbox { margin-top: 8px; }
+.v8-svc__card--skyline .v8-svc__imgbox img { object-fit: contain; object-position: center bottom; }
 .v8-svc__card-t {
   display: block; padding: 16px 12px 12px; font-size: 14px; font-weight: 600;
   letter-spacing: -.01em; color: rgba(0, 0, 0, .85);

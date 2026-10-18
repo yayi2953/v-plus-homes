@@ -50,8 +50,9 @@ export default function V8ServiceCards({ lang = 'zh' }) {
             <span className="v8-svc__card-t">{t.c2a}</span>
             <span className="v8-svc__big" aria-hidden="true">{t.c2big}</span>
           </div>
-          <div className="v8-svc__card v8-svc__card--img">
+          <div className="v8-svc__card v8-svc__card--img v8-svc__card--skyline">
             <span className="v8-svc__card-t">{t.c2b}</span>
+            <span className="v8-svc__imgbox"><img src="/images/skyline.jpg" alt="" loading="lazy" /></span>
           </div>
         </div>
 
