@@ -451,7 +451,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 /* 展示区 section 清除默认大间距，使精选条紧贴 Hero 大图下方 */
 .v8-typeres.v8-section { padding-top: 0; }
 .v8-fstrip {
-  margin: 0 auto 56px; padding: 36px clamp(16px, 4vw, 56px) 0;
+  margin: 0 auto; padding: 36px clamp(16px, 4vw, 56px) 44px;
   background: none;
 }
 .v8-fstrip__title {
@@ -516,12 +516,13 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-fscard:hover .v8-fscard__btn { transform: scale(1.04); }
 
 /* ---------- 服务卡片网格（一比一复刻参考布局） ---------- */
+/* 垂直节奏对齐参考站：上方区块→标题 30px、标题→网格 ~39px、网格→下一区块 ~38px */
 .v8-svc {
-  margin: 0 auto 56px; padding: 36px clamp(16px, 12vw, 150px) 44px;
+  margin: 0 0 8px; padding: 30px clamp(16px, 12vw, 150px) 30px;
   background: #f5f6f8;
 }
 .v8-svc__title {
-  margin: 0 0 20px; font-size: clamp(18px, 2.1vw, 30px); font-weight: 600;
+  margin: 0 0 30px; font-size: clamp(18px, 2.1vw, 30px); font-weight: 600;
   letter-spacing: -.01em; color: rgba(0, 0, 0, .85);
 }
 .v8-svc__grid {
