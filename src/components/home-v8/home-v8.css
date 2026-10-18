@@ -562,6 +562,9 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 .v8-svc__card--mini { background: #fff; box-shadow: 0 4px 16px rgba(0, 0, 0, .12); padding: 16px 14px 18px; justify-content: center; gap: 12px; }
 .v8-svc__card--num { padding: 20px 14px; gap: 10px; justify-content: center; }
+/* 无图片版：图卡仅剩标题，垂直居中 */
+.v8-svc__card--img { justify-content: center; }
+.v8-svc__card--img .v8-svc__card-t { padding: 0; }
 .v8-svc__card-t {
   display: block; padding: 16px 12px 12px; font-size: 14px; font-weight: 600;
   letter-spacing: -.01em; color: rgba(0, 0, 0, .85);
