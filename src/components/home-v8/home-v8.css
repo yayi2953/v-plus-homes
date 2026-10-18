@@ -565,23 +565,25 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 /* 无图片版：图卡仅剩标题，垂直居中 */
 .v8-svc__card--img { justify-content: center; }
 .v8-svc__card--img .v8-svc__card-t { padding: 0; }
+/* 礼品卡：标题置顶带呼吸留白，覆盖 --img 的 padding:0 */
+.v8-svc__card--gift .v8-svc__card-t { padding: 18px 16px 12px; }
 /* 顾问卡：文案置顶，下方填充半身照 */
 .v8-svc__card--person { justify-content: flex-start; }
-.v8-svc__card--person .v8-svc__card-t { padding: 16px 12px 0; z-index: 1; }
+.v8-svc__card--person .v8-svc__card-t { padding: 18px 16px 0; z-index: 1; }
 .v8-svc__imgbox { position: relative; flex: 1; min-height: 0; margin-top: 12px; }
 .v8-svc__imgbox img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 /* 天际线卡：白底 contain 贴卡底，与白卡无缝 */
 .v8-svc__card--skyline { justify-content: flex-start; }
-.v8-svc__card--skyline .v8-svc__card-t { padding: 16px 12px 0; }
+.v8-svc__card--skyline .v8-svc__card-t { padding: 18px 16px 0; }
 .v8-svc__card--skyline .v8-svc__imgbox { margin-top: 8px; }
 .v8-svc__card--skyline .v8-svc__imgbox img { object-fit: cover; object-position: center bottom; }
 /* 相机卡：文字置顶带留白，下方白底 contain 相机图 */
 .v8-svc__card--photog { justify-content: flex-start; }
-.v8-svc__card--photog .v8-svc__card-t { padding: 18px 12px 0; }
+.v8-svc__card--photog .v8-svc__card-t { padding: 18px 16px 0; }
 .v8-svc__card--photog .v8-svc__imgbox { margin-top: 14px; }
 .v8-svc__card--photog .v8-svc__imgbox img { object-fit: contain; object-position: center center; }
 .v8-svc__card-t {
-  display: block; padding: 16px 12px 12px; font-size: 14px; font-weight: 600;
+  display: block; padding: 18px 16px 12px; font-size: 16px; font-weight: 600;
   letter-spacing: -.01em; color: rgba(0, 0, 0, .85);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
 }
