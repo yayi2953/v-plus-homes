@@ -58,7 +58,9 @@ const ROW_STEP = 2 // 横滑触底每次追加的房源小卡片数
 
 function RegionGroup({ group, lang, label, fromText, perMonth, onOpen, openContact }) {
   const rowRef = useRef(null)
+  const fullRef = useRef(null)
   const [visible, setVisible] = useState(4)
+  const [expanded, setExpanded] = useState(false)
   const items = group.items
 
   const minPrice = Math.min(...items.map((x) => priceNum(x.p.price)).filter(Boolean))
@@ -72,8 +74,18 @@ function RegionGroup({ group, lang, label, fromText, perMonth, onOpen, openConta
     }
   }
 
-  const scrollToRow = () => {
-    rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  // 查看房源 → 在区域组下方展开/收起该区域全部符合条件的房源网格
+  const toggleFull = () => {
+    setExpanded((v) => {
+      const next = !v
+      if (next) {
+        // 等网格渲染后平滑滚动到位
+        window.setTimeout(() => {
+          fullRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        }, 60)
+      }
+      return next
+    })
   }
 
   return (
@@ -89,8 +101,8 @@ function RegionGroup({ group, lang, label, fromText, perMonth, onOpen, openConta
             {`¥${minPrice.toLocaleString()}`}
             <small>{fromText}</small>
           </p>
-          <button type="button" className="v8-region__btn" onClick={scrollToRow}>
-            {label('查看房源', 'View homes', '物件を見る')}
+          <button type="button" className="v8-region__btn" onClick={toggleFull} aria-expanded={expanded}>
+            {expanded ? label('收起', 'Collapse', '閉じる') : label('查看房源', 'View homes', '物件を見る')}
           </button>
         </div>
       </div>
@@ -127,6 +139,40 @@ function RegionGroup({ group, lang, label, fromText, perMonth, onOpen, openConta
           </button>
         </div>
       </div>
+
+      {/* 展开区：该区域全部符合条件的房源网格（点击「查看房源」向下展开） */}
+      {expanded && (
+        <div className="v8-region__full" ref={fullRef}>
+          <p className="v8-region__full-count">
+            {label(
+              `${group.label} · 共 ${items.length} 套符合条件的房源`,
+              `${group.label} · ${items.length} homes match`,
+              `${group.label} · ${items.length}件が一致`
+            )}
+          </p>
+          <div className="v8-region__full-grid">
+            {items.map(({ p, index }) => (
+              <button
+                type="button"
+                key={`full-${p.code}-${index}`}
+                className="v8-mcard"
+                onClick={() => onOpen(index)}
+                aria-label={p.district}
+              >
+                <span className="v8-mcard__media">
+                  <SmartImage src={p.img} alt="" />
+                </span>
+                <span className="v8-mcard__sub">{[p.br, p.baths ? `${p.baths} ${label('卫浴', 'Baths', 'バス')}` : ''].filter(Boolean).join(' · ')}</span>
+                <span className="v8-mcard__name">{p.district}</span>
+                <span className="v8-mcard__price">
+                  {p.price}
+                  <small>{perMonth}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   )
 }
