@@ -17,28 +17,7 @@
       "createdAt": 1792260450063
     }
   ],
-  "listings": [
-    {
-      "id": "l-mvcq1eki-3qaod4",
-      "createdAt": 1792261192194,
-      "updatedAt": 1792261442519,
-      "title": "1",
-      "type": "luxury",
-      "price": "1",
-      "city": "广州",
-      "bedrooms": "1",
-      "bathrooms": "1",
-      "area": "50",
-      "address": "广州塔",
-      "description": "测试1",
-      "image": "https://raw.githubusercontent.com/yayi2953/v-plus-homes/main/public/images/uploads/mvcq0ytq-2222.jpg",
-      "published": true,
-      "images": [
-        "https://raw.githubusercontent.com/yayi2953/v-plus-homes/main/public/images/uploads/mvcq0ytq-2222.jpg",
-        "https://raw.githubusercontent.com/yayi2953/v-plus-homes/main/public/images/uploads/mvcq6g8r-111111.jpg"
-      ]
-    }
-  ],
+  "listings": [],
   "messages": [],
   "services": [],
   "texts": {}
