@@ -65,12 +65,18 @@
           "from": "user",
           "text": "第一条测试",
           "at": 1792341686848
+        },
+        {
+          "id": "m-mve1yzey-83vgxq",
+          "from": "user",
+          "text": "第二条测试",
+          "at": 1792341700810
         }
       ],
       "lastReadAdmin": 1792340983789,
-      "lastReadUser": 1792341686848,
+      "lastReadUser": 1792341700810,
       "createdAt": 1792340490629,
-      "updatedAt": 1792341686848
+      "updatedAt": 1792341700810
     },
     {
       "id": "c-mve1g41j-xdxz6a",
