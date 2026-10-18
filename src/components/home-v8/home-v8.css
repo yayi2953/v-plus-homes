@@ -574,7 +574,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-svc__card--skyline { justify-content: flex-start; }
 .v8-svc__card--skyline .v8-svc__card-t { padding: 16px 12px 0; }
 .v8-svc__card--skyline .v8-svc__imgbox { margin-top: 8px; }
-.v8-svc__card--skyline .v8-svc__imgbox img { object-fit: contain; object-position: center bottom; }
+.v8-svc__card--skyline .v8-svc__imgbox img { object-fit: cover; object-position: center bottom; }
 .v8-svc__card-t {
   display: block; padding: 16px 12px 12px; font-size: 14px; font-weight: 600;
   letter-spacing: -.01em; color: rgba(0, 0, 0, .85);
