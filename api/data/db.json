@@ -310,12 +310,25 @@
           "from": "user",
           "text": "回复11111",
           "at": 1792345665396
+        },
+        {
+          "id": "m-mve4es5u-87g2qw",
+          "from": "user",
+          "text": "",
+          "at": 1792345797138,
+          "card": {
+            "img": "https://hqhqwl3jcotwfk9s.public.blob.vercel-storage.com/properties/1791647426384-arssrpya-Fn1PiIsC9EOcWQjN1LqmHKDfxtephr.jpeg",
+            "title": "广州 · 海珠区",
+            "sub": "三房两厅 · 3号线-广州塔",
+            "price": "26,800",
+            "url": "https://www.vplushomes.com/zh/properties/VIVA0001"
+          }
         }
       ],
       "lastReadAdmin": 1792345776311,
-      "lastReadUser": 1792345665396,
+      "lastReadUser": 1792345797138,
       "createdAt": 1792340820343,
-      "updatedAt": 1792345665396
+      "updatedAt": 1792345797138
     }
   ]
 }
