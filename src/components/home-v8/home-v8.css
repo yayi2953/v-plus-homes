@@ -1250,7 +1250,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-nav__mega-card {
   display: flex; align-items: flex-start;
   width: 100%; padding: 32px 40px;
-  background: #fff;
+  background: #f5f6f8;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
 }
 .v8-nav__group:hover .v8-nav__mega,
