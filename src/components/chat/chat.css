@@ -242,6 +242,67 @@
 }
 .v8-chat__row--me .v8-chat__bubble p { color: #fff; }
 
+/* —— 房源卡片消息（仿精选房源卡：图片背景 + 底部渐变 + 左下文字，无按钮，点击新窗口打开房源） —— */
+.v8-chat__bubble--card {
+  padding: 0;
+  overflow: hidden;
+  max-width: 248px;
+}
+.v8-chat__bubble--card p {
+  padding: 10px 12px;
+}
+.v8-chat__propcard {
+  position: relative;
+  display: block;
+  width: 248px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.v8-chat__propcard-img {
+  display: block;
+  width: 100%;
+  height: 156px;
+  object-fit: cover;
+}
+.v8-chat__propcard-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, 0.58) 100%);
+  pointer-events: none;
+}
+.v8-chat__propcard-info {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #fff;
+  pointer-events: none;
+}
+.v8-chat__propcard-info strong {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.v8-chat__propcard-info small {
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.88;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.v8-chat__propcard-info em {
+  font-style: normal;
+  font-size: 15px;
+  font-weight: 800;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
 /* 居中时间分隔标签 */
 .v8-chat__time {
   text-align: center;

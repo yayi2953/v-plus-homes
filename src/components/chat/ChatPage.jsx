@@ -210,6 +210,7 @@ export default function ChatPage() {
   }, [isAuthenticated])
 
   // 房源详情页带来的自动问询：登录态进入聊天窗后仅发送一次
+  // 兼容两种格式：旧版纯文本字符串 / 新版 { text, card } 结构化问询
   useEffect(() => {
     if (!isAuthenticated || !token) return
     let pending = null
@@ -220,24 +221,31 @@ export default function ChatPage() {
       /* ignore */
     }
     if (!pending) return
+    let payload
+    try {
+      const parsed = JSON.parse(pending)
+      payload = parsed && typeof parsed === 'object' && parsed.text ? parsed : { text: pending }
+    } catch {
+      payload = { text: pending }
+    }
     // 稍等首屏历史消息加载完成，再自动发出问询，保证排序在最后
-    const timer = setTimeout(() => send(pending), 800)
+    const timer = setTimeout(() => send(payload.text, payload.card), 800)
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, token])
 
-  async function send(textArg) {
+  async function send(textArg, cardArg) {
     const text = (textArg ?? draft).trim()
     if (!text || sending) return
     setSending(true)
     setDraft('')
     // 乐观更新：先本地展示，服务器响应后校正（不改动计数，避免失败后漏计新消息）
-    setMessages((m) => [...m, { id: `local-${Date.now()}`, from: 'user', text, at: Date.now() }])
+    setMessages((m) => [...m, { id: `local-${Date.now()}`, from: 'user', text, ...(cardArg ? { card: cardArg } : {}), at: Date.now() }])
     try {
       const res = await authFetch('/api/chat/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
+        body: JSON.stringify(cardArg ? { text, card: cardArg } : { text })
       })
       const d = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`)
@@ -318,7 +326,18 @@ export default function ChatPage() {
                   <Fragment key={m.id}>
                     {showTime && <div className="v8-chat__time">{fmtTime(m.at, lang)}</div>}
                     <div className={`v8-chat__row v8-chat__row--${m.from === 'user' ? 'me' : 'agent'}`}>
-                      <div className="v8-chat__bubble">
+                      <div className={`v8-chat__bubble${m.card ? ' v8-chat__bubble--card' : ''}`}>
+                        {m.card && (
+                          <a className="v8-chat__propcard" href={m.card.url} target="_blank" rel="noopener noreferrer">
+                            {m.card.img && <img className="v8-chat__propcard-img" src={m.card.img} alt={m.card.title} loading="lazy" />}
+                            <span className="v8-chat__propcard-shade" aria-hidden="true" />
+                            <span className="v8-chat__propcard-info">
+                              <strong>{m.card.title}</strong>
+                              {m.card.sub && <small>{m.card.sub}</small>}
+                              {m.card.price && <em>{m.card.price}</em>}
+                            </span>
+                          </a>
+                        )}
                         <p>{m.text}</p>
                       </div>
                     </div>

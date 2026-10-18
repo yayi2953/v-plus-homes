@@ -167,14 +167,29 @@ async function chatGet(req, res) {
   })
 }
 
-// 用户端：发送消息
+// 用户端：发送消息（可附带房源卡片 card：{ img, title, sub, price, url }）
 async function chatSend(req, res) {
   const user = requireAuth(req)
   if (!user) return res.status(401).json({ error: '未登录或登录已过期' })
-  const { text } = req.body || {}
+  const { text, card } = req.body || {}
   const content = String(text || '').trim()
   if (!content) return res.status(400).json({ error: '消息不能为空' })
-  const chat = await userSendMessage(user.id, user.name, user.email, content.slice(0, 1000))
+  // 卡片白名单：仅接受字符串字段，url 必须为 http(s) 链接，防注入与超长
+  let cardSafe = null
+  if (card && typeof card === 'object') {
+    const s = (v, n) => (typeof v === 'string' ? v.slice(0, n) : '')
+    const url = s(card.url, 300)
+    if (/^https?:\/\//.test(url)) {
+      cardSafe = {
+        img: s(card.img, 500),
+        title: s(card.title, 60),
+        sub: s(card.sub, 80),
+        price: s(card.price, 30),
+        url
+      }
+    }
+  }
+  const chat = await userSendMessage(user.id, user.name, user.email, content.slice(0, 1000), cardSafe)
   return res.status(201).json({
     chat: { id: chat.id, messages: chat.messages, updatedAt: chat.updatedAt }
   })

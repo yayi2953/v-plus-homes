@@ -151,7 +151,18 @@ export default function ChatWorkbench({ authFetch }) {
                   <Fragment key={m.id}>
                     {showTime && <div className="v8-cw__time">{fmtTime(m.at)}</div>}
                     <div className={`v8-cw__row v8-cw__row--${m.from === 'admin' ? 'me' : 'user'}`}>
-                      <div className="v8-cw__bubble">
+                      <div className={`v8-cw__bubble${m.card ? ' v8-cw__bubble--card' : ''}`}>
+                        {m.card && (
+                          <a className="v8-cw__propcard" href={m.card.url} target="_blank" rel="noopener noreferrer">
+                            {m.card.img && <img className="v8-cw__propcard-img" src={m.card.img} alt={m.card.title} loading="lazy" />}
+                            <span className="v8-cw__propcard-shade" aria-hidden="true" />
+                            <span className="v8-cw__propcard-info">
+                              <strong>{m.card.title}</strong>
+                              {m.card.sub && <small>{m.card.sub}</small>}
+                              {m.card.price && <em>{m.card.price}</em>}
+                            </span>
+                          </a>
+                        )}
                         <p>{m.text}</p>
                       </div>
                     </div>

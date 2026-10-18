@@ -374,7 +374,7 @@ function getChats() {
 }
 
 // 用户发消息：无会话则自动创建，同时视为用户端已读
-async function userSendMessage(userId, userName, userEmail, text) {
+async function userSendMessage(userId, userName, userEmail, text, card) {
   return mutateDb((db) => {
     let chat = db.chats.find((c) => c.userId === userId)
     if (!chat) {
@@ -391,7 +391,8 @@ async function userSendMessage(userId, userName, userEmail, text) {
       }
       db.chats.push(chat)
     }
-    const msg = { id: genId('m'), from: 'user', text, at: Date.now() }
+    // 房源卡片消息：card 为可选结构化字段（图片/标题/副文/价格/链接），点击卡片新窗口打开房源
+    const msg = { id: genId('m'), from: 'user', text, at: Date.now(), ...(card ? { card } : {}) }
     chat.messages.push(msg)
     chat.updatedAt = msg.at
     chat.lastReadUser = msg.at

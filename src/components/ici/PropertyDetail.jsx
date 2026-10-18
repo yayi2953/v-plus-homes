@@ -382,34 +382,29 @@ function DetailPanel({ active, closeProperty }) {
   const activeTab = tabs.some((t) => t.id === tab) ? tab : 'pd-sec-overview'
   const secStyle = (id) => (isPage || activeTab === id ? undefined : { display: 'none' })
 
-  // 组装当前房源的问询卡片文本（登录后带入在线客服自动发送）
-  const buildInquiryText = () => {
-    const L = []
-    L.push(lang === 'zh' ? '【房源问询】' : lang === 'ja' ? '【物件問い合わせ】' : '[Property Inquiry]')
-    L.push(`${p.code} · ${p.district}`)
-    L.push(p.metro)
-    if (p.address) L.push(p.address)
-    L.push(
-      `${d.specs.beds}: ${p.br}  ·  ${d.specs.baths}: ${lang === 'zh' ? `${p.baths} 卫` : lang === 'ja' ? `${p.baths}バス` : p.baths}` +
-      (p.categories?.includes('luxury') ? `  ·  ${d.specs.area}: ${p.area} m²` : '')
-    )
-    L.push(`${lang === 'zh' ? '租金' : lang === 'ja' ? '家賃' : 'Rent'}: ${p.price}${c.ui.perMonth}${p.fx ? ` (≈ ${p.fx})` : ''}`)
-    L.push(`${SITE_ORIGIN}${propertyPath(p.code)}`)
-    L.push(
+  // 组装当前房源的问询消息：卡片数据（仿精选房源卡样式渲染）+ 一句问询语
+  const buildInquiry = () => {
+    const text =
       lang === 'zh'
         ? '您好，我想咨询这套房源，请帮我安排看房。'
         : lang === 'ja'
           ? 'こんにちは、この物件について相談したいです。内見を手配してください。'
           : 'Hello, I would like to ask about this listing. Please arrange a viewing for me.'
-    )
-    return L.join('\n')
+    const card = {
+      img: gallery[0] || '',
+      title: p.district,
+      sub: `${p.br} · ${p.metro}`,
+      price: `${p.price}`,
+      url: `${SITE_ORIGIN}${propertyPath(p.code)}`
+    }
+    return { text, card }
   }
 
-  // 左按钮「在线咨询」：已登录 → 房源问询带入聊天窗自动发送；未登录 → 弹出联系方式选择
+  // 左按钮「在线咨询」：已登录 → 房源问询卡片带入聊天窗自动发送；未登录 → 弹出联系方式选择
   const onAskClick = () => {
     if (isAuthenticated) {
       try {
-        sessionStorage.setItem('vplus_chat_pending', buildInquiryText())
+        sessionStorage.setItem('vplus_chat_pending', JSON.stringify(buildInquiry()))
       } catch {
         /* ignore */
       }
