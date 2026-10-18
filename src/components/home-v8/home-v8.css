@@ -504,8 +504,11 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-region__row::-webkit-scrollbar { display: none; }
 .v8-mcard {
   display: flex; flex-direction: column; align-items: stretch;
-  padding: 10px; text-align: left; font: inherit; color: inherit;
-  background: #fff; border: 1px solid rgba(22, 22, 26, .08); border-radius: 14px;
+  padding: 0; text-align: left; font: inherit; color: inherit;
+  background: #fff; border: 1px solid rgba(22, 22, 26, .08);
+  /* 图片铺满卡片上/左/右；卡片下方（底部）不采用圆角 */
+  border-radius: 14px 14px 0 0;
+  overflow: hidden;
   cursor: pointer; min-width: 0; scroll-snap-align: start;
   box-shadow: 0 1px 2px rgba(22, 22, 26, .04);
   transition: transform .35s var(--v8-ease, ease), box-shadow .35s var(--v8-ease, ease), border-color .35s var(--v8-ease, ease);
@@ -517,7 +520,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-mcard:active { transform: translateY(-1px) scale(.99); }
 .v8-mcard__media {
   position: relative; display: block; width: 100%;
-  border-radius: 10px; overflow: hidden; background: #f0f0f2;
+  border-radius: 0; overflow: hidden; background: #f0f0f2;
 }
 .v8-mcard__media::before { content: ""; display: block; padding-top: 108%; }
 .v8-mcard__media .smart-img {
@@ -527,21 +530,22 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 .v8-mcard:hover .v8-mcard__media .smart-img { transform: scale(1.06); }
 .v8-mcard__sub {
-  margin-top: 11px; font-size: 11px; color: var(--v8-muted, #76767d);
+  margin-top: 11px; padding: 0 12px; font-size: 11px; color: var(--v8-muted, #76767d);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .v8-mcard__name {
-  margin-top: 3px; font-size: 14px; font-weight: 600; color: var(--v8-ink, #16161a);
+  margin-top: 3px; padding: 0 12px; font-size: 14px; font-weight: 600; color: var(--v8-ink, #16161a);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .v8-mcard__price {
-  margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--v8-ink, #16161a);
+  margin-top: 10px; padding: 0 12px 12px; font-size: 13px; font-weight: 600; color: var(--v8-ink, #16161a);
   font-variant-numeric: tabular-nums lining-nums;
 }
 .v8-mcard__price small { font-size: 10.5px; font-weight: 400; color: var(--v8-muted, #76767d); margin-left: 3px; }
 /* 行尾预约引导卡 */
 .v8-mcard--cta {
   cursor: default; justify-content: space-between; gap: 10px;
+  padding: 14px 12px 12px;
   background: #f5f6f8; border-color: rgba(22, 22, 26, .06);
 }
 .v8-mcard--cta:hover { transform: none; box-shadow: 0 1px 2px rgba(22, 22, 26, .04); }

@@ -55,8 +55,8 @@ export default function HomeV8() {
   return (
     <FinderProvider>
       <div className="home-v8" ref={rootRef}>
-        {/* 导航与 Hero 始终保留（品牌门面），仅隐藏 Hero 以下的其它区块 */}
-        {sections.hero !== false && <V8Hero />}
+        {/* 导航与 Hero 始终保留（品牌门面）；展示区展开时 Hero 下方介绍文字块一并隐藏 */}
+        {sections.hero !== false && <V8Hero hideBody={hidden} />}
         {!hidden && <V8Stats />}
         {sections.types !== false && !hidden && <V8Types />}
         {/* 点击类型后就地展开的房源展示区（不跳转 /listings） */}

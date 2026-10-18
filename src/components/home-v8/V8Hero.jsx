@@ -16,7 +16,7 @@ function slideText(t, i) {
   return { eyebrow: t.s3Eyebrow, title: t.s3Title, lede: t.s3Lede, ek: 'v8.hero.s3Eyebrow', tk: 'v8.hero.s3Title', lk: 'v8.hero.s3Lede' }
 }
 
-export default function V8Hero() {
+export default function V8Hero({ hideBody = false }) {
   const { c } = useIciI18n()
   const { openContact } = useContact()
   const [idx, setIdx] = useState(0)
@@ -82,15 +82,18 @@ export default function V8Hero() {
           ))}
         </div>
       </div>
-      <div className="v8-hero-body">
-        <p className="v8-eyebrow" data-edit-key="v8.hero.bodyEyebrow">{t.bodyEyebrow}</p>
-        <p className="v8-lede" data-edit-key="v8.hero.bodyLede">{t.bodyLede}</p>
-        <div className="v8-hero-cta">
-          <button type="button" className="v8-tlink" onClick={openContact}>
-            {t.whatsapp}
-          </button>
+      {/* 轮播下方的介绍文字块：房源展示区展开时一并隐藏 */}
+      {!hideBody && (
+        <div className="v8-hero-body">
+          <p className="v8-eyebrow" data-edit-key="v8.hero.bodyEyebrow">{t.bodyEyebrow}</p>
+          <p className="v8-lede" data-edit-key="v8.hero.bodyLede">{t.bodyLede}</p>
+          <div className="v8-hero-cta">
+            <button type="button" className="v8-tlink" onClick={openContact}>
+              {t.whatsapp}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </section>
   )
 }
