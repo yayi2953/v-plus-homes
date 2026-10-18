@@ -517,31 +517,31 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 
 /* ---------- 服务卡片网格（一比一复刻参考布局） ---------- */
 .v8-svc {
-  margin: 0 auto 56px; padding: 36px clamp(16px, 4vw, 56px) 44px;
+  margin: 0 auto 56px; padding: 36px clamp(16px, 12vw, 150px) 44px;
   background: #f5f6f8;
 }
 .v8-svc__title {
-  margin: 0 0 22px; font-size: clamp(19px, 2.2vw, 25px); font-weight: 700;
-  letter-spacing: -.01em; color: var(--v8-ink, #16161a);
+  margin: 0 0 20px; font-size: clamp(18px, 2.1vw, 30px); font-weight: 600;
+  letter-spacing: -.01em; color: rgba(0, 0, 0, .85);
 }
 .v8-svc__grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
   align-items: stretch;
-  /* 锁定总高，使各列分界线比例与参考站一致 */
-  height: clamp(280px, 32vw, 420px);
+  /* 总高锁定：1024 视口约 240px，与参考站一致（避免卡片被拉长） */
+  height: clamp(220px, 23.5vw, 360px);
 }
 .v8-svc__col { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; }
 .v8-svc__card {
-  background: #fff; border-radius: 12px; overflow: hidden;
+  background: #fff; border-radius: 8px; overflow: hidden;
   display: flex; flex-direction: column; align-items: center;
   text-align: center; min-width: 0; min-height: 0;
 }
-/* 各列上下卡分界线百分比定死（与参考站一致）：
-   列1 56/44、列2 34/66、列3 58/42、列4 58/42；另一张卡填满剩余 */
-.v8-svc__col:nth-child(1) .v8-svc__card--img { flex: 0 0 56%; }
-.v8-svc__col:nth-child(2) .v8-svc__card--num { flex: 0 0 34%; }
+/* 各列上下卡分界线百分比定死（从参考站截图量取，含 12px 间隙）：
+   列1 上卡 54%、列2 数字卡 33%、列3/4 上卡 56%；另一张卡填满剩余 */
+.v8-svc__col:nth-child(1) .v8-svc__card--img { flex: 0 0 54%; }
+.v8-svc__col:nth-child(2) .v8-svc__card--num { flex: 0 0 33%; }
 .v8-svc__col:nth-child(3) .v8-svc__card--img,
-.v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 58%; }
+.v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 56%; }
 .v8-svc__col .v8-svc__card--mini { flex: 1 1 auto; }
 .v8-svc__col:nth-child(2) .v8-svc__card--img { flex: 1 1 auto; }
 .v8-svc__card--img .smart-img {
@@ -560,14 +560,14 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-svc__card--mini { padding: 16px 14px 18px; justify-content: center; gap: 12px; }
 .v8-svc__card--num { padding: 20px 14px; gap: 10px; justify-content: center; }
 .v8-svc__card-t {
-  display: block; padding: 18px 12px 14px; font-size: 15px; font-weight: 700;
-  letter-spacing: -.01em; color: var(--v8-ink, #16161a);
+  display: block; padding: 16px 12px 12px; font-size: 14px; font-weight: 600;
+  letter-spacing: -.01em; color: rgba(0, 0, 0, .85);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
 }
 .v8-svc__card--mini .v8-svc__card-t { padding: 0; }
 /* 橙色特大数字（数字卡） */
 .v8-svc__big {
-  font-size: clamp(38px, 4vw, 50px); font-weight: 900; color: #ff6b00;
+  font-size: clamp(34px, 4vw, 48px); font-weight: 800; color: #ff6b00;
   line-height: 1; letter-spacing: -.01em;
 }
 /* 矮卡图形：描边数字框 / 对勾 / 斜体大字 */
