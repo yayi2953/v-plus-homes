@@ -89,12 +89,18 @@
           "from": "user",
           "text": "时间标签测试",
           "at": 1792341807541
+        },
+        {
+          "id": "m-mve21d27-jwgrlc",
+          "from": "user",
+          "text": "连续消息",
+          "at": 1792341811807
         }
       ],
       "lastReadAdmin": 1792340983789,
-      "lastReadUser": 1792341807541,
+      "lastReadUser": 1792341811807,
       "createdAt": 1792340490629,
-      "updatedAt": 1792341807541
+      "updatedAt": 1792341811807
     },
     {
       "id": "c-mve1g41j-xdxz6a",
