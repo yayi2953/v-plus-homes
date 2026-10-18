@@ -242,12 +242,18 @@
             "price": "26,800",
             "url": "https://www.vplushomes.com/zh/properties/VIVA0001"
           }
+        },
+        {
+          "id": "m-mve3tsqm-g2dka8",
+          "from": "user",
+          "text": "您好，我想咨询这套房源，请帮我安排看房。",
+          "at": 1792344818110
         }
       ],
       "lastReadAdmin": 1792344775061,
-      "lastReadUser": 1792344816949,
+      "lastReadUser": 1792344818110,
       "createdAt": 1792340820343,
-      "updatedAt": 1792344816949
+      "updatedAt": 1792344818110
     }
   ]
 }
