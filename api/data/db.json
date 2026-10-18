@@ -47,12 +47,18 @@
           "from": "admin",
           "text": "您好，有的！我们目前有多套豪华房源在租，欢迎咨询。",
           "at": 1792340541829
+        },
+        {
+          "id": "m-mve1b6m6-hwncsr",
+          "from": "user",
+          "text": "谢谢！",
+          "at": 1792340590398
         }
       ],
       "lastReadAdmin": 1792340531021,
-      "lastReadUser": 1792340490629,
+      "lastReadUser": 1792340590398,
       "createdAt": 1792340490629,
-      "updatedAt": 1792340541829
+      "updatedAt": 1792340590398
     }
   ]
 }
