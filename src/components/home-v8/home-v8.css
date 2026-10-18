@@ -534,43 +534,47 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   display: flex; flex-direction: column; align-items: center;
   text-align: center; min-width: 0;
 }
-/* 上图卡（高）与矮卡的高度比约 2:1 */
-.v8-svc__card--img { flex: 1.9; }
+/* 上图卡与矮卡：各列高度比对齐参考官网（55/45、38/62、60/40、60/40） */
+.v8-svc__col:nth-child(1) .v8-svc__card--img { flex: 1.22; }
+.v8-svc__col:nth-child(1) .v8-svc__card--mini { flex: 1; }
+.v8-svc__col:nth-child(2) .v8-svc__card--num { flex: 0.76; }
+.v8-svc__col:nth-child(2) .v8-svc__card--img { flex: 1.6; }
+.v8-svc__col:nth-child(3) .v8-svc__card--img { flex: 1.5; }
+.v8-svc__col:nth-child(3) .v8-svc__card--mini { flex: 1; }
+.v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 1.5; }
+.v8-svc__col:nth-child(4) .v8-svc__card--mini { flex: 1; }
 .v8-svc__card--img .smart-img {
   flex: 1; width: 100%; min-height: 0;
   object-fit: cover; display: block;
 }
-.v8-svc__card--mini { flex: 1; padding: 16px 14px 18px; justify-content: center; gap: 12px; }
+.v8-svc__card--mini { padding: 16px 14px 18px; justify-content: center; gap: 12px; }
+.v8-svc__card--num { padding: 20px 14px; gap: 10px; }
 .v8-svc__card-t {
   display: block; padding: 18px 12px 14px; font-size: 15px; font-weight: 700;
   letter-spacing: -.01em; color: var(--v8-ink, #16161a);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
 }
 .v8-svc__card--mini .v8-svc__card-t { padding: 0; }
-.v8-svc__card-t--mid { padding: 4px 12px 12px; }
-/* 通高卡：纵跨两行 */
-.v8-svc__card--tall { min-height: 0; }
+/* 橙色特大数字（数字卡） */
 .v8-svc__big {
-  font-size: clamp(38px, 4.2vw, 54px); font-weight: 900; color: #ff7a1a;
-  line-height: 1; letter-spacing: -.01em; padding: 0 12px 16px;
+  font-size: clamp(38px, 4vw, 50px); font-weight: 900; color: #ff6b00;
+  line-height: 1; letter-spacing: -.01em;
 }
-.v8-svc__tallimg { display: block; width: 100%; flex: 1; min-height: 0; margin-top: auto; overflow: hidden; }
-.v8-svc__tallimg .smart-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* 矮卡图形：描边数字框 / 对勾 / 斜体大字 */
 .v8-svc__pct {
   display: inline-flex; align-items: baseline; justify-content: center;
-  border: 3px solid #ff7a1a; border-radius: 10px; padding: 2px 10px 5px;
-  color: #ff7a1a; line-height: 1;
+  border: 3px solid #ff6b00; border-radius: 10px; padding: 2px 10px 5px;
+  color: #ff6b00; line-height: 1;
 }
 .v8-svc__pct b { font-size: 26px; font-weight: 800; }
 .v8-svc__pct i { font-style: normal; font-size: 14px; font-weight: 800; }
 .v8-svc__check {
-  width: 42px; height: 42px; border-radius: 50%; background: #ff7a1a;
+  width: 42px; height: 42px; border-radius: 50%; background: #ff6b00;
   color: #fff; display: flex; align-items: center; justify-content: center;
   font-size: 22px; font-weight: 800;
 }
 .v8-svc__free {
-  font-size: 32px; font-weight: 900; font-style: italic; color: #ff7a1a;
+  font-size: 32px; font-weight: 900; font-style: italic; color: #ff6b00;
   letter-spacing: .01em; line-height: 1;
 }
 @media (max-width: 900px) { .v8-svc__grid { grid-template-columns: 1fr 1fr; } }

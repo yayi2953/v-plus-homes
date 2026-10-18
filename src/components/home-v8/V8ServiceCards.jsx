@@ -1,9 +1,9 @@
 import SmartImage from '../common/SmartImage.jsx'
 
-/* 服务卡片网格（一比一复刻参考布局）：
-   浅灰区块底 + 4 列白色圆角卡片 —— 第 2 列为纵跨两行的通高卡
-   （标题 + 橙色大数字 + 标题 + 大图），其余三列各为「上图卡 + 矮卡」，
-   矮卡配简单图形（描边数字框 / 对勾 / 斜体大字）。
+/* 服务卡片网格（一比一复刻 DJI 商城「选购理由」布局）：
+   浅灰区块底 + 4 列白色圆角卡片，各列上下卡高度比与官网一致：
+   列1 上图卡+矮卡(55/45)、列2 矮数字卡+高图卡(38/62)、
+   列3/4 上图卡+矮卡(60/40)；矮卡配简单图形（描边数字框 / 对勾 / 斜体大字）。
    仅复刻样式结构，文案与图片均为站内房产内容。 */
 
 const T = {
@@ -36,7 +36,7 @@ export default function V8ServiceCards({ lang = 'zh' }) {
     <div className="v8-svc">
       <h3 className="v8-svc__title">{t.title}</h3>
       <div className="v8-svc__grid">
-        {/* 列 1：上图卡 + 矮卡（描边数字框图形） */}
+        {/* 列 1：上图卡(55) + 矮卡(45)，描边数字框图形 */}
         <div className="v8-svc__col">
           <div className="v8-svc__card v8-svc__card--img">
             <span className="v8-svc__card-t">{t.c1a}</span>
@@ -48,15 +48,19 @@ export default function V8ServiceCards({ lang = 'zh' }) {
           </div>
         </div>
 
-        {/* 列 2：纵跨两行的通高卡 */}
-        <div className="v8-svc__card v8-svc__card--tall">
-          <span className="v8-svc__card-t">{t.c2a}</span>
-          <span className="v8-svc__big" aria-hidden="true">{t.c2big}</span>
-          <span className="v8-svc__card-t v8-svc__card-t--mid">{t.c2b}</span>
-          <span className="v8-svc__tallimg"><SmartImage src="/images/listing-studio.jpg" alt="" /></span>
+        {/* 列 2：矮数字卡(38) + 高图卡(62)，橙色特大数字 */}
+        <div className="v8-svc__col">
+          <div className="v8-svc__card v8-svc__card--mini v8-svc__card--num">
+            <span className="v8-svc__card-t">{t.c2a}</span>
+            <span className="v8-svc__big" aria-hidden="true">{t.c2big}</span>
+          </div>
+          <div className="v8-svc__card v8-svc__card--img">
+            <span className="v8-svc__card-t">{t.c2b}</span>
+            <SmartImage src="/images/listing-studio.jpg" alt="" />
+          </div>
         </div>
 
-        {/* 列 3：上图卡 + 矮卡（对勾图形） */}
+        {/* 列 3：上图卡(60) + 矮卡(40)，对勾图形 */}
         <div className="v8-svc__col">
           <div className="v8-svc__card v8-svc__card--img">
             <span className="v8-svc__card-t">{t.c3a}</span>
@@ -68,7 +72,7 @@ export default function V8ServiceCards({ lang = 'zh' }) {
           </div>
         </div>
 
-        {/* 列 4：上图卡 + 矮卡（斜体大字图形） */}
+        {/* 列 4：上图卡(60) + 矮卡(40)，斜体大字图形 */}
         <div className="v8-svc__col">
           <div className="v8-svc__card v8-svc__card--img">
             <span className="v8-svc__card-t">{t.c4a}</span>
