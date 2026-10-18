@@ -2926,6 +2926,115 @@ button.extras-card--more:focus-visible .extras-card__pill--solid svg {
   transform: scale(0.985);
 }
 
+/* —— 咨询双按钮组：左「在线咨询」2/3 + 右「复制联系方式」1/3 —— */
+.pd-cta-group {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.pd-cta-group .pd-cta {
+  width: auto;
+}
+.pd-cta--main {
+  flex: 2 1 0;
+}
+.pd-cta--copy {
+  flex: 1 1 0;
+}
+
+/* —— 未登录咨询弹窗：登录 / 邮箱 / 电话 —— */
+.pd-contact-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(18, 20, 24, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.pd-contact-pop {
+  width: 380px;
+  max-width: 100%;
+  padding: 26px 24px 20px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 24px 64px -16px rgba(10, 14, 22, 0.4);
+}
+.pd-contact-pop__title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #16161a;
+  letter-spacing: -0.01em;
+}
+.pd-contact-pop__sub {
+  margin: 6px 0 18px;
+  font-size: 13px;
+  color: #7a7e86;
+}
+.pd-contact-pop__btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 13px 14px;
+  margin-top: 10px;
+  border: 1px solid #e7e9ee;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+  color: #2a2d33;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.12s;
+  text-align: left;
+}
+.pd-contact-pop__btn:hover {
+  border-color: #cfd5df;
+  background: #f7f8fa;
+}
+.pd-contact-pop__btn:active {
+  transform: scale(0.985);
+}
+.pd-contact-pop__btn svg {
+  flex: none;
+  color: #6b7078;
+}
+.pd-contact-pop__btn--login {
+  background: var(--whatsapp);
+  border-color: var(--whatsapp);
+  color: #fff;
+  font-weight: 700;
+  justify-content: center;
+}
+.pd-contact-pop__btn--login svg {
+  color: #fff;
+}
+.pd-contact-pop__btn--login:hover {
+  background: var(--whatsapp-dark);
+  border-color: var(--whatsapp-dark);
+}
+.pd-contact-pop__label {
+  flex: none;
+  font-weight: 600;
+}
+.pd-contact-pop__value {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #8a8f98;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pd-contact-pop__ok {
+  flex: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1fb957;
+}
+
 /* —— 下方通栏段落（白/浅灰交替） —— */
 .pd-band {
   padding: 54px 40px;

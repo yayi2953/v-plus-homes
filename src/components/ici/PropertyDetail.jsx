@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
+import { useAuth } from '../../contexts/AuthContext.jsx'
 import { useProperty } from './propertyContext.jsx'
-import { Metro, FX, WhatsApp, ChevronLeft } from './Icons.jsx'
+import { Metro, FX, ChevronLeft } from './Icons.jsx'
 import { mapsEmbedSrc } from '../../config/maps.js'
 import { propertyPath, navigate } from '../../lib/router.mjs'
 import { setSeo, clearSeo, SITE_ORIGIN } from '../../lib/seo.mjs'
@@ -62,6 +63,56 @@ const COPY_OK_ICON = (
   </svg>
 )
 
+// 左按钮「在线咨询」聊天气泡图标
+const CHAT_ICON = (
+  <svg width={17} height={17} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-2.9-.36-4.1-1L3 20l1-5.4A8.5 8.5 0 1 1 21 11.5Z" />
+  </svg>
+)
+
+// 复制按钮图标
+const COPY_ICON = (
+  <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="12" height="12" rx="2" />
+    <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+  </svg>
+)
+
+// 弹窗邮箱/电话选项小图标
+const MAIL_ICON = (
+  <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="m3 7 9 6 9-6" />
+  </svg>
+)
+const PHONE_ICON = (
+  <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.9Z" />
+  </svg>
+)
+
+// 客服联系方式（与站内页脚/联系区一致）
+const CONTACT = { email: 'hello@v-plus.house', phone: '+352 621780307' }
+
+// 双按钮 + 未登录弹窗的三语文案
+const CTA_LABELS = {
+  zh: {
+    ask: '在线咨询', copy: '复制联系方式', copied: '已复制',
+    popTitle: '选择咨询方式', popSub: '登录后可与在线客服实时对话',
+    login: '登录后在线咨询', email: '邮箱联系', phone: '电话联系', copiedTip: '已复制到剪贴板'
+  },
+  en: {
+    ask: 'Chat with Us', copy: 'Copy Contact', copied: 'Copied',
+    popTitle: 'Choose how to contact us', popSub: 'Log in to chat with our agent in real time',
+    login: 'Log in to chat', email: 'Email us', phone: 'Call us', copiedTip: 'Copied to clipboard'
+  },
+  ja: {
+    ask: 'オンライン相談', copy: '連絡先をコピー', copied: 'コピーしました',
+    popTitle: 'お問い合わせ方法をお選びください', popSub: 'ログインするとオンライン相談をご利用いただけます',
+    login: 'ログインして相談', email: 'メールで連絡', phone: '電話で連絡', copiedTip: 'クリップボードにコピーしました'
+  }
+}
+
 // 复制到剪贴板：优先现代 Clipboard API（https 下微信/iOS 均支持），
 // 失败或老内核缺失时退化为隐藏 textarea + execCommand，保证微信内置浏览器可用
 async function copyToClipboard(text) {
@@ -97,8 +148,10 @@ const fill = (text, vars) => text.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '')
 
 function DetailPanel({ active, closeProperty }) {
   const { c, lang } = useIciI18n()
+  const { isAuthenticated } = useAuth()
   const p = c.properties[active.index]
   const d = c.detail
+  const TL = CTA_LABELS[lang] || CTA_LABELS.zh
   const scrollRef = useRef(null)
   const trackRef = useRef(null)
   const rafRef = useRef(0)
@@ -109,9 +162,11 @@ function DetailPanel({ active, closeProperty }) {
   const [mapError, setMapError] = useState(false)
   const [mapReady, setMapReady] = useState(false)
   const [tab, setTab] = useState('overview')
-  // 咨询按钮点击后已复制房源信息的短暂反馈
-  const [copied, setCopied] = useState(false)
-  const copiedTimer = useRef(null)
+  // 咨询双按钮交互状态：未登录弹窗 + 复制反馈
+  const [contactOpen, setContactOpen] = useState(false)
+  const [copiedWay, setCopiedWay] = useState(null)
+  const [copiedContact, setCopiedContact] = useState(false)
+  const contactTimer = useRef(null)
 
   // 打开瞬间定形态：PC（>900px）居中弹窗；平板/手机为整页跳转
   const [mode] = useState(() =>
@@ -207,9 +262,12 @@ function DetailPanel({ active, closeProperty }) {
   useEffect(() => {
     setPhoto(0)
     setMapError(false)
+    setMapReady(false)
     setTab('overview')
-    setCopied(false)
-    clearTimeout(copiedTimer.current)
+    setContactOpen(false)
+    setCopiedContact(false)
+    setCopiedWay(null)
+    clearTimeout(contactTimer.current)
     scrollRef.current?.scrollTo({ top: 0 })
     trackRef.current?.scrollTo({ left: 0 })
     // 地图 iframe 延迟到入场动画结束后再挂载，避免打开瞬间与动画争抢主线程
@@ -223,7 +281,7 @@ function DetailPanel({ active, closeProperty }) {
   }, [active.index])
 
   // 卸载时清理复制反馈定时器
-  useEffect(() => () => clearTimeout(copiedTimer.current), [])
+  useEffect(() => () => clearTimeout(contactTimer.current), [])
 
   useEffect(() => {
     const prevOverflow = document.body.style.overflow
@@ -324,11 +382,11 @@ function DetailPanel({ active, closeProperty }) {
   const activeTab = tabs.some((t) => t.id === tab) ? tab : 'pd-sec-overview'
   const secStyle = (id) => (isPage || activeTab === id ? undefined : { display: 'none' })
 
-  // 组装当前房源的纯文本详情，随当前界面语言生成，供一键复制后粘贴给顾问/朋友
-  const buildShareText = () => {
+  // 组装当前房源的问询卡片文本（登录后带入在线客服自动发送）
+  const buildInquiryText = () => {
     const L = []
-    L.push(`V PLUS Homes · ${p.code}`)
-    L.push(p.district)
+    L.push(lang === 'zh' ? '【房源问询】' : lang === 'ja' ? '【物件問い合わせ】' : '[Property Inquiry]')
+    L.push(`${p.code} · ${p.district}`)
     L.push(p.metro)
     if (p.address) L.push(p.address)
     L.push(
@@ -336,30 +394,71 @@ function DetailPanel({ active, closeProperty }) {
       (p.categories?.includes('luxury') ? `  ·  ${d.specs.area}: ${p.area} m²` : '')
     )
     L.push(`${lang === 'zh' ? '租金' : lang === 'ja' ? '家賃' : 'Rent'}: ${p.price}${c.ui.perMonth}${p.fx ? ` (≈ ${p.fx})` : ''}`)
-    L.push(`${d.specs.available}: ${d.available}`)
-    if (amenities.length) L.push(`${d.amenitiesTitle}: ${amenities.map(([, label]) => label).join(lang === 'zh' ? '、' : ', ')}`)
-    L.push(`${d.depositLabel}: ${d.depositValue}  ·  ${d.leaseLabel}: ${d.leaseValue}`)
     L.push(`${SITE_ORIGIN}${propertyPath(p.code)}`)
+    L.push(
+      lang === 'zh'
+        ? '您好，我想咨询这套房源，请帮我安排看房。'
+        : lang === 'ja'
+          ? 'こんにちは、この物件について相談したいです。内見を手配してください。'
+          : 'Hello, I would like to ask about this listing. Please arrange a viewing for me.'
+    )
     return L.join('\n')
   }
 
-  const copyOkText = lang === 'zh' ? '房源信息已复制' : lang === 'ja' ? '物件情報をコピーしました' : 'Details copied'
-
-  // 点击咨询：把该房源详情复制到剪贴板（方便直接粘贴到 WhatsApp/微信）
-  const onCtaClick = async () => {
-    const ok = await copyToClipboard(buildShareText())
-    if (ok) {
-      setCopied(true)
-      clearTimeout(copiedTimer.current)
-      copiedTimer.current = setTimeout(() => setCopied(false), 2000)
+  // 左按钮「在线咨询」：已登录 → 房源问询带入聊天窗自动发送；未登录 → 弹出联系方式选择
+  const onAskClick = () => {
+    if (isAuthenticated) {
+      try {
+        sessionStorage.setItem('vplus_chat_pending', buildInquiryText())
+      } catch {
+        /* ignore */
+      }
+      navigate('/chat')
+    } else {
+      setCopiedWay(null)
+      setContactOpen(true)
     }
   }
 
-  const ctaButton = (
-    <button type="button" className="pd-cta" onClick={onCtaClick}>
-      {copied ? COPY_OK_ICON : <WhatsApp size={17} />}
-      {copied ? copyOkText : d.ask}
-    </button>
+  // 右按钮「复制联系方式」：复制客服邮箱 + 电话
+  const onCopyContact = async () => {
+    const ok = await copyToClipboard(`Email: ${CONTACT.email}\nTel/WhatsApp: ${CONTACT.phone}`)
+    if (ok) {
+      setCopiedContact(true)
+      clearTimeout(contactTimer.current)
+      contactTimer.current = setTimeout(() => setCopiedContact(false), 2000)
+    }
+  }
+
+  // 弹窗内选择邮箱/电话联系：复制对应联系方式并提示成功，随后自动收起弹窗
+  const onPickContact = async (way) => {
+    const ok = await copyToClipboard(way === 'email' ? CONTACT.email : CONTACT.phone)
+    if (!ok) return
+    setCopiedWay(way)
+    clearTimeout(contactTimer.current)
+    contactTimer.current = setTimeout(() => {
+      setContactOpen(false)
+      setCopiedWay(null)
+    }, 1400)
+  }
+
+  // 弹窗「登录后在线咨询」
+  const onPopLogin = () => {
+    setContactOpen(false)
+    navigate('/login')
+  }
+
+  const ctaGroup = (
+    <div className="pd-cta-group">
+      <button type="button" className="pd-cta pd-cta--main" onClick={onAskClick}>
+        {CHAT_ICON}
+        {TL.ask}
+      </button>
+      <button type="button" className="pd-cta pd-cta--copy" onClick={onCopyContact}>
+        {copiedContact ? COPY_OK_ICON : COPY_ICON}
+        {copiedContact ? TL.copied : TL.copy}
+      </button>
+    </div>
   )
 
   return createPortal(
@@ -524,7 +623,7 @@ function DetailPanel({ active, closeProperty }) {
                 </div>
               </dl>
 
-              {!isPage && ctaButton}
+              {!isPage && ctaGroup}
             </div>
           </section>
 
@@ -573,8 +672,34 @@ function DetailPanel({ active, closeProperty }) {
                 <span className="pd-price-unit">{c.ui.perMonth}</span>
               </strong>
             </div>
-            {ctaButton}
+            {ctaGroup}
           </footer>
+        )}
+
+        {/* 未登录咨询弹窗：登录 / 邮箱 / 电话 三选一 */}
+        {contactOpen && (
+          <div className="pd-contact-mask" onClick={() => setContactOpen(false)}>
+            <div className="pd-contact-pop" onClick={(e) => e.stopPropagation()}>
+              <div className="pd-contact-pop__title">{TL.popTitle}</div>
+              <p className="pd-contact-pop__sub">{TL.popSub}</p>
+              <button type="button" className="pd-contact-pop__btn pd-contact-pop__btn--login" onClick={onPopLogin}>
+                {CHAT_ICON}
+                {TL.login}
+              </button>
+              <button type="button" className="pd-contact-pop__btn" onClick={() => onPickContact('email')}>
+                {MAIL_ICON}
+                <span className="pd-contact-pop__label">{TL.email}</span>
+                <span className="pd-contact-pop__value">{CONTACT.email}</span>
+                {copiedWay === 'email' && <span className="pd-contact-pop__ok">{TL.copied}</span>}
+              </button>
+              <button type="button" className="pd-contact-pop__btn" onClick={() => onPickContact('phone')}>
+                {PHONE_ICON}
+                <span className="pd-contact-pop__label">{TL.phone}</span>
+                <span className="pd-contact-pop__value">{CONTACT.phone}</span>
+                {copiedWay === 'phone' && <span className="pd-contact-pop__ok">{TL.copied}</span>}
+              </button>
+            </div>
+          </div>
         )}
       </motion.div>
     </motion.div>,

@@ -209,6 +209,23 @@ export default function ChatPage() {
     return () => clearInterval(bannerRef.current)
   }, [isAuthenticated])
 
+  // 房源详情页带来的自动问询：登录态进入聊天窗后仅发送一次
+  useEffect(() => {
+    if (!isAuthenticated || !token) return
+    let pending = null
+    try {
+      pending = sessionStorage.getItem('vplus_chat_pending')
+      if (pending) sessionStorage.removeItem('vplus_chat_pending')
+    } catch {
+      /* ignore */
+    }
+    if (!pending) return
+    // 稍等首屏历史消息加载完成，再自动发出问询，保证排序在最后
+    const timer = setTimeout(() => send(pending), 800)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, token])
+
   async function send(textArg) {
     const text = (textArg ?? draft).trim()
     if (!text || sending) return
