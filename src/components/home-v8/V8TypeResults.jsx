@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useProperty } from '../ici/propertyContext.jsx'
 import V8RegionBoard from './V8RegionBoard.jsx'
+import V8FeaturedStrip from './V8FeaturedStrip.jsx'
 
 /* 首页内嵌房源展示区：点击导航类型菜单 / 首页四大类后就地展开（不跳转 /listings）。
    受控组件：sel 状态由 HomeV8 持有并同步隐藏其它首页区块；onClear 清除筛选并恢复。
@@ -47,6 +48,12 @@ export default function V8TypeResults({ sel, onClear }) {
 
   return (
     <section className="v8-section v8-typeres" id="type-results" ref={sectionRef}>
+      {/* Hero 下方：DJI 式精选房源卡片条 */}
+      <V8FeaturedStrip
+        items={properties.map((p, index) => ({ p, index })).slice(0, 4)}
+        onOpen={(index) => openProperty(index, 'g')}
+        viewText={lang === 'zh' ? '查看详情' : lang === 'ja' ? '詳細を見る' : 'View'}
+      />
       <div className="v8-wrap">
         <div className="v8-typeres__head v8-rise">
           <div className="v8-typeres__meta">

@@ -444,6 +444,72 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   .home-v8 .v8-fcard:hover { transform: none; }
 }
 
+/* ---------- 精选房源卡片条（DJI「热卖爆款」式样） ---------- */
+.v8-fstrip {
+  margin: 0 auto 56px; padding: 40px clamp(16px, 4vw, 56px) 48px;
+  background: #f5f6f8;
+}
+.v8-fstrip__title {
+  margin: 0 0 22px; font-size: clamp(19px, 2.2vw, 25px); font-weight: 700;
+  letter-spacing: -.01em; color: var(--v8-ink, #16161a);
+}
+.v8-fstrip__row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+}
+@media (max-width: 900px) { .v8-fstrip__row { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .v8-fstrip__row { grid-template-columns: 1fr; } }
+/* 竖版卡片：图片贴满整卡，白字叠加图片下部渐变，右下白色按钮 */
+.v8-fscard {
+  position: relative; display: block; overflow: hidden;
+  border: 0; padding: 0; background: #e8eaee; cursor: pointer;
+  border-radius: 4px; text-align: left; font: inherit; color: inherit;
+  min-width: 0;
+  transition: transform .35s var(--v8-ease, ease), box-shadow .35s var(--v8-ease, ease);
+}
+.v8-fscard:hover { transform: translateY(-3px); box-shadow: 0 18px 36px -18px rgba(22, 22, 26, .4); }
+.v8-fscard:active { transform: translateY(-1px) scale(.99); }
+.v8-fscard::before { content: ""; display: block; padding-top: 128%; }
+.v8-fscard > img,
+.v8-fscard .smart-img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; filter: saturate(.94);
+  transition: transform .6s var(--v8-ease, ease);
+}
+.v8-fscard:hover .smart-img { transform: scale(1.05); }
+.v8-fscard__shade {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(0deg, rgba(12, 14, 18, .68), rgba(12, 14, 18, .18) 38%, rgba(12, 14, 18, 0) 58%);
+}
+.v8-fscard__info {
+  position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 1;
+  display: flex; flex-direction: column; gap: 4px; color: #fff;
+}
+.v8-fscard__name {
+  font-size: 15px; font-weight: 700; letter-spacing: -.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .3);
+}
+.v8-fscard__sub {
+  font-size: 12px; color: rgba(255, 255, 255, .85);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.v8-fscard__meta {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-top: 8px;
+}
+.v8-fscard__price {
+  font-size: 14px; font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .3);
+}
+.v8-fscard__btn {
+  flex: none; padding: 7px 14px; border-radius: 4px;
+  background: #fff; color: var(--v8-ink, #16161a);
+  font-size: 12px; font-weight: 600;
+  transition: transform .25s var(--v8-ease, ease);
+}
+.v8-fscard:hover .v8-fscard__btn { transform: scale(1.04); }
+
 /* ---------- 区域找房板：区域大图卡片（banner）+ 房源小卡片行 ---------- */
 .v8-region { margin-bottom: 44px; }
 .v8-region:last-child { margin-bottom: 0; }
