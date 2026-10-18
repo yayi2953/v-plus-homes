@@ -15,7 +15,8 @@
   --v8-shadow-rest: 0 1px 2px rgba(22, 22, 26, .04), 0 12px 32px -16px rgba(22, 22, 26, .18);
   --v8-shadow-lift: 0 2px 4px rgba(22, 22, 26, .05), 0 22px 44px -18px rgba(22, 22, 26, .28);
   --v8-shadow-btn: inset 0 1px 0 rgba(255, 255, 255, .14), 0 10px 24px -12px rgba(22, 22, 26, .45);
-  background: #fff;
+  /* 页面底色对齐参考站浅灰：白卡浮于灰底形成层次 */
+  background: #f5f6f8;
   color: var(--v8-ink);
   font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -107,7 +108,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   min-height: 100dvh; /* 老内核不识别 dvh 时回退上一行 vh */
   display: flex; flex-direction: column;
   padding: 72px 0 0;
-  background: #fff;
+  background: #f5f6f8;
 }
 /* 房源展示态：介绍文字块隐藏后取消全屏最小高，Hero 紧贴轮播高度，消除下方大片留白 */
 .home-v8 .v8-hero.is-compact { min-height: 0; }
@@ -976,7 +977,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .home-v8 .v8-cta-foot { margin-top: 26px; font-size: 13px; color: var(--v8-muted); }
 
 /* ---------- Footer ---------- */
-.home-v8 .v8-footer { border-top: 1px solid var(--v8-line-soft); padding: 64px 28px 32px; background: #fff; }
+.home-v8 .v8-footer { border-top: 1px solid var(--v8-line-soft); padding: 64px 28px 32px; background: #f5f6f8; }
 .home-v8 .v8-footer-in { max-width: 1320px; margin: 0 auto; }
 .home-v8 .v8-footer-cols { display: grid; grid-template-columns: 1.6fr repeat(2, 1fr); gap: 36px; margin-bottom: 52px; }
 .home-v8 .v8-footer-brand .v8-wordmark { font-size: 16px; font-weight: 500; letter-spacing: .02em; color: var(--v8-ink); text-decoration: none; display: inline-block; font-family: "Gotham", "Montserrat", "Nunito Sans", "Helvetica Neue", Arial, sans-serif; }
@@ -1019,7 +1020,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .home-v8 .getstarted { margin: 0; border-radius: 0; }
 
 /* ---------- 其它服务（复用经典版 ExtraServices，仅在 v8 作用域内对齐"服务流程"样式与间距） ---------- */
-.home-v8 .extras { padding: 104px 28px; background: #fff; }
+.home-v8 .extras { padding: 104px 28px; background: #f5f6f8; }
 .home-v8 .extras .container { max-width: 1320px; margin: 0 auto; padding: 0; text-align: left; }
 /* 黑色胶囊眉标 → 与 v8-eyebrow 一致的灰色大字距小标 */
 .home-v8 .extras .eyebrow-pill {
