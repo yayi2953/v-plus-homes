@@ -71,12 +71,18 @@
           "from": "user",
           "text": "你好",
           "at": 1792340820343
+        },
+        {
+          "id": "m-mve1hq5b-3pygri",
+          "from": "admin",
+          "text": "你好",
+          "at": 1792340895647
         }
       ],
       "lastReadAdmin": 1792340889999,
       "lastReadUser": 1792340820343,
       "createdAt": 1792340820343,
-      "updatedAt": 1792340820343
+      "updatedAt": 1792340895647
     }
   ]
 }
