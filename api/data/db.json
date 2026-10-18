@@ -119,12 +119,18 @@
           "from": "admin",
           "text": "输入区可见测试",
           "at": 1792342617053
+        },
+        {
+          "id": "m-mve3aq2m-9ndqrt",
+          "from": "user",
+          "text": "【房源问询】\nVIVA0001 · 广州 · 海珠区\n3号线-广州塔\n珠江帝景\n户型: 三房两厅  ·  卫生间: 3 卫  ·  建筑面积: 238 m²\n租金: 26,800 起 (≈ 3,970$)\nhttps://www.vplushomes.com/zh/properties/VIVA0001\n您好，我想咨询这套房源，请帮我安排看房。",
+          "at": 1792343928190
         }
       ],
       "lastReadAdmin": 1792342609029,
-      "lastReadUser": 1792342340902,
+      "lastReadUser": 1792343928190,
       "createdAt": 1792340490629,
-      "updatedAt": 1792342617053
+      "updatedAt": 1792343928190
     },
     {
       "id": "c-mve1g41j-xdxz6a",
