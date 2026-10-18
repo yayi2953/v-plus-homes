@@ -527,28 +527,29 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-svc__grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
   align-items: stretch;
+  /* 锁定总高，使各列分界线比例与参考站一致 */
+  height: clamp(280px, 32vw, 420px);
 }
-.v8-svc__col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.v8-svc__col { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; }
 .v8-svc__card {
   background: #fff; border-radius: 12px; overflow: hidden;
   display: flex; flex-direction: column; align-items: center;
-  text-align: center; min-width: 0;
+  text-align: center; min-width: 0; min-height: 0;
 }
-/* 上图卡与矮卡：各列高度比对齐参考官网（55/45、38/62、60/40、60/40） */
-.v8-svc__col:nth-child(1) .v8-svc__card--img { flex: 1.22; }
-.v8-svc__col:nth-child(1) .v8-svc__card--mini { flex: 1; }
-.v8-svc__col:nth-child(2) .v8-svc__card--num { flex: 0.76; }
-.v8-svc__col:nth-child(2) .v8-svc__card--img { flex: 1.6; }
-.v8-svc__col:nth-child(3) .v8-svc__card--img { flex: 1.5; }
-.v8-svc__col:nth-child(3) .v8-svc__card--mini { flex: 1; }
-.v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 1.5; }
-.v8-svc__col:nth-child(4) .v8-svc__card--mini { flex: 1; }
+/* 各列上下卡分界线百分比定死（与参考站一致）：
+   列1 56/44、列2 34/66、列3 58/42、列4 58/42；另一张卡填满剩余 */
+.v8-svc__col:nth-child(1) .v8-svc__card--img { flex: 0 0 56%; }
+.v8-svc__col:nth-child(2) .v8-svc__card--num { flex: 0 0 34%; }
+.v8-svc__col:nth-child(3) .v8-svc__card--img,
+.v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 58%; }
+.v8-svc__col .v8-svc__card--mini { flex: 1 1 auto; }
+.v8-svc__col:nth-child(2) .v8-svc__card--img { flex: 1 1 auto; }
 .v8-svc__card--img .smart-img {
   flex: 1; width: 100%; min-height: 0;
   object-fit: cover; display: block;
 }
 .v8-svc__card--mini { padding: 16px 14px 18px; justify-content: center; gap: 12px; }
-.v8-svc__card--num { padding: 20px 14px; gap: 10px; }
+.v8-svc__card--num { padding: 20px 14px; gap: 10px; justify-content: center; }
 .v8-svc__card-t {
   display: block; padding: 18px 12px 14px; font-size: 15px; font-weight: 700;
   letter-spacing: -.01em; color: var(--v8-ink, #16161a);
@@ -577,7 +578,14 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   font-size: 32px; font-weight: 900; font-style: italic; color: #ff6b00;
   letter-spacing: .01em; line-height: 1;
 }
-@media (max-width: 900px) { .v8-svc__grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px) {
+  .v8-svc__grid { grid-template-columns: 1fr 1fr; height: auto; }
+  .v8-svc__col:nth-child(1) .v8-svc__card--img,
+  .v8-svc__col:nth-child(2) .v8-svc__card--num,
+  .v8-svc__col:nth-child(3) .v8-svc__card--img,
+  .v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 56%; }
+  .v8-svc__col { min-height: 300px; }
+}
 @media (max-width: 560px) { .v8-svc__grid { grid-template-columns: 1fr; } }
 
 /* ---------- 区域找房板：区域大图卡片（banner）+ 房源小卡片行 ---------- */
