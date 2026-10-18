@@ -77,12 +77,18 @@
           "from": "admin",
           "text": "你好",
           "at": 1792340895647
+        },
+        {
+          "id": "m-mve1jutm-nirysb",
+          "from": "user",
+          "text": "测试1111",
+          "at": 1792340995018
         }
       ],
       "lastReadAdmin": 1792340987064,
-      "lastReadUser": 1792340820343,
+      "lastReadUser": 1792340995018,
       "createdAt": 1792340820343,
-      "updatedAt": 1792340895647
+      "updatedAt": 1792340995018
     }
   ]
 }
