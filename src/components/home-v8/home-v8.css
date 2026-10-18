@@ -467,7 +467,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 /* 竖版卡片：图片贴满整卡，白字叠加图片下部渐变，右下白色按钮 */
 .v8-fscard {
   position: relative; display: block; overflow: hidden;
-  border: 0; padding: 0; background: #e8eaee; cursor: pointer;
+  border: 0; padding: 0; background: #fff; cursor: pointer;
   border-radius: 4px; text-align: left; font: inherit; color: inherit;
   min-width: 0;
   transition: transform .35s var(--v8-ease, ease), box-shadow .35s var(--v8-ease, ease);
