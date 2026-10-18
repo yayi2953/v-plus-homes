@@ -33,7 +33,7 @@ export default function V8Hero({ hideBody = false }) {
   const ot = slideText(t, idx)
 
   return (
-    <section className="v8-hero" id="top">
+    <section className={`v8-hero${hideBody ? ' is-compact' : ''}`} id="top">
       <div className="v8-hero-canvas">
         {/* 轮播背景图 */}
         <div className="v8-hero-videobg" aria-hidden="true">

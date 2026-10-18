@@ -109,6 +109,9 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   padding: 72px 0 0;
   background: #fff;
 }
+/* 房源展示态：介绍文字块隐藏后取消全屏最小高，Hero 紧贴轮播高度，消除下方大片留白 */
+.home-v8 .v8-hero.is-compact { min-height: 0; }
+.home-v8 .v8-hero.is-compact .v8-hero-canvas { height: clamp(420px, 58vh, 620px); }
 .home-v8 .v8-hero-canvas { position: relative; width: 100%; height: clamp(480px, 72vh, 760px); flex: none; }
 /* 「一句话找房」覆盖层：绝对居中于舞台，直接可见可交互 */
 .home-v8 .v8-hero-finder {
@@ -445,8 +448,10 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 
 /* ---------- 精选房源卡片条（DJI「热卖爆款」式样） ---------- */
+/* 展示区 section 清除默认大间距，使精选条紧贴 Hero 大图下方 */
+.v8-typeres.v8-section { padding-top: 0; }
 .v8-fstrip {
-  margin: 0 auto 56px; padding: 40px clamp(16px, 4vw, 56px) 48px;
+  margin: 0 auto 56px; padding: 36px clamp(16px, 4vw, 56px) 48px;
   background: #f5f6f8;
 }
 .v8-fstrip__title {
