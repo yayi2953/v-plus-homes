@@ -161,12 +161,18 @@
           "from": "user",
           "text": "豪华住宅",
           "at": 1792341372635
+        },
+        {
+          "id": "m-mve2fanl-6h6aoi",
+          "from": "user",
+          "text": "预约看房",
+          "at": 1792342461873
         }
       ],
       "lastReadAdmin": 1792342399995,
-      "lastReadUser": 1792341372635,
+      "lastReadUser": 1792342461873,
       "createdAt": 1792340820343,
-      "updatedAt": 1792341372635
+      "updatedAt": 1792342461873
     }
   ]
 }
