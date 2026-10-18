@@ -15,10 +15,19 @@
       "role": "admin",
       "password": "feef761f2b3c3003b361750412dd92b9:bd2de02796611b7f119dc763b26e0932a4ba7bd4ae978149701ddb6e9e0b81b3855772bde0f67ccf53f849545151486e3ab76189790e2f494a7178e9057544bd",
       "createdAt": 1792260450063
+    },
+    {
+      "id": "u-mve18bik-yhwte6",
+      "role": "user",
+      "createdAt": 1792340456780,
+      "email": "chat-test-1019@v-plus.test",
+      "name": "Chat Tester",
+      "password": "b95554b90799bec62da08ad21ba7a271:df87a1631ad00f6b0b98d77219e141b92768532999536c85ab434fb550ee630a6ab02c10b9ce2c55e7392ad5b55ed1d11f87e2286d297d89052753699a6915ac"
     }
   ],
   "listings": [],
   "messages": [],
   "services": [],
-  "texts": {}
+  "texts": {},
+  "chats": []
 }
