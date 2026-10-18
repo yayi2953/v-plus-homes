@@ -46,8 +46,8 @@ export default function ChatWorkbench({ authFetch }) {
       if (!res.ok) return
       const d = await res.json()
       const msgs = d.chat?.messages || []
-      // 乐观回复未被服务端确认前不覆盖本地
-      if (!localPushRef.current || msgs.length >= lastCountRef.current) {
+      // 仅在消息数增加或有待确认的本地乐观回复时更新，避免轮询空转触发自动滚底
+      if (msgs.length > lastCountRef.current || localPushRef.current) {
         localPushRef.current = false
         lastCountRef.current = msgs.length
         setActiveChat(d.chat)
@@ -61,7 +61,7 @@ export default function ChatWorkbench({ authFetch }) {
     return () => clearInterval(pollRef.current)
   }, [loadChats, loadActive])
 
-  // 消息变化自动滚底
+  // 消息数变化（即有新消息）才自动滚底
   useEffect(() => {
     const el = listRef.current
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })

@@ -39,23 +39,13 @@ const L = {
       '可以短租吗？最短租期多久？',
       'V PLUS 会员有什么权益？'
     ],
-    cards: [
-      { icon: 'search', label: '房源信息', q: '请介绍一下当前的房源信息' },
-      { icon: 'clock', label: '租房进度', q: '我想查询我的租房进度' },
-      { icon: 'calendar', label: '自助看房', q: '如何预约线下看房？' },
-      { icon: 'crown', label: '会员专区', q: 'V PLUS 会员有什么权益？' },
-      { icon: 'box', label: '失物招领', q: '我想登记失物招领' },
-      { icon: 'list', label: '我的订单', q: '我想查询我的订单' }
-    ],
     chips: ['🔥 新房源上线', '豪华住宅', '学生公寓', '城市公寓', '预约看房'],
     sideLinks: [
       { icon: 'search', label: '房源信息', q: '请介绍一下当前的房源信息' },
       { icon: 'calendar', label: '自助看房', q: '如何预约线下看房？' },
-      { icon: 'crown', label: '会员专区', q: 'V PLUS 会员有什么权益？' },
       { icon: 'flag', label: '租房申报', q: '我想申报租房相关事宜' },
       { icon: 'clock', label: '服务进度', q: '我想查询我的租房进度' },
-      { icon: 'tag', label: '房源价格查询', q: '请提供房源价格查询' },
-      { icon: 'shield', label: '查询 V PLUS 会员状态', q: '帮我查询 V PLUS 会员状态' }
+      { icon: 'tag', label: '房源价格查询', q: '请提供房源价格查询' }
     ]
   },
   en: {
@@ -81,23 +71,13 @@ const L = {
       'Is short-term rental possible?',
       'What are V PLUS member benefits?'
     ],
-    cards: [
-      { icon: 'search', label: 'Listings', q: 'Please introduce the current listings' },
-      { icon: 'clock', label: 'Progress', q: 'I want to check my rental progress' },
-      { icon: 'calendar', label: 'Viewing', q: 'How do I book a viewing?' },
-      { icon: 'crown', label: 'Membership', q: 'What are V PLUS member benefits?' },
-      { icon: 'box', label: 'Lost & Found', q: 'I want to report a lost item' },
-      { icon: 'list', label: 'My Orders', q: 'I want to check my orders' }
-    ],
     chips: ['🔥 New listings', 'Luxury', 'Student', 'City', 'Book a viewing'],
     sideLinks: [
       { icon: 'search', label: 'Listings', q: 'Please introduce the current listings' },
       { icon: 'calendar', label: 'Book a viewing', q: 'How do I book a viewing?' },
-      { icon: 'crown', label: 'Membership', q: 'What are V PLUS member benefits?' },
       { icon: 'flag', label: 'Rental requests', q: 'I want to submit a rental request' },
       { icon: 'clock', label: 'Service progress', q: 'I want to check my rental progress' },
-      { icon: 'tag', label: 'Price inquiry', q: 'Please provide listing prices' },
-      { icon: 'shield', label: 'Check member status', q: 'Please check my V PLUS member status' }
+      { icon: 'tag', label: 'Price inquiry', q: 'Please provide listing prices' }
     ]
   },
   ja: {
@@ -123,23 +103,13 @@ const L = {
       '短期賃貸は可能ですか？',
       'V PLUS 会員の特典は？'
     ],
-    cards: [
-      { icon: 'search', label: '物件情報', q: '現在の物件情報を紹介してください' },
-      { icon: 'clock', label: '進捗確認', q: '契約の進捗を確認したいです' },
-      { icon: 'calendar', label: '内見予約', q: '内見の予約方法は？' },
-      { icon: 'crown', label: '会員专区', q: 'V PLUS 会員の特典は？' },
-      { icon: 'box', label: '遗失物', q: '遺失物の登録をしたいです' },
-      { icon: 'list', label: '注文確認', q: '自分の注文を確認したいです' }
-    ],
     chips: ['🔥 新着物件', '高級住宅', '学生アパート', 'シティアパート', '内見予約'],
     sideLinks: [
       { icon: 'search', label: '物件情報', q: '現在の物件情報を紹介してください' },
       { icon: 'calendar', label: '内見予約', q: '内見の予約方法は？' },
-      { icon: 'crown', label: '会員特典', q: 'V PLUS 会員の特典は？' },
       { icon: 'flag', label: '申請・届出', q: '賃貸に関する申請をしたいです' },
       { icon: 'clock', label: 'サービス進捗', q: '契約の進捗を確認したいです' },
-      { icon: 'tag', label: '価格照会', q: '物件価格を教えてください' },
-      { icon: 'shield', label: '会員状態の確認', q: 'V PLUS 会員状態を確認してください' }
+      { icon: 'tag', label: '価格照会', q: '物件価格を教えてください' }
     ]
   }
 }
@@ -198,10 +168,10 @@ export default function ChatPage() {
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' })
   }, [])
 
-  // 应用服务端会话数据（仅在新消息更多时替换，避免覆盖本地乐观消息）
+  // 应用服务端会话数据（仅在消息数增加时更新，避免轮询空转触发自动滚底）
   const applyChat = useCallback((chat) => {
     const msgs = chat?.messages || []
-    if (msgs.length >= lastCountRef.current) {
+    if (msgs.length > lastCountRef.current) {
       lastCountRef.current = msgs.length
       setMessages(msgs)
     }
@@ -227,7 +197,7 @@ export default function ChatPage() {
     return () => clearInterval(pollRef.current)
   }, [isAuthenticated, token, loadChat])
 
-  // 消息变化滚到底部
+  // 消息数变化（即有新消息）才自动滚底
   useEffect(() => {
     scrollBottom(messages.length > 0)
   }, [messages, scrollBottom])
@@ -244,8 +214,7 @@ export default function ChatPage() {
     if (!text || sending) return
     setSending(true)
     setDraft('')
-    // 乐观更新：先本地展示，服务器响应后校正
-    lastCountRef.current += 1
+    // 乐观更新：先本地展示，服务器响应后校正（不改动计数，避免失败后漏计新消息）
     setMessages((m) => [...m, { id: `local-${Date.now()}`, from: 'user', text, at: Date.now() }])
     try {
       const res = await authFetch('/api/chat/send', {
@@ -288,9 +257,9 @@ export default function ChatPage() {
   return (
     <div className="v8-chat">
       <div className="v8-chat__shell">
-        {/* 顶栏：品牌字标 + 关闭 */}
+        {/* 顶栏：品牌 Logo + 关闭 */}
         <header className="v8-chat__header">
-          <span className="v8-chat__logo">V PLUS</span>
+          <img src="/images/vlu-logo.png" alt="V PLUS" className="v8-chat__logo" />
           <button className="v8-chat__close" onClick={() => navigate('/')} aria-label={lang === 'zh' ? '关闭' : 'Close'}>
             <Icon name="close" size={16} />
           </button>
@@ -299,16 +268,6 @@ export default function ChatPage() {
         <div className="v8-chat__body">
           {/* 左：聊天区 */}
           <section className="v8-chat__main">
-            {/* 服务入口卡片行 */}
-            <div className="v8-chat__services">
-              {T.cards.map((c) => (
-                <button key={c.label} className="v8-chat__service" onClick={() => send(c.q)}>
-                  <span className="v8-chat__service-ico"><Icon name={c.icon} size={16} /></span>
-                  <span className="v8-chat__service-label">{c.label}</span>
-                </button>
-              ))}
-            </div>
-
             {/* 消息画布 */}
             <div className="v8-chat__canvas" ref={canvasRef}>
               {/* 猜您想问 */}
