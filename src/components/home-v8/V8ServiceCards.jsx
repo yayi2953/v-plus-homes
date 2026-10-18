@@ -40,7 +40,7 @@ export default function V8ServiceCards({ lang = 'zh' }) {
         <div className="v8-svc__col">
           <div className="v8-svc__card v8-svc__card--img">
             <span className="v8-svc__card-t">{t.c1a}</span>
-            <SmartImage src="/images/listing-family.jpg" alt="" />
+            <span className="v8-svc__imgbox"><SmartImage src="/images/listing-family.jpg" alt="" /></span>
           </div>
           <div className="v8-svc__card v8-svc__card--mini">
             <span className="v8-svc__card-t">{t.c1b}</span>
@@ -48,7 +48,7 @@ export default function V8ServiceCards({ lang = 'zh' }) {
           </div>
         </div>
 
-        {/* 列 2：矮数字卡(38) + 高图卡(62)，橙色特大数字 */}
+        {/* 列 2：矮数字卡(34) + 高图卡(66)，橙色特大数字 */}
         <div className="v8-svc__col">
           <div className="v8-svc__card v8-svc__card--mini v8-svc__card--num">
             <span className="v8-svc__card-t">{t.c2a}</span>
@@ -56,7 +56,7 @@ export default function V8ServiceCards({ lang = 'zh' }) {
           </div>
           <div className="v8-svc__card v8-svc__card--img">
             <span className="v8-svc__card-t">{t.c2b}</span>
-            <SmartImage src="/images/listing-studio.jpg" alt="" />
+            <span className="v8-svc__imgbox"><SmartImage src="/images/listing-studio.jpg" alt="" /></span>
           </div>
         </div>
 
@@ -64,7 +64,7 @@ export default function V8ServiceCards({ lang = 'zh' }) {
         <div className="v8-svc__col">
           <div className="v8-svc__card v8-svc__card--img">
             <span className="v8-svc__card-t">{t.c3a}</span>
-            <SmartImage src="/images/listing-penthouse.jpg" alt="" />
+            <span className="v8-svc__imgbox"><SmartImage src="/images/listing-penthouse.jpg" alt="" /></span>
           </div>
           <div className="v8-svc__card v8-svc__card--mini">
             <span className="v8-svc__card-t">{t.c3b}</span>
@@ -76,7 +76,7 @@ export default function V8ServiceCards({ lang = 'zh' }) {
         <div className="v8-svc__col">
           <div className="v8-svc__card v8-svc__card--img">
             <span className="v8-svc__card-t">{t.c4a}</span>
-            <SmartImage src="/images/listing-student1.jpg" alt="" />
+            <span className="v8-svc__imgbox"><SmartImage src="/images/listing-student1.jpg" alt="" /></span>
           </div>
           <div className="v8-svc__card v8-svc__card--mini">
             <span className="v8-svc__card-t">{t.c4b}</span>
