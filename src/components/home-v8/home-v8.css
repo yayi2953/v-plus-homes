@@ -515,6 +515,67 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 .v8-fscard:hover .v8-fscard__btn { transform: scale(1.04); }
 
+/* ---------- 服务卡片网格（一比一复刻参考布局） ---------- */
+.v8-svc {
+  margin: 0 auto 56px; padding: 36px clamp(16px, 4vw, 56px) 44px;
+  background: #f5f6f8;
+}
+.v8-svc__title {
+  margin: 0 0 22px; font-size: clamp(19px, 2.2vw, 25px); font-weight: 700;
+  letter-spacing: -.01em; color: var(--v8-ink, #16161a);
+}
+.v8-svc__grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  align-items: stretch;
+}
+.v8-svc__col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.v8-svc__card {
+  background: #fff; border-radius: 12px; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; min-width: 0;
+}
+/* 上图卡（高）与矮卡的高度比约 2:1 */
+.v8-svc__card--img { flex: 1.9; }
+.v8-svc__card--img .smart-img {
+  flex: 1; width: 100%; min-height: 0;
+  object-fit: cover; display: block;
+}
+.v8-svc__card--mini { flex: 1; padding: 16px 14px 18px; justify-content: center; gap: 12px; }
+.v8-svc__card-t {
+  display: block; padding: 18px 12px 14px; font-size: 15px; font-weight: 700;
+  letter-spacing: -.01em; color: var(--v8-ink, #16161a);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+.v8-svc__card--mini .v8-svc__card-t { padding: 0; }
+.v8-svc__card-t--mid { padding: 4px 12px 12px; }
+/* 通高卡：纵跨两行 */
+.v8-svc__card--tall { min-height: 0; }
+.v8-svc__big {
+  font-size: clamp(38px, 4.2vw, 54px); font-weight: 900; color: #ff7a1a;
+  line-height: 1; letter-spacing: -.01em; padding: 0 12px 16px;
+}
+.v8-svc__tallimg { display: block; width: 100%; flex: 1; min-height: 0; margin-top: auto; overflow: hidden; }
+.v8-svc__tallimg .smart-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* 矮卡图形：描边数字框 / 对勾 / 斜体大字 */
+.v8-svc__pct {
+  display: inline-flex; align-items: baseline; justify-content: center;
+  border: 3px solid #ff7a1a; border-radius: 10px; padding: 2px 10px 5px;
+  color: #ff7a1a; line-height: 1;
+}
+.v8-svc__pct b { font-size: 26px; font-weight: 800; }
+.v8-svc__pct i { font-style: normal; font-size: 14px; font-weight: 800; }
+.v8-svc__check {
+  width: 42px; height: 42px; border-radius: 50%; background: #ff7a1a;
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800;
+}
+.v8-svc__free {
+  font-size: 32px; font-weight: 900; font-style: italic; color: #ff7a1a;
+  letter-spacing: .01em; line-height: 1;
+}
+@media (max-width: 900px) { .v8-svc__grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .v8-svc__grid { grid-template-columns: 1fr; } }
+
 /* ---------- 区域找房板：区域大图卡片（banner）+ 房源小卡片行 ---------- */
 .v8-region { margin-bottom: 44px; }
 .v8-region:last-child { margin-bottom: 0; }

@@ -3,6 +3,7 @@ import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useProperty } from '../ici/propertyContext.jsx'
 import V8RegionBoard from './V8RegionBoard.jsx'
 import V8FeaturedStrip from './V8FeaturedStrip.jsx'
+import V8ServiceCards from './V8ServiceCards.jsx'
 
 /* 首页内嵌房源展示区：点击导航类型菜单 / 首页四大类后就地展开（不跳转 /listings）。
    受控组件：sel 状态由 HomeV8 持有并同步隐藏其它首页区块；onClear 清除筛选并恢复。
@@ -54,6 +55,8 @@ export default function V8TypeResults({ sel, onClear }) {
         onOpen={(index) => openProperty(index, 'g')}
         viewText={lang === 'zh' ? '查看详情' : lang === 'ja' ? '詳細を見る' : 'View'}
       />
+      {/* 精选条下方：服务卡片网格 */}
+      <V8ServiceCards lang={lang} />
       <div className="v8-wrap">
         <div className="v8-typeres__head v8-rise">
           <div className="v8-typeres__meta">
