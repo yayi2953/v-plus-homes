@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useProperty } from '../ici/propertyContext.jsx'
-import PropertyQuadCard from './PropertyQuadCard.jsx'
+import V8RegionBoard from './V8RegionBoard.jsx'
 
 /* 首页内嵌房源展示区：点击导航类型菜单 / 首页四大类后就地展开（不跳转 /listings）。
    受控组件：sel 状态由 HomeV8 持有并同步隐藏其它首页区块；onClear 清除筛选并恢复。
@@ -61,17 +61,10 @@ export default function V8TypeResults({ sel, onClear }) {
         </div>
 
         {items.length > 0 ? (
-          <div className="v8-listings__grid">
-            {items.map((it, seq) => (
-              <PropertyQuadCard
-                key={`${it.p.code}-${it.index}`}
-                p={it.p}
-                seq={seq + 1}
-                lang={lang}
-                onOpen={() => openProperty(it.index, 'g')}
-              />
-            ))}
-          </div>
+          <V8RegionBoard
+            items={items}
+            onOpen={(index) => openProperty(index, 'g')}
+          />
         ) : (
           <p className="v8-featured-empty">
             {lang === 'zh'

@@ -74,6 +74,7 @@ export function IciI18nProvider({ children }) {
             area: parseInt(l.area, 10) || 0,
             amenities: [],
             district: [l.address, l.city].filter(Boolean).join(' · ') || l.city || '',
+            city: l.city || '',
             districtKey: null,
             price: `¥${l.price}`,
             img: imgs[0] || '/images/listing-family.jpg',

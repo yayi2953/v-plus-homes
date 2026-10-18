@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { useProperty } from '../ici/propertyContext.jsx'
 import { navigate } from '../../lib/router.mjs'
-import PropertyQuadCard from './PropertyQuadCard.jsx'
+import V8RegionBoard from './V8RegionBoard.jsx'
 import V8Bubbles from './V8Bubbles.jsx'
 
 /* 房源结果页：根据 URL 查询参数（district/beds/budget/type/school）
@@ -75,13 +75,10 @@ export default function V8Listings() {
     activeSchool ? activeSchool.label : null
   ].filter(Boolean)
 
-  const renderCard = ({ p, index }, seq) => (
-    <PropertyQuadCard
-      key={`${p.code}-${index}`}
-      p={p}
-      seq={seq}
-      lang={lang}
-      onOpen={() => openProperty(index, 'v8')}
+  const renderBoard = (list) => (
+    <V8RegionBoard
+      items={list}
+      onOpen={(index) => openProperty(index, 'v8')}
     />
   )
 
@@ -112,11 +109,9 @@ export default function V8Listings() {
           </p>
         </div>
 
-        {/* 房源卡片网格：虚拟房源 + 后台真实房源（置于弹幕上方，进页即见） */}
+        {/* 房源展示：区域分组（区域大图卡片 + 房源小卡片行），虚拟房源 + 后台真实房源 */}
         {items.length > 0 ? (
-          <div className="v8-listings__grid">
-            {items.map((it, seq) => renderCard(it, seq + 1))}
-          </div>
+          renderBoard(items)
         ) : (
           <p className="v8-featured-empty">
             {lang === 'zh' ? '暂无符合条件的房源，请调整筛选条件' : lang === 'ja' ? '条件に合う物件はまだありません。絞り込み条件をご調整ください。' : 'No homes match your filters yet — try adjusting them.'}
