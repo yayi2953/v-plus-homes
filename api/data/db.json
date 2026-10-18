@@ -113,12 +113,18 @@
           "from": "user",
           "text": "押金和付款方式是什么？",
           "at": 1792342340902
+        },
+        {
+          "id": "m-mve2ime5-8glwjj",
+          "from": "admin",
+          "text": "输入区可见测试",
+          "at": 1792342617053
         }
       ],
       "lastReadAdmin": 1792342609029,
       "lastReadUser": 1792342340902,
       "createdAt": 1792340490629,
-      "updatedAt": 1792342340902
+      "updatedAt": 1792342617053
     },
     {
       "id": "c-mve1g41j-xdxz6a",
