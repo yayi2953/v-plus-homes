@@ -248,12 +248,18 @@
           "from": "user",
           "text": "您好，我想咨询这套房源，请帮我安排看房。",
           "at": 1792344818110
+        },
+        {
+          "id": "m-mve3xo4d-9bghyd",
+          "from": "admin",
+          "text": "1111",
+          "at": 1792344998749
         }
       ],
       "lastReadAdmin": 1792344987004,
       "lastReadUser": 1792344818110,
       "createdAt": 1792340820343,
-      "updatedAt": 1792344818110
+      "updatedAt": 1792344998749
     }
   ]
 }
