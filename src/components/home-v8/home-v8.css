@@ -530,8 +530,8 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
   align-items: stretch;
   max-width: 1320px; margin: 0 auto;
-  /* 总高锁定：1024 视口约 240px，与参考站一致（避免卡片被拉长） */
-  height: clamp(220px, 23.5vw, 360px);
+  /* 总高拉高：网格底部延伸至「为你找到的房源」标题上方（约 26.5vw） */
+  height: clamp(240px, 26.5vw, 420px);
 }
 .v8-svc__col { display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; }
 .v8-svc__card {
@@ -539,12 +539,11 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   display: flex; flex-direction: column; align-items: center;
   text-align: center; min-width: 0; min-height: 0;
 }
-/* 各列上下卡分界线百分比定死（从参考站截图量取，含 12px 间隙）：
-   列1 上卡 54%、列2 数字卡 33%、列3/4 上卡 56%；另一张卡填满剩余 */
-.v8-svc__col:nth-child(1) .v8-svc__card--img { flex: 0 0 54%; }
+/* 四列分界统一 33/67：所有图卡等高（对齐列 2 图卡高度），上卡 33%、图卡 67% */
 .v8-svc__col:nth-child(2) .v8-svc__card--num { flex: 0 0 33%; }
+.v8-svc__col:nth-child(1) .v8-svc__card--img,
 .v8-svc__col:nth-child(3) .v8-svc__card--img,
-.v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 56%; }
+.v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 67%; }
 .v8-svc__col .v8-svc__card--mini { flex: 1 1 auto; }
 .v8-svc__col:nth-child(2) .v8-svc__card--img { flex: 1 1 auto; }
 .v8-svc__card--img .smart-img {
@@ -595,7 +594,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   .v8-svc__col:nth-child(1) .v8-svc__card--img,
   .v8-svc__col:nth-child(2) .v8-svc__card--num,
   .v8-svc__col:nth-child(3) .v8-svc__card--img,
-  .v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 56%; }
+  .v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 33%; }
   .v8-svc__col { min-height: 300px; }
 }
 @media (max-width: 560px) { .v8-svc__grid { grid-template-columns: 1fr; } }
