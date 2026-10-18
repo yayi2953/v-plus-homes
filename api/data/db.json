@@ -29,5 +29,24 @@
   "messages": [],
   "services": [],
   "texts": {},
-  "chats": []
+  "chats": [
+    {
+      "id": "c-mve191mt-pjjz8d",
+      "userId": "u-mve18bik-yhwte6",
+      "userName": "Chat Tester",
+      "userEmail": "chat-test-1019@v-plus.test",
+      "messages": [
+        {
+          "id": "m-mve191mt-er7sj5",
+          "from": "user",
+          "text": "你好，请问还有房源吗？",
+          "at": 1792340490629
+        }
+      ],
+      "lastReadAdmin": 0,
+      "lastReadUser": 1792340490629,
+      "createdAt": 1792340490629,
+      "updatedAt": 1792340490629
+    }
+  ]
 }
