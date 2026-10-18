@@ -516,18 +516,19 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-fscard:hover .v8-fscard__btn { transform: scale(1.04); }
 
 /* ---------- 服务卡片网格（一比一复刻参考布局） ---------- */
-/* 垂直节奏对齐参考站：上方区块→标题 30px、标题→网格 ~39px、网格→下一区块 ~38px */
+/* 垂直节奏对齐参考站；内容区与下方 .v8-wrap 对齐（max-width 1320 居中 + 28px 侧距），无底色 */
 .v8-svc {
-  margin: 0 0 8px; padding: 30px clamp(16px, 12vw, 150px) 30px;
-  background: #f5f6f8;
+  margin: 0 0 8px; padding: 30px 28px;
+  background: none;
 }
 .v8-svc__title {
-  margin: 0 0 30px; font-size: clamp(18px, 2.1vw, 30px); font-weight: 600;
+  max-width: 1320px; margin: 0 auto 30px; font-size: clamp(18px, 2.1vw, 30px); font-weight: 600;
   letter-spacing: -.01em; color: rgba(0, 0, 0, .85);
 }
 .v8-svc__grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
   align-items: stretch;
+  max-width: 1320px; margin: 0 auto;
   /* 总高锁定：1024 视口约 240px，与参考站一致（避免卡片被拉长） */
   height: clamp(220px, 23.5vw, 360px);
 }
