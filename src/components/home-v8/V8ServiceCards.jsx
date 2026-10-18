@@ -35,8 +35,9 @@ export default function V8ServiceCards({ lang = 'zh' }) {
       <div className="v8-svc__grid">
         {/* 列 1：上卡(50) + 矮卡(50)，描边数字框图形 */}
         <div className="v8-svc__col">
-          <div className="v8-svc__card v8-svc__card--img">
+          <div className="v8-svc__card v8-svc__card--img v8-svc__card--photog">
             <span className="v8-svc__card-t">{t.c1a}</span>
+            <span className="v8-svc__imgbox"><img src="/images/photographer.jpg" alt="" loading="lazy" /></span>
           </div>
           <div className="v8-svc__card v8-svc__card--mini">
             <span className="v8-svc__card-t">{t.c1b}</span>
