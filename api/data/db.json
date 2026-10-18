@@ -101,12 +101,18 @@
           "from": "user",
           "text": "连续消息",
           "at": 1792341820521
+        },
+        {
+          "id": "m-mve2aifp-6kmqs1",
+          "from": "user",
+          "text": "滚底测试",
+          "at": 1792342238677
         }
       ],
       "lastReadAdmin": 1792340983789,
-      "lastReadUser": 1792341820521,
+      "lastReadUser": 1792342238677,
       "createdAt": 1792340490629,
-      "updatedAt": 1792341820521
+      "updatedAt": 1792342238677
     },
     {
       "id": "c-mve1g41j-xdxz6a",
