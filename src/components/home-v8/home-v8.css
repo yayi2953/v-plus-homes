@@ -1450,13 +1450,11 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 .v8-quiz__select:focus { outline: none; border-color: #16161a; }
 
-/* 右下角操作区：不限（灰色文本式）+ 上一步 */
-.v8-quiz__foot { margin-top: 28px; display: flex; align-items: center; justify-content: flex-end; gap: 20px; }
-.v8-quiz__any { padding: 0; background: none; border: 0; color: #9a9fa6; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
-.v8-quiz__any:hover { color: #16161a; }
+/* 操作区：上一步常驻左下角，确认？常驻右下角（第 1 步无上一步时确认仍靠右） */
+.v8-quiz__foot { margin-top: 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .v8-quiz__back { padding: 0; background: none; border: 0; color: #0070d5; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
 .v8-quiz__back:hover { text-decoration: underline; text-underline-offset: 3px; }
-.v8-quiz__confirm { padding: 0; background: none; border: 0; color: #0070d5; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.v8-quiz__confirm { margin-left: auto; padding: 0; background: none; border: 0; color: #0070d5; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
 .v8-quiz__confirm:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* 价格题：双把手区间滑杆（容器作轨道并注入选中段渐变，两只 input 仅提供把手） */
@@ -1484,8 +1482,14 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   pointer-events: all;
 }
 .v8-quiz__slider input[type='range']::-moz-range-track { background: none; }
-.v8-quiz__slider-scale { display: flex; justify-content: space-between; }
-.v8-quiz__slider-scale span { font-size: 11.5px; color: #9a9fa6; }
+/* 刻度按真实价格比例绝对定位（连续滑杆不再等距档位） */
+.v8-quiz__slider-scale { position: relative; height: 15px; }
+.v8-quiz__slider-scale span {
+  position: absolute; top: 0; transform: translateX(-50%);
+  font-size: 11.5px; color: #9a9fa6; white-space: nowrap;
+}
+.v8-quiz__slider-scale span:first-child { transform: none; }
+.v8-quiz__slider-scale span:last-child { transform: translateX(-100%); }
 .v8-quiz__slider-scale span.is-on { color: #16161a; font-weight: 600; }
 .v8-tmodal { width: min(560px, 100%); border-radius: 8px; }
 .v8-tmodal .legal-modal__close { background: none; border: 0; box-shadow: none; }
