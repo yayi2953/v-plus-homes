@@ -1412,22 +1412,25 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 @media (max-width: 1080px) {
   .v8-nav__mega-blurb { display: none; }
 }
-/* 类型详情弹窗（复用 legal-overlay / legal-modal 外壳） */
-.v8-tmodal { width: min(460px, 100%); }
-.v8-tmodal__hero { height: 200px; overflow: hidden; background: #f0f0f0; }
-.v8-tmodal__hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.v8-tmodal__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px 0; }
-.v8-tmodal__title { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.01em; color: var(--ink, #16161a); }
-.v8-tmodal__body { padding: 8px 24px 4px; overflow-y: auto; }
-.v8-tmodal__desc { margin: 0 0 14px; font-size: 14px; line-height: 1.7; color: #55585f; }
-.v8-tmodal__feats { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.v8-tmodal__feats li { position: relative; padding-left: 26px; font-size: 14px; line-height: 1.6; color: var(--ink, #16161a); }
+/* 类型详情弹窗（大疆式紧凑无图：标题+关闭同行、简介、特色、蓝色文字链接） */
+.v8-tmodal { width: min(560px, 100%); }
+.v8-tmodal__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px 0; }
+.v8-tmodal__title { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -.01em; color: var(--ink, #16161a); }
+.v8-tmodal__body { padding: 10px 24px 24px; }
+.v8-tmodal__desc { margin: 0 0 14px; font-size: 13.5px; line-height: 1.7; color: #55585f; }
+.v8-tmodal__feats { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.v8-tmodal__feats li { position: relative; padding-left: 26px; font-size: 13.5px; line-height: 1.6; color: var(--ink, #16161a); }
 .v8-tmodal__feats li::before {
   content: '✓'; position: absolute; left: 2px; top: 0;
   color: var(--v8-wa, #1fb957); font-weight: 700;
 }
-.v8-tmodal__foot { padding: 12px 24px 20px; display: flex; justify-content: flex-end; }
-.v8-tmodal__foot .legal-modal__ok { width: auto; padding: 11px 26px; }
+.v8-tmodal__link {
+  margin-top: 16px; padding: 0;
+  background: none; border: 0;
+  color: #0070d5; font-size: 14px; font-family: inherit;
+  cursor: pointer;
+}
+.v8-tmodal__link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .v8-nav__mega-side {
   width: 220px; flex: none;
   padding-left: 32px; border-left: 1px solid var(--v8n-line);

@@ -4,15 +4,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import { Close } from '../ici/Icons.jsx'
 
-// 户型详情弹窗：导航「房源」下拉「了解」入口。图片 + 简介 + 三条特色 + 查看房源 CTA。
+// 户型详情弹窗：导航「房源」下拉点击类型名触发。
+// 大疆式紧凑无图弹窗：标题 + 关闭同行，一句简介，特色勾选列表，蓝色文字链接跳转。
 // 弹窗外壳复用 legal-overlay / legal-modal 样式体系，内容为 v8-tmodal 专属类。
-
-const IMG = {
-  luxury: '/images/listing-penthouse.jpg',
-  standard: '/images/listing-family.jpg',
-  student: '/images/listing-student1.jpg',
-  city: '/images/listing-studio.jpg'
-}
 
 const FEATS = {
   luxury: {
@@ -78,9 +72,6 @@ export default function TypeModal({ typeKey, onClose, onBrowse }) {
             transition={{ type: 'spring', stiffness: 320, damping: 30 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="v8-tmodal__hero">
-              <img src={IMG[typeKey] || IMG.city} alt={type.label} />
-            </div>
             <header className="v8-tmodal__head">
               <h3 className="v8-tmodal__title">{type.label}</h3>
               <button type="button" className="legal-modal__close" onClick={() => onClose?.()} aria-label={lang === 'zh' ? '关闭' : 'Close'}>
@@ -92,12 +83,10 @@ export default function TypeModal({ typeKey, onClose, onBrowse }) {
               <ul className="v8-tmodal__feats">
                 {feats.map((f) => <li key={f}>{f}</li>)}
               </ul>
-            </div>
-            <footer className="v8-tmodal__foot">
-              <button type="button" className="legal-modal__ok v8-tmodal__ok" onClick={() => onBrowse(typeKey)}>
+              <button type="button" className="v8-tmodal__link" onClick={() => onBrowse(typeKey)}>
                 {browseLabel}
               </button>
-            </footer>
+            </div>
           </motion.div>
         </motion.div>
       ) : null}
