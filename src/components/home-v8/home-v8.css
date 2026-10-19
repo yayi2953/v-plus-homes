@@ -297,7 +297,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 /* ---------- Types：editorial 索引行 + 联动大图舞台 ---------- */
 .home-v8 .v8-types {
   display: grid; grid-template-columns: 5fr 6fr; gap: 64px;
-  align-items: center;
+  align-items: start; /* 视频舞台与索引列表顶对齐：视频上沿 = 「豪华住宅」首行上沿线 */
 }
 /* 左：杂志目录式索引，发丝线收口，不卡片化 */
 .home-v8 .v8-type-index { border-top: 1px solid var(--v8-line); }
