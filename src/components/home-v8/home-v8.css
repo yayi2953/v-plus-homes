@@ -1393,7 +1393,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-nav__mega .v8-nav__mega-main--list { flex: none; width: 300px; }
 .v8-nav__mega-main--list .v8-nav__mega-item {
   flex-direction: column; align-items: flex-start; justify-content: center;
-  gap: 3px; padding: 13px 16px; border-radius: 10px;
+  gap: 3px; padding: 0 16px 13px; border-radius: 10px;
   text-align: left;
 }
 .v8-nav__mega-main--list .v8-nav__mega-info { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
