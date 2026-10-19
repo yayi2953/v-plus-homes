@@ -15,7 +15,7 @@ export default function V8Types() {
   const { c } = useIciI18n()
   const types = c.discover?.types || []
   const t = c.v8?.types || {}
-  // active：点击选中的户型（行高亮 + 驱动视频舞台）
+  // active：鼠标停留选中的户型（行高亮 + 驱动视频舞台）
   const [active, setActive] = useState(0)
   if (!types.length) return null
 
@@ -35,13 +35,16 @@ export default function V8Types() {
         </div>
 
         <div className="v8-types v8-rise">
-          {/* 索引行：点击切换右侧视频舞台；点击执行原有筛选 */}
+          {/* 索引行：鼠标停留即切换右侧视频舞台（离开后保持最后停留项循环播放，重新停留即切换）；
+              点击保留原有展开房源列表行为（触屏无 hover，仍靠点击） */}
           <div className="v8-type-index">
             {types.map((tp, i) => (
               <button
                 type="button"
                 key={tp.key}
                 className={`v8-trow${active === i ? ' is-on' : ''}`}
+                onMouseEnter={() => setActive(i)}
+                onFocus={() => setActive(i)}
                 onClick={() => pick(tp.key, i)}
                 aria-label={`${tp.label}, ${t.view}`}
               >
