@@ -462,8 +462,8 @@ export default function AdminPage() {
           </table>
 
           {pwdUser && (
-            <div className="v8-admin__modal-mask" onClick={() => setPwdUser(null)}>
-              <div className="v8-admin__modal" onClick={(e) => e.stopPropagation()}>
+            <div className="v8-admin__modal" onClick={() => setPwdUser(null)}>
+              <div className="v8-admin__modal-box v8-admin__pwd-box" onClick={(e) => e.stopPropagation()}>
                 <h3>{t('修改密码', 'Reset Password')}</h3>
                 <p className="v8-admin__modal-user">{pwdUser.name} · {pwdUser.email}</p>
                 <input
