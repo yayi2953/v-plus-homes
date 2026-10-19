@@ -646,3 +646,56 @@
   .v8-cw__list { max-height: 260px; border-right: none; border-bottom: 1px solid #e5e7eb; }
   .v8-cw__window { height: 520px; }
 }
+
+/* ---------- 用户管理：修改密码 ---------- */
+.v8-admin__pwd-btn {
+  padding: 5px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+  color: #16161a;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.v8-admin__pwd-btn:hover { border-color: #16161a; background: #16161a; color: #fff; }
+.v8-admin__modal-mask {
+  position: fixed; inset: 0; z-index: 320;
+  background: rgba(17, 24, 39, .45);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.v8-admin__modal {
+  width: 100%; max-width: 380px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .18);
+}
+.v8-admin__modal h3 { margin: 0 0 6px; font-size: 17px; font-weight: 600; color: #16161a; }
+.v8-admin__modal-user { margin: 0 0 16px; font-size: 13px; color: #6b7280; }
+.v8-admin__modal-input {
+  width: 100%; box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s;
+}
+.v8-admin__modal-input:focus { border-color: #16161a; }
+.v8-admin__modal-msg { margin: 10px 0 0; font-size: 13px; color: #dc2626; }
+.v8-admin__modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.v8-admin__pwd-cancel {
+  padding: 9px 18px; border: 1px solid #d1d5db; border-radius: 6px;
+  background: #fff; color: #374151; font-size: 14px; cursor: pointer; transition: all .2s;
+}
+.v8-admin__pwd-cancel:hover { border-color: #9ca3af; }
+.v8-admin__pwd-save {
+  padding: 9px 18px; border: none; border-radius: 6px;
+  background: #16161a; color: #fff; font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: opacity .2s;
+}
+.v8-admin__pwd-save:hover { opacity: .85; }

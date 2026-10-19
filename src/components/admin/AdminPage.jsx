@@ -22,6 +22,10 @@ export default function AdminPage() {
   const [listings, setListings] = useState([])
   const [messages, setMessages] = useState([])
   const [users, setUsers] = useState([])
+  // 用户管理：修改密码弹窗
+  const [pwdUser, setPwdUser] = useState(null)
+  const [pwdVal, setPwdVal] = useState('')
+  const [pwdMsg, setPwdMsg] = useState('')
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ ...EMPTY_LISTING })
   const [saving, setSaving] = useState(false)
@@ -436,7 +440,7 @@ export default function AdminPage() {
           <h2>{t('注册用户', 'Registered Users')} ({users.length})</h2>
           <table className="v8-admin__table">
             <thead>
-              <tr><th>{t('姓名', 'Name')}</th><th>{t('邮箱', 'Email')}</th><th>{t('角色', 'Role')}</th><th>{t('注册时间', 'Registered')}</th></tr>
+              <tr><th>{t('姓名', 'Name')}</th><th>{t('邮箱', 'Email')}</th><th>{t('角色', 'Role')}</th><th>{t('注册时间', 'Registered')}</th><th>{t('操作', 'Actions')}</th></tr>
             </thead>
             <tbody>
               {users.map((u) => (
@@ -445,10 +449,55 @@ export default function AdminPage() {
                   <td>{u.email}</td>
                   <td>{u.role === 'admin' ? t('管理员', 'Admin') : t('普通用户', 'User')}</td>
                   <td>{new Date(u.createdAt).toLocaleString(zh ? 'zh-CN' : 'en-US')}</td>
+                  <td>
+                    {u.role !== 'admin' && (
+                      <button className="v8-admin__pwd-btn" onClick={() => { setPwdUser(u); setPwdVal(''); setPwdMsg('') }}>
+                        {t('修改密码', 'Reset Password')}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          {pwdUser && (
+            <div className="v8-admin__modal-mask" onClick={() => setPwdUser(null)}>
+              <div className="v8-admin__modal" onClick={(e) => e.stopPropagation()}>
+                <h3>{t('修改密码', 'Reset Password')}</h3>
+                <p className="v8-admin__modal-user">{pwdUser.name} · {pwdUser.email}</p>
+                <input
+                  type="text"
+                  className="v8-admin__modal-input"
+                  value={pwdVal}
+                  placeholder={t('新密码（至少 6 位）', 'New password (min 6 chars)')}
+                  onChange={(e) => { setPwdVal(e.target.value); setPwdMsg('') }}
+                />
+                {pwdMsg && <p className="v8-admin__modal-msg">{pwdMsg}</p>}
+                <div className="v8-admin__modal-actions">
+                  <button className="v8-admin__pwd-cancel" onClick={() => setPwdUser(null)}>{t('取消', 'Cancel')}</button>
+                  <button
+                    className="v8-admin__pwd-save"
+                    onClick={async () => {
+                      if (pwdVal.length < 6) { setPwdMsg(t('密码至少 6 位', 'Password must be at least 6 characters')); return }
+                      try {
+                        const r = await authFetch('/api/admin/users/password', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ userId: pwdUser.id, password: pwdVal })
+                        })
+                        const d = await r.json().catch(() => ({}))
+                        if (r.ok) { setPwdUser(null); setPwdVal(''); alert(t('密码已更新', 'Password updated')) }
+                        else setPwdMsg(d.error || t('修改失败，请重试', 'Update failed, please retry'))
+                      } catch { setPwdMsg(t('网络错误，请重试', 'Network error, please retry')) }
+                    }}
+                  >
+                    {t('确认修改', 'Update')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

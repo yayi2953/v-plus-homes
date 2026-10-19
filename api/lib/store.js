@@ -315,6 +315,16 @@ async function createUser(data) {
   })
 }
 
+// 用户管理：管理员修改指定用户密码（password 已在 handler 中 hash）
+async function updateUserPassword(id, hashed) {
+  return mutateDb((db) => {
+    const u = (db.users || []).find((x) => x.id === id)
+    if (!u) return null
+    u.password = hashed
+    return { id: u.id, email: u.email, name: u.name, role: u.role }
+  })
+}
+
 async function createListing(data) {
   return mutateDb((db) => {
     const listing = { id: genId('l'), createdAt: Date.now(), updatedAt: Date.now(), ...data }
@@ -450,7 +460,7 @@ async function uploadImageToGitHub(name, dataBase64) {
 export {
   genId,
   getUsers, getListings, getMessages, getServices, getTexts, getChats,
-  findUserByEmail, createUser,
+  findUserByEmail, createUser, updateUserPassword,
   createListing, updateListing, deleteListing,
   createMessage, markMessageRead, deleteMessage,
   userSendMessage, adminReplyMessage, markChatReadAdmin,

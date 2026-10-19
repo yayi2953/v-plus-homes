@@ -6,7 +6,8 @@ import {
   createListing, updateListing, deleteListing,
   createMessage, markMessageRead, deleteMessage,
   userSendMessage, adminReplyMessage, markChatReadAdmin,
-  getTexts, updateTexts, resetTexts, uploadImageToGitHub
+  getTexts, updateTexts, resetTexts, uploadImageToGitHub,
+  updateUserPassword
 } from './lib/store.js'
 
 // 统一入口：所有 /api/* 路由在此函数内分发，共享同一个 /tmp/db.json
@@ -57,6 +58,9 @@ export default async function handler(req, res) {
     }
     if (rel === '/admin/users' && req.method === 'GET') {
       return adminUsers(req, res)
+    }
+    if (rel === '/admin/users/password' && req.method === 'POST') {
+      return adminUserPassword(req, res)
     }
     if (rel === '/admin/messages') {
       return adminMessages(req, res)
@@ -272,6 +276,17 @@ async function adminUsers(req, res) {
     id: u.id, email: u.email, name: u.name, role: u.role, createdAt: u.createdAt
   }))
   return res.status(200).json({ users })
+}
+
+// 管理端：修改指定用户密码（用户管理）
+async function adminUserPassword(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  const { userId, password } = req.body || {}
+  if (!userId || !password) return res.status(400).json({ error: '参数不完整' })
+  if (String(password).length < 6) return res.status(400).json({ error: '密码至少 6 位' })
+  const target = await updateUserPassword(userId, hashPassword(String(password)))
+  if (!target) return res.status(404).json({ error: '用户不存在' })
+  return res.status(200).json({ ok: true, user: target })
 }
 
 async function adminMessages(req, res) {
