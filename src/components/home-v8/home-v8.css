@@ -449,8 +449,9 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 
 /* ---------- 精选房源卡片条（DJI「热卖爆款」式样） ---------- */
-/* 展示区 section 清除默认大间距，使精选条紧贴 Hero 大图下方 */
-.v8-typeres.v8-section { padding-top: 0; }
+/* 展示区 section 清除默认大间距，使精选条紧贴 Hero 大图下方
+   （加 .home-v8 提升特异性，防止手机端媒体查询的 padding 简写覆盖回 72px） */
+.home-v8 .v8-typeres.v8-section { padding-top: 0; }
 .v8-fstrip {
   margin: 0 auto; padding: 36px clamp(16px, 4vw, 56px) 44px;
   background: none;
@@ -463,7 +464,19 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
 }
 @media (max-width: 900px) { .v8-fstrip__row { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 560px) { .v8-fstrip__row { grid-template-columns: 1fr; } }
+/* 手机端：精选卡片并列展示 + 左右滑动（保持竖版卡片比例） */
+@media (max-width: 560px) {
+  .v8-fstrip__row {
+    display: flex; gap: 10px;
+    overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+  }
+  .v8-fstrip__row::-webkit-scrollbar { display: none; }
+  .v8-fstrip__row > * { flex: 0 0 72%; min-width: 0; scroll-snap-align: start; }
+}
 /* 竖版卡片：图片贴满整卡，白字叠加图片下部渐变，右下白色按钮 */
 .v8-fscard {
   position: relative; display: block; overflow: hidden;
@@ -618,7 +631,23 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   .v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 33%; }
   .v8-svc__col { min-height: 300px; }
 }
-@media (max-width: 560px) { .v8-svc__grid { grid-template-columns: 1fr; } }
+/* 手机端：保持 PC 端「每列上下两卡」的排版，整列横向滑动切换（隐藏滚动条 + snap 吸附） */
+@media (max-width: 560px) {
+  .v8-svc__grid {
+    display: flex; gap: 10px;
+    height: auto; max-width: none;
+    overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+  }
+  .v8-svc__grid::-webkit-scrollbar { display: none; }
+  .v8-svc__col {
+    flex: 0 0 74%; min-width: 0; min-height: 0;
+    scroll-snap-align: start;
+  }
+}
 
 /* ---------- 区域找房板：区域大图卡片（banner）+ 房源小卡片行 ---------- */
 .v8-region { margin-bottom: 44px; }
