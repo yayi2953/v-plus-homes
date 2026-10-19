@@ -473,8 +473,8 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: 6px;
-    /* 抵消 section 20px 内边距，让卡片通到屏幕两侧边缘、无空白条 */
-    margin-left: -20px; margin-right: -20px;
+    /* 抵消外层累计 36px 内边距（section 20px + 内容区 16px），卡片通到屏幕两侧边缘 */
+    margin-left: -36px; margin-right: -36px;
   }
   .v8-fstrip__row::-webkit-scrollbar { display: none; }
   .v8-fstrip__row > * { flex: 0 0 72%; min-width: 0; scroll-snap-align: start; }
