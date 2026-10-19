@@ -48,6 +48,8 @@ export default function V8Navbar({ solid = false }) {
   const [legalDoc, setLegalDoc] = useState(null)
   // 房源下拉「了解」：类型详情弹窗
   const [detailType, setDetailType] = useState(null)
+  // 下拉左侧信息区：随 hover 的类型切换显示对应描述（与首页 hover 切视频呼应）
+  const [megaType, setMegaType] = useState(null)
   const langRef = useRef(null)
 
   useEffect(() => {
@@ -201,17 +203,30 @@ export default function V8Navbar({ solid = false }) {
                   {/* 特斯拉式巨型下拉菜单 */}
                   <span className="v8-nav__mega" role="menu">
                     <span className="v8-nav__mega-card">
-                      <span className={`v8-nav__mega-main${m.subs[0]?.event ? ' v8-nav__mega-main--list' : ''}`}>
+                    {m.subs[0]?.event && (() => {
+                      // 左侧信息区：顶部与右侧快捷栏「全部房源」标题对齐，内容随 hover 类型切换
+                      const active = m.subs.find((x) => x.key === megaType) || m.subs[0]
+                      return (
+                        <span className="v8-nav__mega-blurb">
+                          <span className="v8-nav__mega-blurb-name">{active.label}</span>
+                          <span className="v8-nav__mega-blurb-desc">{active.desc}</span>
+                          {active.value && <span className="v8-nav__mega-blurb-meta">{active.value}</span>}
+                        </span>
+                      )
+                    })()}
+                    <span className={`v8-nav__mega-main${m.subs[0]?.event ? ' v8-nav__mega-main--list' : ''}`}>
                         {m.subs.map((s) => {
                           const Icon = s.icon ? ICON_MAP[s.icon] : null
                           const external = s.href && !s.href.startsWith('#') && !s.href.startsWith('/')
                           if (s.event) {
-                            // 房源四类型：纵向列表（无图、文案居中），点击类型名弹出详情弹窗，行其余区域点击展开该类型房源
+                            // 房源四类型：纵向居中列表（纯名称），hover 切换左侧信息区，点名称弹详情弹窗，点行展开房源
                             return (
                               <a
                                 className="v8-nav__mega-item"
                                 key={s.key}
                                 href="#type-results"
+                                onMouseEnter={() => setMegaType(s.key)}
+                                onFocus={() => setMegaType(s.key)}
                                 onClick={(e) => pickSub(s, e)}
                               >
                                 <span className="v8-nav__mega-info">
@@ -229,7 +244,6 @@ export default function V8Navbar({ solid = false }) {
                                   >
                                     {s.label}
                                   </span>
-                                  {(s.desc || s.value) && <span className="v8-nav__mega-desc">{s.desc || s.value}</span>}
                                 </span>
                               </a>
                             )

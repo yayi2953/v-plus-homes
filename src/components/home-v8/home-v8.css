@@ -1400,6 +1400,18 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-nav__mega-main--list .v8-nav__mega-name.is-link { cursor: pointer; }
 .v8-nav__mega-main--list .v8-nav__mega-name.is-link:hover { text-decoration: underline; text-underline-offset: 4px; }
 .v8-nav__mega-main--list .v8-nav__mega-desc { margin-top: 0; -webkit-line-clamp: 1; text-align: center; }
+/* 房源下拉左侧信息区：描述文字信息，顶部与右侧快捷栏「全部房源」标题对齐，随 hover 类型切换 */
+.v8-nav__mega-blurb {
+  width: 250px; flex: none; margin-right: 40px;
+  padding-right: 32px; border-right: 1px solid var(--v8n-line);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.v8-nav__mega-blurb-name { font-size: 15px; line-height: 21px; font-weight: 600; color: var(--v8n-ink); }
+.v8-nav__mega-blurb-desc { font-size: 13px; line-height: 1.75; color: var(--v8n-muted); }
+.v8-nav__mega-blurb-meta { font-size: 13px; font-weight: 500; color: var(--v8n-ink); opacity: .72; }
+@media (max-width: 1080px) {
+  .v8-nav__mega-blurb { display: none; }
+}
 /* 类型详情弹窗（复用 legal-overlay / legal-modal 外壳） */
 .v8-tmodal { width: min(460px, 100%); }
 .v8-tmodal__hero { height: 200px; overflow: hidden; background: #f0f0f0; }
