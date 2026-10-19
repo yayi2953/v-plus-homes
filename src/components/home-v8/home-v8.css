@@ -1388,18 +1388,17 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-nav__mega-item:hover .v8-nav__mega-action {
   color: var(--v8n-ink); border-bottom-color: var(--v8n-ink);
 }
-/* 房源下拉：四类型纵向列表（无图、文案居中），点击类型名弹类型详情 */
-.v8-nav__mega-main--list { grid-template-columns: 1fr; gap: 2px; }
+/* 房源下拉：四类型纵向列表（无图），紧贴左侧信息区，文字左对齐与其他栏文案一致 */
+.v8-nav__mega-main--list { grid-template-columns: 1fr; gap: 2px; flex: none; width: 300px; }
 .v8-nav__mega-main--list .v8-nav__mega-item {
-  flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; padding: 15px 16px; border-radius: 10px;
-  text-align: center;
+  flex-direction: column; align-items: flex-start; justify-content: center;
+  gap: 3px; padding: 13px 16px; border-radius: 10px;
+  text-align: left;
 }
-.v8-nav__mega-main--list .v8-nav__mega-info { min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.v8-nav__mega-main--list .v8-nav__mega-info { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
 .v8-nav__mega-main--list .v8-nav__mega-name { margin-top: 0; font-size: 15px; }
 .v8-nav__mega-main--list .v8-nav__mega-name.is-link { cursor: pointer; }
 .v8-nav__mega-main--list .v8-nav__mega-name.is-link:hover { text-decoration: underline; text-underline-offset: 4px; }
-.v8-nav__mega-main--list .v8-nav__mega-desc { margin-top: 0; -webkit-line-clamp: 1; text-align: center; }
 /* 房源下拉左侧信息区：描述文字信息，顶部与右侧快捷栏「全部房源」标题对齐，随 hover 类型切换 */
 .v8-nav__mega-blurb {
   width: 250px; flex: none; margin-right: 40px;
