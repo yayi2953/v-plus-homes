@@ -1433,8 +1433,11 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 .v8-quiz__opt:hover { background: #eceef1; }
 .v8-quiz__opt.is-sel { background: #16161a; border-color: #16161a; color: #fff; }
-.v8-quiz__opt--any { background: none; border-color: #d8dade; color: #55585f; }
-.v8-quiz__back { margin-top: 16px; padding: 0; background: none; border: 0; color: #0070d5; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.v8-quiz__opt--any { background: none; border-color: #d8dade; color: #55585f; border-radius: 6px; padding: 7px 14px; }
+
+/* 右下角操作区：不限 + 上一步 */
+.v8-quiz__foot { margin-top: 18px; display: flex; align-items: center; justify-content: flex-end; gap: 18px; }
+.v8-quiz__back { padding: 0; background: none; border: 0; color: #0070d5; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
 .v8-quiz__back:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* 价格题：拉条式滑杆 */

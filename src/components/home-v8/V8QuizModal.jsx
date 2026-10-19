@@ -111,9 +111,6 @@ export default function V8QuizModal({ open, onClose }) {
                 <div className="v8-quiz__slider-scale">
                   {opts.map((o) => <span key={o.v} className={opts[sliderVal]?.v === o.v ? 'is-on' : ''}>{o.label}</span>)}
                 </div>
-                <button type="button" className="v8-quiz__opt v8-quiz__opt--any" onClick={() => pick(cur.key, null)}>
-                  {t.any}
-                </button>
               </div>
             ) : (
               <div className="v8-quiz__opts">
@@ -127,16 +124,23 @@ export default function V8QuizModal({ open, onClose }) {
                     {o.label}
                   </button>
                 ))}
-                <button type="button" className="v8-quiz__opt v8-quiz__opt--any" onClick={() => pick(cur.key, null)}>
-                  {t.any}
-                </button>
               </div>
             )}
-            {step > 0 && (
-              <button type="button" className="v8-quiz__back" onClick={() => setStep(step - 1)}>
-                {labels.back}
+            {/* 右下角操作区：不限（除价格题外每题都有）+ 上一步 */}
+            <div className="v8-quiz__foot">
+              <button
+                type="button"
+                className="v8-quiz__opt v8-quiz__opt--any"
+                onClick={() => pick(cur.key, null)}
+              >
+                {t.any}
               </button>
-            )}
+              {step > 0 && (
+                <button type="button" className="v8-quiz__back" onClick={() => setStep(step - 1)}>
+                  {labels.back}
+                </button>
+              )}
+            </div>
           </div>
         </motion.div>
       </motion.div>
