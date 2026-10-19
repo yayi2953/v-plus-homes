@@ -1,5 +1,22 @@
 import { useState, useCallback } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
+import { navigate } from '../../lib/router.mjs'
+
+// Hero 下方快捷功能长条卡（三语，简洁准确）
+const QB_LABELS = {
+  zh: ['需求找房', '其它服务', '联系我们'],
+  en: ['Find a Home', 'Services', 'Contact'],
+  ja: ['住まい探し', 'サービス', 'お問い合わせ']
+}
+
+// 三个入口的行为：需求找房滚到「按户型找房」，其它服务滚到服务区，联系我们打开在线客服
+function qbGo(item) {
+  if (item.chat) { navigate('/chat'); return }
+  const el = document.getElementById(item.target)
+  if (!el) return
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+}
 
 // 首屏轮播背景图（每张配独立文案组，切换图片时文字跟随变化）
 const SLIDES = [
@@ -16,7 +33,7 @@ function slideText(t, i) {
 }
 
 export default function V8Hero({ hideBody = false }) {
-  const { c } = useIciI18n()
+  const { c, lang } = useIciI18n()
   const [idx, setIdx] = useState(0)
 
   const prev = useCallback(() => {
@@ -80,7 +97,32 @@ export default function V8Hero({ hideBody = false }) {
           ))}
         </div>
       </div>
-      {/* 轮播下方的介绍文字块：房源展示区展开时一并隐藏 */}
+      {/* 轮播下方的快捷功能长条卡与介绍文字块：房源展示区展开时一并隐藏 */}
+      {!hideBody && (
+        <div className="v8-quickbar">
+          <div className="v8-quickbar-in" role="navigation" aria-label="快捷功能">
+            {[
+              {
+                key: 'find', target: 'types',
+                icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
+              },
+              {
+                key: 'services', target: 'get-started',
+                icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>
+              },
+              {
+                key: 'contact', chat: true,
+                icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.4-2.4A8 8 0 1 1 21 12Z" /></svg>
+              }
+            ].map((item, i) => (
+              <button key={item.key} type="button" className="v8-quickbar-item" onClick={() => qbGo(item)}>
+                {item.icon}
+                <span>{(QB_LABELS[lang] || QB_LABELS.zh)[i]}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       {!hideBody && (
         <div className="v8-hero-body">
           <p className="v8-eyebrow" data-edit-key="v8.hero.bodyEyebrow">{t.bodyEyebrow}</p>

@@ -280,6 +280,39 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .home-v8 .v8-hero-body .v8-lede { max-width: 46ch; }
 .home-v8 .v8-hero-cta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
 
+/* ---------- Hero 下方快捷功能长条卡（需求找房 / 其它服务 / 联系我们） ---------- */
+.home-v8 .v8-quickbar { max-width: 1320px; margin: 18px auto 0; padding: 0 24px; }
+.home-v8 .v8-quickbar-in {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  background: #fff;
+  border: 1px solid var(--v8-line-soft, #e5e7eb);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(17, 24, 39, .06);
+  overflow: hidden;
+}
+.home-v8 .v8-quickbar-item {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 17px 12px;
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; font-size: 14px; font-weight: 500; color: #16161a;
+  transition: background-color .2s cubic-bezier(.16, 1, .3, 1), transform .15s;
+}
+.home-v8 .v8-quickbar-item + .v8-quickbar-item { border-left: 1px solid var(--v8-line-soft, #e5e7eb); }
+.home-v8 .v8-quickbar-item svg { width: 17px; height: 17px; flex: none; }
+.home-v8 .v8-quickbar-item:hover { background: #f6f7f8; }
+.home-v8 .v8-quickbar-item:active { transform: scale(.98); }
+/* 锚点滚动预留固定导航高度，避免目标标题被遮挡 */
+.home-v8 #types, .home-v8 #get-started { scroll-margin-top: 76px; }
+@media (max-width: 560px) {
+  .home-v8 .v8-quickbar { padding: 0 16px; margin-top: 14px; }
+  .home-v8 .v8-quickbar-item { padding: 13px 6px; font-size: 13px; gap: 7px; }
+  .home-v8 .v8-quickbar-item svg { width: 15px; height: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-v8 .v8-quickbar-item { transition: none; }
+  .home-v8 .v8-quickbar-item:active { transform: none; }
+}
+
 /* ---------- Stats ---------- */
 .home-v8 .v8-stats { border-top: 1px solid var(--v8-line-soft); }
 .home-v8 .v8-stats-in { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: repeat(var(--v8-stat-cols, 4), 1fr); }
