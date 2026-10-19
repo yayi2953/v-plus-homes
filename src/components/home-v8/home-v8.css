@@ -473,6 +473,9 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: 6px;
+    /* 两侧边缘 20px 渐隐羽化，消除相邻卡片残片被"硬切断"的观感 */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent);
+    mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent);
   }
   .v8-fstrip__row::-webkit-scrollbar { display: none; }
   .v8-fstrip__row > * { flex: 0 0 72%; min-width: 0; scroll-snap-align: start; }
@@ -644,6 +647,9 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding-bottom: 6px;
+    /* 两侧边缘 20px 渐隐羽化，消除相邻卡片残片被"硬切断"的观感 */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent);
+    mask-image: linear-gradient(90deg, transparent 0, #000 20px, #000 calc(100% - 20px), transparent);
   }
   .v8-svc__grid::-webkit-scrollbar { display: none; }
   .v8-svc__col {
