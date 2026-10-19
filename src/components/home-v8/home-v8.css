@@ -1434,6 +1434,10 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-quiz__opt:hover { background: #eceef1; }
 .v8-quiz__opt.is-sel { background: #16161a; border-color: #16161a; color: #fff; }
 /* 下拉选择（区域/房型/房间数题） */
+/* 问卷弹窗留白：标题/问题/控件/按钮分层间距放大，避免拥挤 */
+.v8-quiz .v8-tmodal__head { padding: 26px 28px 0; }
+.v8-quiz .v8-tmodal__body { padding: 18px 28px 28px; }
+.v8-quiz .v8-quiz__q { margin: 0 0 20px; }
 .v8-quiz__select {
   width: 100%; padding: 12px 40px 12px 14px;
   border: 1px solid #d8dade; border-radius: 8px;
@@ -1445,14 +1449,14 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-quiz__select:focus { outline: none; border-color: #16161a; }
 
 /* 右下角操作区：不限（灰色文本式）+ 上一步 */
-.v8-quiz__foot { margin-top: 18px; display: flex; align-items: center; justify-content: flex-end; gap: 18px; }
+.v8-quiz__foot { margin-top: 28px; display: flex; align-items: center; justify-content: flex-end; gap: 20px; }
 .v8-quiz__any { padding: 0; background: none; border: 0; color: #9a9fa6; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
 .v8-quiz__any:hover { color: #16161a; }
 .v8-quiz__back { padding: 0; background: none; border: 0; color: #0070d5; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
 .v8-quiz__back:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* 价格题：拉条式滑杆 */
-.v8-quiz__slider { display: flex; flex-direction: column; gap: 12px; }
+.v8-quiz__slider { display: flex; flex-direction: column; gap: 14px; }
 .v8-quiz__slider-val { font-size: 22px; font-weight: 700; letter-spacing: -.01em; color: var(--ink, #16161a); }
 .v8-quiz__slider input[type='range'] {
   -webkit-appearance: none; appearance: none;
