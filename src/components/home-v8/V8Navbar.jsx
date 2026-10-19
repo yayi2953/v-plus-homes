@@ -206,7 +206,7 @@ export default function V8Navbar({ solid = false }) {
                           const Icon = s.icon ? ICON_MAP[s.icon] : null
                           const external = s.href && !s.href.startsWith('#') && !s.href.startsWith('/')
                           if (s.event) {
-                            // 房源四类型：纵向列表（无图），「了解」弹出类型详情弹窗，整行点击仍展开该类型房源
+                            // 房源四类型：纵向列表（无图、文案居中），点击类型名弹出详情弹窗，行其余区域点击展开该类型房源
                             return (
                               <a
                                 className="v8-nav__mega-item"
@@ -215,22 +215,21 @@ export default function V8Navbar({ solid = false }) {
                                 onClick={(e) => pickSub(s, e)}
                               >
                                 <span className="v8-nav__mega-info">
-                                  <span className="v8-nav__mega-name">{s.label}</span>
+                                  <span
+                                    className="v8-nav__mega-name is-link"
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-haspopup="dialog"
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDetailType(s.key) }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault(); e.stopPropagation(); setDetailType(s.key)
+                                      }
+                                    }}
+                                  >
+                                    {s.label}
+                                  </span>
                                   {(s.desc || s.value) && <span className="v8-nav__mega-desc">{s.desc || s.value}</span>}
-                                </span>
-                                <span
-                                  className="v8-nav__mega-more"
-                                  role="button"
-                                  tabIndex={0}
-                                  aria-haspopup="dialog"
-                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDetailType(s.key) }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                      e.preventDefault(); e.stopPropagation(); setDetailType(s.key)
-                                    }
-                                  }}
-                                >
-                                  {lang === 'zh' ? '了解' : lang === 'ja' ? '詳しく' : 'Learn'}
                                 </span>
                               </a>
                             )

@@ -1388,26 +1388,18 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-nav__mega-item:hover .v8-nav__mega-action {
   color: var(--v8n-ink); border-bottom-color: var(--v8n-ink);
 }
-/* 房源下拉：四类型纵向列表（无图），右侧「了解」按钮弹类型详情 */
+/* 房源下拉：四类型纵向列表（无图、文案居中），点击类型名弹类型详情 */
 .v8-nav__mega-main--list { grid-template-columns: 1fr; gap: 2px; }
 .v8-nav__mega-main--list .v8-nav__mega-item {
-  flex-direction: row; align-items: center; justify-content: space-between;
-  gap: 18px; padding: 12px 16px; border-radius: 10px;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 15px 16px; border-radius: 10px;
+  text-align: center;
 }
-.v8-nav__mega-main--list .v8-nav__mega-info { min-width: 0; display: flex; flex-direction: column; }
+.v8-nav__mega-main--list .v8-nav__mega-info { min-width: 0; display: flex; flex-direction: column; align-items: center; }
 .v8-nav__mega-main--list .v8-nav__mega-name { margin-top: 0; font-size: 15px; }
-.v8-nav__mega-main--list .v8-nav__mega-desc { margin-top: 2px; -webkit-line-clamp: 1; }
-.v8-nav__mega-more {
-  flex: none; padding: 7px 18px;
-  border: 1px solid rgba(23, 26, 32, .18); border-radius: 999px;
-  background: #fff; color: var(--v8n-ink, #171a20);
-  font-size: 13px; cursor: pointer; user-select: none;
-  transition: background .15s, color .15s, border-color .15s;
-}
-.v8-nav__mega-more:hover, .v8-nav__mega-more:focus-visible,
-.v8-nav__mega-item:hover .v8-nav__mega-more {
-  background: #171a20; border-color: #171a20; color: #fff;
-}
+.v8-nav__mega-main--list .v8-nav__mega-name.is-link { cursor: pointer; }
+.v8-nav__mega-main--list .v8-nav__mega-name.is-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.v8-nav__mega-main--list .v8-nav__mega-desc { margin-top: 0; -webkit-line-clamp: 1; text-align: center; }
 /* 类型详情弹窗（复用 legal-overlay / legal-modal 外壳） */
 .v8-tmodal { width: min(460px, 100%); }
 .v8-tmodal__hero { height: 200px; overflow: hidden; background: #f0f0f0; }
