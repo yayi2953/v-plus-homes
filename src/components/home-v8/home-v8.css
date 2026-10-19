@@ -1390,6 +1390,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 }
 /* 房源下拉：四类型纵向列表（无图），紧贴左侧信息区，文字左对齐与其他栏文案一致 */
 .v8-nav__mega-main--list { grid-template-columns: 1fr; gap: 2px; flex: none; width: 300px; }
+.v8-nav__mega .v8-nav__mega-main--list { flex: none; width: 300px; }
 .v8-nav__mega-main--list .v8-nav__mega-item {
   flex-direction: column; align-items: flex-start; justify-content: center;
   gap: 3px; padding: 13px 16px; border-radius: 10px;
@@ -1428,7 +1429,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-tmodal__foot { padding: 12px 24px 20px; display: flex; justify-content: flex-end; }
 .v8-tmodal__foot .legal-modal__ok { width: auto; padding: 11px 26px; }
 .v8-nav__mega-side {
-  width: 220px; flex: none; margin-left: 40px;
+  width: 220px; flex: none; margin-left: auto;
   padding-left: 32px; border-left: 1px solid var(--v8n-line);
   display: flex; flex-direction: column; gap: 20px;
 }
