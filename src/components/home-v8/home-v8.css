@@ -1434,8 +1434,31 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-quiz__opt:hover { background: #eceef1; }
 .v8-quiz__opt.is-sel { background: #16161a; border-color: #16161a; color: #fff; }
 .v8-quiz__opt--any { background: none; border-color: #d8dade; color: #55585f; }
-.v8-quiz__back { margin-top: 16px; padding: 0; background: none; border: 0; color: #9a9fa6; font-size: 13px; font-family: inherit; cursor: pointer; }
-.v8-quiz__back:hover { color: #16161a; }
+.v8-quiz__back { margin-top: 16px; padding: 0; background: none; border: 0; color: #0070d5; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.v8-quiz__back:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* 价格题：拉条式滑杆 */
+.v8-quiz__slider { display: flex; flex-direction: column; gap: 12px; }
+.v8-quiz__slider-val { font-size: 22px; font-weight: 700; letter-spacing: -.01em; color: var(--ink, #16161a); }
+.v8-quiz__slider input[type='range'] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px; border-radius: 2px;
+  background: #e3e5e9; outline: none; cursor: pointer;
+}
+.v8-quiz__slider input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #16161a; border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+}
+.v8-quiz__slider input[type='range']::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #16161a; border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+}
+.v8-quiz__slider-scale { display: flex; justify-content: space-between; }
+.v8-quiz__slider-scale span { font-size: 11.5px; color: #9a9fa6; }
+.v8-quiz__slider-scale span.is-on { color: #16161a; font-weight: 600; }
 .v8-tmodal { width: min(560px, 100%); border-radius: 8px; }
 .v8-tmodal .legal-modal__close { background: none; border: 0; box-shadow: none; }
 .v8-tmodal__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px 0; }

@@ -22,11 +22,13 @@ export default function V8QuizModal({ open, onClose }) {
   const ft = c.v8?.finder || {}
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
+  const [sliderVal, setSliderVal] = useState(0)
 
   useEffect(() => {
     if (!open) return undefined
     setStep(0)
     setAnswers({})
+    setSliderVal(0)
     const onKey = (e) => {
       if (e.key === 'Escape') onClose?.()
     }
@@ -91,24 +93,48 @@ export default function V8QuizModal({ open, onClose }) {
           </header>
           <div className="v8-tmodal__body">
             <p className="v8-quiz__q">{(t.questions || [])[step]}</p>
-            <div className="v8-quiz__opts">
-              {opts.map((o) => (
-                <button
-                  type="button"
-                  key={String(o.v)}
-                  className={`v8-quiz__opt${answers[cur.key] === o.v ? ' is-sel' : ''}`}
-                  onClick={() => pick(cur.key, o.v)}
-                >
-                  {o.label}
+            {cur.key === 'budget' ? (
+              /* 价格题：拉条式滑杆，松手即确认 */
+              <div className="v8-quiz__slider">
+                <div className="v8-quiz__slider-val">{opts[sliderVal]?.label}</div>
+                <input
+                  type="range"
+                  min="0"
+                  max={opts.length - 1}
+                  step="1"
+                  value={sliderVal}
+                  aria-label={(t.questions || [])[3]}
+                  onChange={(e) => setSliderVal(Number(e.target.value))}
+                  onPointerUp={() => pick('budget', opts[sliderVal].v)}
+                  onKeyUp={(e) => { if (e.key.startsWith('Arrow')) pick('budget', opts[sliderVal].v) }}
+                />
+                <div className="v8-quiz__slider-scale">
+                  {opts.map((o) => <span key={o.v} className={opts[sliderVal]?.v === o.v ? 'is-on' : ''}>{o.label}</span>)}
+                </div>
+                <button type="button" className="v8-quiz__opt v8-quiz__opt--any" onClick={() => pick(cur.key, null)}>
+                  {t.any}
                 </button>
-              ))}
-              <button type="button" className="v8-quiz__opt v8-quiz__opt--any" onClick={() => pick(cur.key, null)}>
-                {t.any}
-              </button>
-            </div>
+              </div>
+            ) : (
+              <div className="v8-quiz__opts">
+                {opts.map((o) => (
+                  <button
+                    type="button"
+                    key={String(o.v)}
+                    className={`v8-quiz__opt${answers[cur.key] === o.v ? ' is-sel' : ''}`}
+                    onClick={() => pick(cur.key, o.v)}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+                <button type="button" className="v8-quiz__opt v8-quiz__opt--any" onClick={() => pick(cur.key, null)}>
+                  {t.any}
+                </button>
+              </div>
+            )}
             {step > 0 && (
               <button type="button" className="v8-quiz__back" onClick={() => setStep(step - 1)}>
-                ← {labels.back}
+                {labels.back}
               </button>
             )}
           </div>
