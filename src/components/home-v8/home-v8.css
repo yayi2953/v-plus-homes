@@ -631,11 +631,13 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   .v8-svc__col:nth-child(4) .v8-svc__card--img { flex: 0 0 33%; }
   .v8-svc__col { min-height: 300px; }
 }
-/* 手机端：保持 PC 端「每列上下两卡」的排版，整列横向滑动切换（隐藏滚动条 + snap 吸附） */
+/* 手机端：保持 PC 端「每列上下两卡」的排版与高低差，整列横向滑动切换（隐藏滚动条 + snap 吸附）
+   高度修复：PC 端 26.5vw 在手机屏只算出 240px 下限导致卡片压扁，
+   改用 min(420px, 87vw) —— 390 屏约 339px，列宽 74% 时高/宽比 ≈ 1.31 与 PC 端完全一致 */
 @media (max-width: 560px) {
   .v8-svc__grid {
     display: flex; gap: 10px;
-    height: auto; max-width: none;
+    height: min(420px, 87vw); max-width: none;
     overflow-x: auto; overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
