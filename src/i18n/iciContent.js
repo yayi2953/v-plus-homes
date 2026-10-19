@@ -375,7 +375,18 @@ const en = {
       clear: 'Clear all',
       typeAsk: 'Any home type preference?',
       typeAny: 'Any type',
-      findBtn: 'Find My Home'
+      findBtn: 'Find My Home',
+      quiz: {
+        trigger: 'Need a more detailed home search?',
+        title: 'Quick Home Finder',
+        questions: [
+          'Which area would you like to live in?',
+          'What type of home do you prefer?',
+          'How many bedrooms do you need?',
+          'What is your ideal price range?'
+        ],
+        any: 'No preference'
+      }
     },
     listings: {
       back: 'Back to home',
@@ -759,7 +770,18 @@ const zh = {
       clear: '清除条件',
       typeAsk: '有房型要求吗？',
       typeAny: '不限房型',
-      findBtn: '帮我找房'
+      findBtn: '帮我找房',
+      quiz: {
+        trigger: '需要更详细的筛选房屋？',
+        title: '快速找房',
+        questions: [
+          '您希望住在哪个区域？',
+          '您希望您的房型是什么？',
+          '您希望您的房间数规格是？',
+          '您的理想价格是？'
+        ],
+        any: '不限'
+      }
     },
     listings: {
       back: '返回首页',
@@ -1138,8 +1160,19 @@ const ja = {
       count: '{n}件の物件が見つかりました',
       clear: '条件をクリア',
       typeAsk: 'タイプの希望はありますか？',
-      typeAny: 'タイプ指定なし',
-      findBtn: '物件を探す'
+      typeAny: 'タイプ不限',
+      findBtn: '物件を探す',
+      quiz: {
+        trigger: 'もっと詳しい条件で探しますか？',
+        title: 'かんたん物件探し',
+        questions: [
+          'どのエリアに住みたいですか？',
+          'どんなタイプの住まいをご希望ですか？',
+          '必要な部屋数は？',
+          'ご希望の価格帯は？'
+        ],
+        any: 'こだわらない'
+      }
     },
     listings: {
       back: 'ホームに戻る',

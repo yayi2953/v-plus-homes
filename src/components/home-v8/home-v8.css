@@ -1412,7 +1412,30 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 @media (max-width: 1080px) {
   .v8-nav__mega-blurb { display: none; }
 }
-/* 类型详情弹窗（大疆式紧凑无图：标题+关闭同行、简介、特色、蓝色文字链接） */
+/* 快速找房问卷触发文本（视频下方蓝色可点文本） */
+.v8-quiz-cta {
+  margin-top: 18px; padding: 0;
+  background: none; border: 0;
+  color: #0070d5; font-size: 14px; font-family: inherit;
+  cursor: pointer; text-align: left;
+}
+.v8-quiz-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* 问卷弹窗（复用 v8-tmodal 微圆角外壳） */
+.v8-quiz__step { margin-left: 10px; font-size: 12px; font-weight: 500; color: #9a9fa6; }
+.v8-quiz__q { margin: 0 0 14px; font-size: 14px; font-weight: 600; color: var(--ink, #16161a); }
+.v8-quiz__opts { display: flex; flex-wrap: wrap; gap: 10px; }
+.v8-quiz__opt {
+  padding: 9px 16px; border-radius: 999px;
+  background: #f5f6f8; border: 1px solid transparent;
+  font-size: 13.5px; font-family: inherit; color: var(--ink, #16161a);
+  cursor: pointer; transition: background .15s ease, border-color .15s ease;
+}
+.v8-quiz__opt:hover { background: #eceef1; }
+.v8-quiz__opt.is-sel { background: #16161a; border-color: #16161a; color: #fff; }
+.v8-quiz__opt--any { background: none; border-color: #d8dade; color: #55585f; }
+.v8-quiz__back { margin-top: 16px; padding: 0; background: none; border: 0; color: #9a9fa6; font-size: 13px; font-family: inherit; cursor: pointer; }
+.v8-quiz__back:hover { color: #16161a; }
 .v8-tmodal { width: min(560px, 100%); border-radius: 8px; }
 .v8-tmodal .legal-modal__close { background: none; border: 0; box-shadow: none; }
 .v8-tmodal__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px 0; }

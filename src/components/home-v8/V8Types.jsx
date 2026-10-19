@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import SmartImage from '../common/SmartImage.jsx'
 import TypeHouse from './TypeHouse.jsx'
+import V8QuizModal from './V8QuizModal.jsx'
 
 // 数据模型无户型图：映射到本地已有房源图，手机端行首缩略图使用
 const TYPE_IMG = {
@@ -15,6 +16,8 @@ export default function V8Types() {
   const { c } = useIciI18n()
   const types = c.discover?.types || []
   const t = c.v8?.types || {}
+  // 快速找房问卷弹窗
+  const [quizOpen, setQuizOpen] = useState(false)
   // active：鼠标停留选中的户型（行高亮 + 驱动视频舞台）
   const [active, setActive] = useState(0)
   if (!types.length) return null
@@ -64,12 +67,18 @@ export default function V8Types() {
             ))}
           </div>
 
-          {/* 视频舞台：随点击选中的户型切换（手机端整体隐藏） */}
-          <div className="v8-type-stage" aria-hidden="true">
-            <TypeHouse activeIndex={active} />
+          {/* 视频舞台：随 hover 选中的户型切换（手机端整体隐藏）；下方蓝色文本打开快速找房问卷 */}
+          <div className="v8-types-right">
+            <div className="v8-type-stage" aria-hidden="true">
+              <TypeHouse activeIndex={active} />
+            </div>
+            <button type="button" className="v8-quiz-cta" onClick={() => setQuizOpen(true)}>
+              {c.v8?.finder?.quiz?.trigger}
+            </button>
           </div>
         </div>
       </div>
+      <V8QuizModal open={quizOpen} onClose={() => setQuizOpen(false)} />
     </section>
   )
 }
