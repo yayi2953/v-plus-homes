@@ -1415,10 +1415,12 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-quiz-cta {
   margin-top: 18px; padding: 0;
   background: none; border: 0;
-  color: #0070d5; font-size: 14px; font-family: inherit;
+  color: #0070d5; font-size: 16px; font-family: inherit;
   cursor: pointer; text-align: left;
 }
 .v8-quiz-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* 第二条：免筛选直看全部房源（间距比首条更紧凑） */
+.v8-quiz-cta--all { margin-top: 9px; }
 
 /* 问卷弹窗（复用 v8-tmodal 微圆角外壳） */
 .v8-quiz__step { margin-left: 10px; font-size: 12px; font-weight: 500; color: #9a9fa6; }

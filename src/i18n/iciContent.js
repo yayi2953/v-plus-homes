@@ -378,6 +378,7 @@ const en = {
       findBtn: 'Find My Home',
       quiz: {
         trigger: 'Need a more detailed home search?',
+        allHomes: 'Or browse all available homes?',
         title: 'Quick Home Finder',
         questions: [
           'Which area would you like to live in?',
@@ -773,6 +774,7 @@ const zh = {
       findBtn: '帮我找房',
       quiz: {
         trigger: '需要更详细的筛选房屋？',
+        allHomes: '或者查看当前全部房源？',
         title: '快速找房',
         questions: [
           '您希望住在哪个区域？',
@@ -1164,6 +1166,7 @@ const ja = {
       findBtn: '物件を探す',
       quiz: {
         trigger: 'もっと詳しい条件で探しますか？',
+        allHomes: 'または、現在の全物件を見てみますか？',
         title: 'かんたん物件探し',
         questions: [
           'どのエリアに住みたいですか？',

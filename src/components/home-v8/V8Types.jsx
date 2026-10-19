@@ -72,8 +72,16 @@ export default function V8Types() {
             <div className="v8-type-stage" aria-hidden="true">
               <TypeHouse activeIndex={active} />
             </div>
+            {/* 视频下方蓝色文本：打开快速找房问卷 / 免筛选直看全部房源 */}
             <button type="button" className="v8-quiz-cta" onClick={() => setQuizOpen(true)}>
               {c.v8?.finder?.quiz?.trigger}
+            </button>
+            <button
+              type="button"
+              className="v8-quiz-cta v8-quiz-cta--all"
+              onClick={() => window.dispatchEvent(new CustomEvent('v8:show-type', { detail: { type: 'all' } }))}
+            >
+              {c.v8?.finder?.quiz?.allHomes}
             </button>
           </div>
         </div>
