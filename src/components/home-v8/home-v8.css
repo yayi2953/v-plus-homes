@@ -190,7 +190,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 /* 轮播指示器：特斯拉风格圆点，位于图片底部居中 */
 .home-v8 .v8-hero-dots {
   position: absolute;
-  bottom: 18px;
+  bottom: 56px; /* 上移避让悬浮长条卡（跨压轮播底边约 26px） */
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
@@ -219,7 +219,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   transform: scale(.85);
 }
 @media (max-width: 768px) {
-  .home-v8 .v8-hero-dots { bottom: 12px; gap: 8px; }
+  .home-v8 .v8-hero-dots { bottom: 48px; gap: 8px; }
   .home-v8 .v8-hero-dot { width: 7px; height: 7px; }
 }
 /* Hero 图片文字层：上半部分居中白色，小标题 + 大粗体标题 + 副标题 */
@@ -281,13 +281,18 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .home-v8 .v8-hero-cta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
 
 /* ---------- Hero 下方快捷功能长条卡（需求找房 / 其它服务 / 联系我们） ---------- */
-.home-v8 .v8-quickbar { max-width: 1320px; margin: 18px auto 0; padding: 0 24px; }
+/* 悬浮跨压在轮播图底边：上缘入图、下缘压边；flex 列容器内需显式 width:100% 防止宽度塌陷 */
+.home-v8 .v8-quickbar {
+  width: 100%; max-width: 920px;
+  margin: -26px auto 0; padding: 0 24px;
+  position: relative; z-index: 5;
+}
 .home-v8 .v8-quickbar-in {
   display: grid; grid-template-columns: repeat(3, 1fr);
   background: #fff;
   border: 1px solid var(--v8-line-soft, #e5e7eb);
   border-radius: 12px;
-  box-shadow: 0 6px 24px rgba(17, 24, 39, .06);
+  box-shadow: 0 10px 30px rgba(17, 24, 39, .12), 0 2px 8px rgba(17, 24, 39, .06);
   overflow: hidden;
 }
 .home-v8 .v8-quickbar-item {
@@ -304,7 +309,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 /* 锚点滚动预留固定导航高度，避免目标标题被遮挡 */
 .home-v8 #types, .home-v8 #get-started { scroll-margin-top: 76px; }
 @media (max-width: 560px) {
-  .home-v8 .v8-quickbar { padding: 0 16px; margin-top: 14px; }
+  .home-v8 .v8-quickbar { padding: 0 16px; margin-top: -20px; }
   .home-v8 .v8-quickbar-item { padding: 13px 6px; font-size: 13px; gap: 7px; }
   .home-v8 .v8-quickbar-item svg { width: 15px; height: 15px; }
 }
