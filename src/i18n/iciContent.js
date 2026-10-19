@@ -386,7 +386,8 @@ const en = {
           'How many bedrooms do you need?',
           'What is your ideal price range?'
         ],
-        any: 'No preference'
+        any: 'No preference',
+        confirm: 'Confirm?'
       }
     },
     listings: {
@@ -782,7 +783,8 @@ const zh = {
           '您希望您的房间数规格是？',
           '您的理想价格是？'
         ],
-        any: '不限'
+        any: '不限',
+        confirm: '确认？'
       }
     },
     listings: {
@@ -1174,7 +1176,8 @@ const ja = {
           '必要な部屋数は？',
           'ご希望の価格帯は？'
         ],
-        any: 'こだわらない'
+        any: 'こだわらない',
+        confirm: '確定しますか？'
       }
     },
     listings: {

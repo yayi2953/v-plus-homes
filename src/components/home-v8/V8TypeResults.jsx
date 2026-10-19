@@ -56,7 +56,12 @@ export default function V8TypeResults({ sel, onClear }) {
       if (quiz) {
         if (quiz.district && p.districtKey !== quiz.district) return false
         if (quiz.beds && (Number(quiz.beds) >= 4 ? bedCount(p.br) >= 4 : bedCount(p.br) !== Number(quiz.beds))) return false
-        if (quiz.budget && priceNum(p.price) > Number(quiz.budget)) return false
+        // 预算：区间 { min, max }（问卷双把手滑杆），落在区间内才保留
+        if (quiz.budget) {
+          const price = priceNum(p.price)
+          if (quiz.budget.min && price < Number(quiz.budget.min)) return false
+          if (quiz.budget.max && price > Number(quiz.budget.max)) return false
+        }
       }
       return true
     })

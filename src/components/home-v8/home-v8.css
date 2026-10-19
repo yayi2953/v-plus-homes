@@ -1456,26 +1456,34 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 .v8-quiz__any:hover { color: #16161a; }
 .v8-quiz__back { padding: 0; background: none; border: 0; color: #0070d5; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
 .v8-quiz__back:hover { text-decoration: underline; text-underline-offset: 3px; }
+.v8-quiz__confirm { padding: 0; background: none; border: 0; color: #0070d5; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.v8-quiz__confirm:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* 价格题：拉条式滑杆 */
+/* 价格题：双把手区间滑杆（容器作轨道并注入选中段渐变，两只 input 仅提供把手） */
 .v8-quiz__slider { display: flex; flex-direction: column; gap: 14px; }
 .v8-quiz__slider-val { font-size: 22px; font-weight: 700; letter-spacing: -.01em; color: var(--ink, #16161a); }
+.v8-quiz__range { position: relative; height: 20px; border-radius: 2px; }
 .v8-quiz__slider input[type='range'] {
   -webkit-appearance: none; appearance: none;
-  width: 100%; height: 4px; border-radius: 2px;
-  background: #e3e5e9; outline: none; cursor: pointer;
+  position: absolute; left: 0; top: 0;
+  width: 100%; height: 20px; margin: 0;
+  background: none; outline: none;
+  cursor: pointer; pointer-events: none;
 }
 .v8-quiz__slider input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
   width: 20px; height: 20px; border-radius: 50%;
   background: #16161a; border: 3px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+  pointer-events: all;
 }
 .v8-quiz__slider input[type='range']::-moz-range-thumb {
   width: 14px; height: 14px; border-radius: 50%;
   background: #16161a; border: 3px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+  pointer-events: all;
 }
+.v8-quiz__slider input[type='range']::-moz-range-track { background: none; }
 .v8-quiz__slider-scale { display: flex; justify-content: space-between; }
 .v8-quiz__slider-scale span { font-size: 11.5px; color: #9a9fa6; }
 .v8-quiz__slider-scale span.is-on { color: #16161a; font-weight: 600; }
