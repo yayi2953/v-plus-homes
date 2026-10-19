@@ -136,9 +136,7 @@ export default function V8QuizModal({ open, onClose }) {
                     value={rLo}
                     style={{ zIndex: rLo === rHi ? 3 : 1 }}
                     aria-label={(t.questions || [])[3]}
-                    onChange={(e) => onLo(e.target.value)}
-                    onPointerUp={() => setRangeTouched(true)}
-                    onKeyUp={(e) => { if (e.key.startsWith('Arrow')) setRangeTouched(true) }}
+                    onChange={(e) => { onLo(e.target.value); setRangeTouched(true) }}
                   />
                   <input
                     type="range"
@@ -148,9 +146,7 @@ export default function V8QuizModal({ open, onClose }) {
                     value={rHi}
                     style={{ zIndex: rLo === rHi ? 1 : 2 }}
                     aria-label={(t.questions || [])[3]}
-                    onChange={(e) => onHi(e.target.value)}
-                    onPointerUp={() => setRangeTouched(true)}
-                    onKeyUp={(e) => { if (e.key.startsWith('Arrow')) setRangeTouched(true) }}
+                    onChange={(e) => { onHi(e.target.value); setRangeTouched(true) }}
                   />
                 </div>
                 <div className="v8-quiz__slider-scale">
