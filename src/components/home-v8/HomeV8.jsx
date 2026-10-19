@@ -45,6 +45,17 @@ export default function HomeV8() {
     if (type) setTypeSel({ type, school: params.get('school') || null })
   }, [])
 
+  // Logo /「首页」菜单（#top）点击：清除结果区筛选状态、抹掉 URL ?type= 残留参数并回到首页顶部
+  useEffect(() => {
+    const onReset = () => {
+      setTypeSel(null)
+      if (window.location.search) window.history.replaceState({}, '', window.location.pathname)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    window.addEventListener('v8:reset-home', onReset)
+    return () => window.removeEventListener('v8:reset-home', onReset)
+  }, [])
+
   // 清除筛选：恢复其它区块并滚回类型区块（后台关闭类型区块时滚回顶部）
   const clearTypeSel = () => {
     setTypeSel(null)

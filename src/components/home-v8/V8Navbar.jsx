@@ -113,6 +113,13 @@ export default function V8Navbar({ solid = false }) {
       return
     }
     e?.preventDefault()
+    // 「首页」菜单项（#top）：与 Logo 一致，清除结果区筛选状态并回到首页顶部
+    if (m.href === '#top') {
+      runOnHome(() => window.dispatchEvent(new CustomEvent('v8:reset-home')))
+      closeMenu()
+      document.activeElement?.blur()
+      return
+    }
     // 「房源」主链接：与其他类型入口一致，就地展开全部房源，不再跳独立列表页
     if (m.href === '/listings') {
       goType('all')
@@ -186,7 +193,8 @@ export default function V8Navbar({ solid = false }) {
             href="#top"
             onClick={(e) => {
               e.preventDefault()
-              runOnHome(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
+              // 回首页：清除结果区筛选状态并滚回顶部（runOnHome 处理跨页场景）
+              runOnHome(() => window.dispatchEvent(new CustomEvent('v8:reset-home')))
             }}
           >
             <img src="/images/vlu-logo.png" alt="V PLUS" className="v8-wordmark__img" />
