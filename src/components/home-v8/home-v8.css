@@ -661,6 +661,14 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   /* 手机端列高（约 277px）比 PC 矮，33% 矮卡（约 85px）装不下「零中介费 ¥0」等内容，
      恢复 min-height 让文字矮卡按内容撑开，同列图卡（object-fit: cover）自动让位收缩，避免文字被裁切 */
   .v8-svc__card--mini { min-height: auto; }
+  /* 同步缩小矮卡内黑标题与橙色大字 + 收紧内边距，使内容在 33% 高度内自然放下、互不遮挡 */
+  .v8-svc__card--mini { padding: 12px 12px 14px; gap: 8px; }
+  .v8-svc__card--mini .v8-svc__card-t { font-size: 14px; }
+  .v8-svc__big { font-size: 30px; }
+  .v8-svc__free { font-size: 28px; }
+  .v8-svc__pct { padding: 2px 8px 4px; border-width: 2px; }
+  .v8-svc__pct b { font-size: 22px; }
+  .v8-svc__check { width: 36px; height: 36px; font-size: 19px; }
 }
 
 /* ---------- 区域找房板：区域大图卡片（banner）+ 房源小卡片行 ---------- */
