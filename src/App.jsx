@@ -11,7 +11,6 @@ import EditMode from './components/ici/EditMode.jsx'
 // v8 首页与专属导航独立 chunk
 const HomeV8 = lazy(() => import('./components/home-v8/HomeV8.jsx'))
 const V8Navbar = lazy(() => import('./components/home-v8/V8Navbar.jsx'))
-const V8Listings = lazy(() => import('./components/home-v8/V8Listings.jsx'))
 const LoginPage = lazy(() => import('./components/auth/LoginPage.jsx'))
 const RegisterPage = lazy(() => import('./components/auth/RegisterPage.jsx'))
 const AdminPage = lazy(() => import('./components/admin/AdminPage.jsx'))
@@ -21,7 +20,6 @@ function Site() {
   const { c, lang, setLang } = useIciI18n()
   const { active, openProperty } = useProperty()
   const [route, setRoute] = useState(() => readRoute())
-  const isListings = route.type === 'listings'
   const isAuth = route.type === 'login' || route.type === 'register'
   const isAdmin = route.type === 'admin'
   const isChat = route.type === 'chat'
@@ -58,7 +56,7 @@ function Site() {
     <div className="ici-page">
       {showNav && (
         <Suspense fallback={null}>
-          <V8Navbar solid={isListings} />
+          <V8Navbar />
         </Suspense>
       )}
       {isAuth ? (
@@ -77,12 +75,6 @@ function Site() {
         <main>
           <Suspense fallback={<div style={{ minHeight: '100vh', background: '#f5f6f8' }} />}>
             <AdminPage />
-          </Suspense>
-        </main>
-      ) : isListings ? (
-        <main>
-          <Suspense fallback={<div style={{ minHeight: '100vh', background: '#fff' }} />}>
-            <V8Listings />
           </Suspense>
         </main>
       ) : (

@@ -316,7 +316,7 @@ export default function ChatPage() {
               </div>
 
               {/* 推广卡片 */}
-              <button className="v8-chat__promo" onClick={() => navigate('/listings')}>
+              <button className="v8-chat__promo" onClick={() => navigate('/?type=all')}>
                 <img src={PROMO_IMG} alt={T.promoTitle} loading="lazy" />
                 <span className="v8-chat__promo-title">{T.promoTitle}</span>
                 <span className="v8-chat__promo-sub">{T.promoSub}</span>

@@ -23,10 +23,15 @@ export default function HomeV8() {
   // 只留内嵌房源展示区，进入沉浸式浏览；清除后恢复
   const [typeSel, setTypeSel] = useState(null)
 
-  // 导航/类型区块点击事件契约：v8:show-type { type, school }
+  // 导航/类型区块/问卷事件契约：v8:show-type { type, school, quiz }
+  // quiz = { district, beds, budget } 为快速找房问卷条件，与 type 一并在结果区过滤
   useEffect(() => {
     const onShow = (e) => {
-      setTypeSel({ type: e.detail?.type || 'all', school: e.detail?.school || null })
+      setTypeSel({
+        type: e.detail?.type || 'all',
+        school: e.detail?.school || null,
+        quiz: e.detail?.quiz || null
+      })
     }
     window.addEventListener('v8:show-type', onShow)
     return () => window.removeEventListener('v8:show-type', onShow)

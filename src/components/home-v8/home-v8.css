@@ -942,8 +942,7 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
 
 /* ---------- Customer Danmaku Bubbles ---------- */
 .v8-bubbles__head { margin-bottom: 28px; }
-.home-v8 .v8-bubbles__wrap,
-.v8-listings .v8-bubbles__wrap {
+.home-v8 .v8-bubbles__wrap {
   width: 100%; height: 380px;
   border-radius: 16px; overflow: hidden;
   background: #f5f6f8;
@@ -1585,54 +1584,6 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   transition: background-color .18s;
 }
 
-/* ============================================================
-   房源结果页 /listings
-   ============================================================ */
-.v8-listings-page { min-height: 100vh; background: var(--v8-paper, #fafafa); }
-.v8-listings {
-  max-width: 980px; margin: 0 auto;
-  padding: 120px 24px 96px;
-}
-/* 页头：返回按钮 + 标题 + 筛选条件胶囊 + 计数 */
-.v8-listings__head { margin-bottom: 40px; }
-.v8-listings__back {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 0; border: 0; background: none; cursor: pointer;
-  font-size: 13.5px; font-weight: 500; color: var(--v8-muted, #76767d);
-  transition: color .2s;
-}
-.v8-listings__back:hover { color: var(--v8-ink, #16161a); }
-.v8-listings__title {
-  margin: 18px 0 0; font-size: 32px; font-weight: 600;
-  letter-spacing: -.02em; color: var(--v8-ink, #16161a);
-}
-.v8-listings__chips {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-  margin-top: 18px;
-}
-.v8-listings__chip {
-  display: inline-flex; align-items: center;
-  padding: 5px 13px; border-radius: 999px;
-  font-size: 13px; font-weight: 500; color: var(--v8-ink-2, #4a4a52);
-  background: rgba(255, 255, 255, .9);
-  border: 1px solid rgba(22, 22, 26, .1);
-  box-shadow: 0 1px 2px rgba(22, 22, 26, .04);
-}
-.v8-listings__clear {
-  padding: 0; border: 0; background: none; cursor: pointer;
-  font-size: 13px; color: var(--v8-muted, #76767d);
-  text-decoration: underline; text-underline-offset: 3px;
-  transition: color .2s;
-}
-.v8-listings__clear:hover { color: var(--v8-ink, #16161a); }
-.v8-listings__count {
-  margin: 14px 0 0; font-size: 14px; color: var(--v8-muted, #76767d);
-  font-variant-numeric: tabular-nums;
-}
-/* 房源网格复用 v8-fcard 样式 */
-.v8-listings__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
-.v8-listings-page .v8-featured-empty { min-height: 320px; }
-
 /* ---------- 首页内嵌类型房源展示区（点击类型后就地展开） ---------- */
 .v8-typeres__head {
   display: flex; align-items: flex-end; justify-content: space-between;
@@ -1657,11 +1608,6 @@ html:has(.home-v8) { scrollbar-color: #d3d3d8 #f4f4f5; }
   .v8-typeres__head { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
 
-@media (max-width: 768px) {
-  .v8-listings { padding: 96px 16px 64px; }
-  .v8-listings__title { font-size: 24px; }
-  .v8-listings__grid { grid-template-columns: 1fr; gap: 12px; }
-}
 .v8-drawer__link:active { background: rgba(255, 255, 255, .9); }
 .v8-drawer__link--parent { font-weight: 600; background: rgba(255, 255, 255, .8); }
 .v8-drawer__subs { display: flex; flex-direction: column; gap: 4px; margin: 4px 0 4px 12px; }

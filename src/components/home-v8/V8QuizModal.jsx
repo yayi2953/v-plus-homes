@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
-import { navigate } from '../../lib/router.mjs'
 import { Close } from '../ici/Icons.jsx'
 
 // 快速找房问卷：户型区视频下方蓝色文本触发。
-// 四题逐问（区域 → 房型 → 房间数 → 预算），每题可选「不限」；答完按条件跳 /listings 真实筛选。
+// 四题逐问（区域 → 房型 → 房间数 → 预算），每题可选「不限」；答完按条件在首页结果区就地筛选展示。
 // 弹窗外壳复用 legal-overlay / legal-modal + v8-tmodal（微圆角、× 无灰底）体系。
 
 const STEPS = [
@@ -44,15 +43,16 @@ export default function V8QuizModal({ open, onClose }) {
   if (!open) return null
 
   const finish = (final) => {
-    const a = { ...answers, ...final }
-    const q = new URLSearchParams()
-    if (a.district) q.set('district', a.district)
-    if (a.type) q.set('type', a.type)
-    if (a.beds) q.set('beds', String(a.beds))
-    if (a.budget) q.set('budget', String(a.budget))
-    const qs = q.toString()
+    // 答完不跳独立列表页：按 v8:show-type 契约通知首页就地展开结果区（带问卷条件）
+    const a = final
     onClose?.()
-    navigate('/listings' + (qs ? `?${qs}` : ''))
+    window.dispatchEvent(new CustomEvent('v8:show-type', {
+      detail: {
+        type: a.type || 'all',
+        school: null,
+        quiz: { district: a.district || null, beds: a.beds || null, budget: a.budget || null }
+      }
+    }))
   }
 
   const pick = (key, v) => {

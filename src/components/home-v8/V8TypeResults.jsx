@@ -5,9 +5,21 @@ import V8RegionBoard from './V8RegionBoard.jsx'
 import V8FeaturedStrip from './V8FeaturedStrip.jsx'
 import V8ServiceCards from './V8ServiceCards.jsx'
 
-/* 首页内嵌房源展示区：点击导航类型菜单 / 首页四大类后就地展开（不跳转 /listings）。
+/* 首页内嵌房源展示区：点击导航类型菜单 / 首页四大类 / 问卷答完后就地展开（无独立列表页）。
    受控组件：sel 状态由 HomeV8 持有并同步隐藏其它首页区块；onClear 清除筛选并恢复。
-   sel = { type, school } | null；type 为 'all' 或空时展示全部房源。 */
+   sel = { type, school, quiz } | null；type 为 'all' 或空时展示全部房源；
+   quiz = { district, beds, budget } 为快速找房问卷条件，与 type 叠加过滤。 */
+
+const priceNum = (s) => parseInt(String(s ?? '').replace(/[^\d]/g, ''), 10) || 0
+const CN_NUM = { 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 }
+const bedCount = (br) => {
+  const s = String(br ?? '')
+  const digit = s.match(/\d+/)
+  if (digit) return parseInt(digit[0], 10)
+  const cn = s.match(/[一二两三四五六七八九]/)
+  if (cn) return CN_NUM[cn[0]]
+  return 1
+}
 
 function fmt(tpl, vars) {
   return String(tpl || '').replace(/\{(\w+)\}/g, (_, k) => (vars[k] != null ? vars[k] : ''))
@@ -33,15 +45,20 @@ export default function V8TypeResults({ sel, onClear }) {
 
   if (!sel) return null
 
-  const { type, school } = sel
+  const { type, school, quiz } = sel
   const activeSchool = school ? (c.discover?.schools ?? []).find((x) => x.key === school) ?? null : null
 
   const items = properties
     .map((p, index) => ({ p, index }))
     .filter(({ p }) => {
       if (activeSchool) return p.categories?.includes('student') && p.schoolKeys?.includes(activeSchool.key)
-      if (!type || type === 'all') return true
-      return (p.categories || []).includes(type)
+      if (type && type !== 'all' && !(p.categories || []).includes(type)) return false
+      if (quiz) {
+        if (quiz.district && p.districtKey !== quiz.district) return false
+        if (quiz.beds && (Number(quiz.beds) >= 4 ? bedCount(p.br) >= 4 : bedCount(p.br) !== Number(quiz.beds))) return false
+        if (quiz.budget && priceNum(p.price) > Number(quiz.budget)) return false
+      }
+      return true
     })
 
   const typeLabel = types.find((x) => x.key === type)?.label

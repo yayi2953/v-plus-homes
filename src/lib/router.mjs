@@ -72,7 +72,6 @@ export function readRoute(pathname = window.location.pathname) {
   if (pm) return { type: 'property', code: decodeURIComponent(pm[1]), lang: prefix }
   if (bare === '/map' || bare === '/map/') return { type: 'map', lang: prefix }
   if (bare === '/guides' || bare === '/guides/') return { type: 'guides', lang: prefix }
-  if (bare === '/listings' || bare === '/listings/') return { type: 'listings', lang: prefix }
   if (bare === '/login' || bare === '/login/') return { type: 'login', lang: prefix }
   if (bare === '/register' || bare === '/register/') return { type: 'register', lang: prefix }
   if (bare === '/chat' || bare === '/chat/') return { type: 'chat', lang: prefix }
