@@ -65,7 +65,8 @@ export default function V8QuizModal({ open, onClose }) {
   const cur = STEPS[step]
   const opts = cur.get(c, ft)
   const labels = {
-    back: lang === 'zh' ? '上一步' : lang === 'ja' ? '戻る' : 'Back'
+    back: lang === 'zh' ? '上一步' : lang === 'ja' ? '戻る' : 'Back',
+    select: lang === 'zh' ? '请选择' : lang === 'ja' ? '選択してください' : 'Select…'
   }
 
   return createPortal(
@@ -113,26 +114,20 @@ export default function V8QuizModal({ open, onClose }) {
                 </div>
               </div>
             ) : (
-              <div className="v8-quiz__opts">
-                {opts.map((o) => (
-                  <button
-                    type="button"
-                    key={String(o.v)}
-                    className={`v8-quiz__opt${answers[cur.key] === o.v ? ' is-sel' : ''}`}
-                    onClick={() => pick(cur.key, o.v)}
-                  >
-                    {o.label}
-                  </button>
-                ))}
-              </div>
-            )}
-            {/* 右下角操作区：不限（除价格题外每题都有）+ 上一步 */}
-            <div className="v8-quiz__foot">
-              <button
-                type="button"
-                className="v8-quiz__opt v8-quiz__opt--any"
-                onClick={() => pick(cur.key, null)}
+              /* 区域 / 房型 / 房间数：下拉选择，选中即进入下一题 */
+              <select
+                className="v8-quiz__select"
+                value=""
+                aria-label={(t.questions || [])[step]}
+                onChange={(e) => pick(cur.key, e.target.value || null)}
               >
+                <option value="" disabled>{labels.select}</option>
+                {opts.map((o) => <option key={String(o.v)} value={String(o.v)}>{o.label}</option>)}
+              </select>
+            )}
+            {/* 右下角操作区：不限（灰色文本式）+ 上一步 */}
+            <div className="v8-quiz__foot">
+              <button type="button" className="v8-quiz__any" onClick={() => pick(cur.key, null)}>
                 {t.any}
               </button>
               {step > 0 && (
