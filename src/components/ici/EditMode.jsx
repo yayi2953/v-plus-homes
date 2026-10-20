@@ -170,19 +170,6 @@ export default function EditMode() {
       }
     }
 
-    function isInteractive(el) {
-      // 检查元素是否是链接、按钮或表单元素（这些应该允许正常交互）
-      let node = el
-      while (node && node !== document.body) {
-        const tag = node.tagName
-        if (tag === 'A' || tag === 'BUTTON' || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') {
-          return true
-        }
-        node = node.parentElement
-      }
-      return false
-    }
-
     function onClick(e) {
       // 图片优先：点击图片（即使包在链接里）进入图片替换，编辑优先于跳转
       const img = findEditableImg(e.target)
@@ -202,8 +189,6 @@ export default function EditMode() {
         }, '*')
         return
       }
-      // 如果点击的是链接/按钮/表单元素，允许正常跳转，不拦截
-      if (isInteractive(e.target)) return
 
       const found = findEditableAncestor(e.target)
       if (!found) return
