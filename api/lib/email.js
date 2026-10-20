@@ -1,6 +1,17 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// 延迟初始化：环境变量未设置时不抛异常，只在发送时检查
+let resend = null
+function getResend() {
+  if (!resend) {
+    const key = process.env.RESEND_API_KEY
+    if (!key) {
+      throw new Error('RESEND_API_KEY not configured')
+    }
+    resend = new Resend(key)
+  }
+  return resend
+}
 
 // 发送验证邮件
 export async function sendVerificationEmail(to, token, name = '') {
@@ -49,7 +60,8 @@ export async function sendVerificationEmail(to, token, name = '') {
 </html>
   `
 
-  const { data, error } = await resend.emails.send({
+  const client = getResend()
+  const { data, error } = await client.emails.send({
     from: process.env.FROM_EMAIL || 'V PLUS <no-reply@v-plus.house>',
     to,
     subject: 'Verify your email address - V PLUS',
@@ -112,7 +124,8 @@ export async function sendPasswordResetEmail(to, token, name = '') {
 </html>
   `
 
-  const { data, error } = await resend.emails.send({
+  const client = getResend()
+  const { data, error } = await client.emails.send({
     from: process.env.FROM_EMAIL || 'V PLUS <no-reply@v-plus.house>',
     to,
     subject: 'Reset your password - V PLUS',
