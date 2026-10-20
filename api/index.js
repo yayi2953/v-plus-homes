@@ -27,10 +27,31 @@ export default async function handler(req, res) {
     return res.status(204).end()
   }
 
-  // Parse JSON body (Vercel serverless doesn't auto-parse)
+  // Parse JSON body：兼容三种 runtime 形态 ——
+  // 1) 已被平台预解析（req.body 为对象）；2) Web Request 风格 req.json()；3) Node 流手动收集
   let parsedBody = {}
   if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
-    try { parsedBody = await req.json() } catch { /* ignore */ }
+    if (req.body && typeof req.body === 'object' && Object.keys(req.body).length) {
+      parsedBody = req.body
+    } else {
+      try {
+        if (typeof req.json === 'function') {
+          const j = await req.json()
+          if (j && typeof j === 'object') parsedBody = j
+        }
+      } catch { /* ignore */ }
+      if (!Object.keys(parsedBody).length) {
+        try {
+          const chunks = []
+          for await (const chunk of req) chunks.push(chunk)
+          const raw = Buffer.concat(chunks).toString('utf-8')
+          if (raw) {
+            const j = JSON.parse(raw)
+            if (j && typeof j === 'object') parsedBody = j
+          }
+        } catch { /* ignore */ }
+      }
+    }
   }
   req.body = parsedBody
 
