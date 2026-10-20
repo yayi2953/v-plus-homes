@@ -13,7 +13,6 @@ const HomeV8 = lazy(() => import('./components/home-v8/HomeV8.jsx'))
 const V8Navbar = lazy(() => import('./components/home-v8/V8Navbar.jsx'))
 const LoginPage = lazy(() => import('./components/auth/LoginPage.jsx'))
 const RegisterPage = lazy(() => import('./components/auth/RegisterPage.jsx'))
-const VerifyEmailPage = lazy(() => import('./components/auth/VerifyEmailPage.jsx'))
 const AdminPage = lazy(() => import('./components/admin/AdminPage.jsx'))
 const ChatPage = lazy(() => import('./components/chat/ChatPage.jsx'))
 
@@ -21,7 +20,7 @@ function Site() {
   const { c, lang, setLang } = useIciI18n()
   const { active, openProperty } = useProperty()
   const [route, setRoute] = useState(() => readRoute())
-  const isAuth = route.type === 'login' || route.type === 'register' || route.type === 'verify-email'
+  const isAuth = route.type === 'login' || route.type === 'register'
   const isAdmin = route.type === 'admin'
   const isChat = route.type === 'chat'
 
@@ -63,7 +62,7 @@ function Site() {
       {isAuth ? (
         <main>
           <Suspense fallback={<div style={{ minHeight: '100vh', background: '#f5f6f8' }} />}>
-            {route.type === 'login' ? <LoginPage /> : route.type === 'verify-email' ? <VerifyEmailPage /> : <RegisterPage />}
+            {route.type === 'login' ? <LoginPage /> : <RegisterPage />}
           </Suspense>
         </main>
       ) : isChat ? (

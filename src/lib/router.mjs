@@ -74,7 +74,6 @@ export function readRoute(pathname = window.location.pathname) {
   if (bare === '/guides' || bare === '/guides/') return { type: 'guides', lang: prefix }
   if (bare === '/login' || bare === '/login/') return { type: 'login', lang: prefix }
   if (bare === '/register' || bare === '/register/') return { type: 'register', lang: prefix }
-  if (bare === '/verify-email' || bare === '/verify-email/') return { type: 'verify-email', lang: prefix }
   if (bare === '/chat' || bare === '/chat/') return { type: 'chat', lang: prefix }
   if (bare === '/admin' || bare === '/admin/') return { type: 'admin', lang: prefix }
   const gm = bare.match(GUIDE_ARTICLE_RE)
