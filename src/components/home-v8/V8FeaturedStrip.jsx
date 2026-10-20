@@ -1,3 +1,4 @@
+import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
 import SmartImage from '../common/SmartImage.jsx'
 
 /* 精选房源卡片条（DJI「热卖爆款」式样）：
@@ -6,10 +7,11 @@ import SmartImage from '../common/SmartImage.jsx'
    仅采用参考样式，图片与文案均来自站内房源数据。 */
 
 export default function V8FeaturedStrip({ items, onOpen, viewText }) {
+  const { lang } = useIciI18n()
   if (!items?.length) return null
   return (
     <div className="v8-fstrip">
-      <h3 className="v8-fstrip__title">精选房源</h3>
+      <h3 className="v8-fstrip__title" data-edit-key="v8.featured.title">{lang === 'zh' ? '精选房源' : lang === 'ja' ? '注目物件' : 'Featured Homes'}</h3>
       <div className="v8-fstrip__row">
         {items.slice(0, 4).map(({ p, index }) => (
           <button
@@ -26,7 +28,7 @@ export default function V8FeaturedStrip({ items, onOpen, viewText }) {
               <span className="v8-fscard__sub">{[p.br, p.metro].filter(Boolean).join(' · ')}</span>
               <span className="v8-fscard__meta">
                 <span className="v8-fscard__price">{p.price}</span>
-                <span className="v8-fscard__btn">{viewText || '查看详情'}</span>
+                <span className="v8-fscard__btn">{viewText || (lang === 'zh' ? '查看详情' : lang === 'ja' ? '詳細を見る' : 'View')}</span>
               </span>
             </span>
           </button>

@@ -32,9 +32,9 @@ export default function V8Types() {
     <section className="v8-section" id="types">
       <div className="v8-wrap">
         <div className="v8-sec-head v8-rise">
-          <p className="v8-eyebrow">{t.eyebrow}</p>
-          <h2 className="v8-h-sec" style={{ marginTop: 12 }}>{t.title}</h2>
-          <p className="v8-lede">{t.desc}</p>
+          <p className="v8-eyebrow" data-edit-key="v8.types.eyebrow">{t.eyebrow}</p>
+          <h2 className="v8-h-sec" style={{ marginTop: 12 }} data-edit-key="v8.types.title">{t.title}</h2>
+          <p className="v8-lede" data-edit-key="v8.types.desc">{t.desc}</p>
         </div>
 
         <div className="v8-types v8-rise">
@@ -59,8 +59,8 @@ export default function V8Types() {
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <span className="v8-trow__main">
-                  <span className="v8-trow__name">{tp.label}</span>
-                  <span className="v8-trow__desc">{tp.desc}</span>
+                  <span className="v8-trow__name" data-edit-key={`discover.types.${tp.key}.label`}>{tp.label}</span>
+                  <span className="v8-trow__desc" data-edit-key={`discover.types.${tp.key}.desc`}>{tp.desc}</span>
                 </span>
                 <span className="v8-trow__go" aria-hidden="true" />
               </button>
@@ -73,13 +73,14 @@ export default function V8Types() {
               <TypeHouse activeIndex={active} />
             </div>
             {/* 视频下方蓝色文本：打开快速找房问卷 / 免筛选直看全部房源 */}
-            <button type="button" className="v8-quiz-cta" onClick={() => setQuizOpen(true)}>
+            <button type="button" className="v8-quiz-cta" onClick={() => setQuizOpen(true)} data-edit-key="v8.finder.quiz.trigger">
               {c.v8?.finder?.quiz?.trigger}
             </button>
             <button
               type="button"
               className="v8-quiz-cta v8-quiz-cta--all"
               onClick={() => window.dispatchEvent(new CustomEvent('v8:show-type', { detail: { type: 'all' } }))}
+              data-edit-key="v8.finder.quiz.allHomes"
             >
               {c.v8?.finder?.quiz?.allHomes}
             </button>

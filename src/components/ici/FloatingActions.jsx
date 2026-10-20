@@ -40,12 +40,12 @@ export default function FloatingActions() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 30 }}
           >
-            <p>{c.cookie.text}</p>
+            <p data-edit-key="cookie.text">{c.cookie.text}</p>
             <div className="cookie__actions">
-              <button className="cookie__btn cookie__btn--ghost" onClick={() => setCookie(false)}>
+              <button className="cookie__btn cookie__btn--ghost" onClick={() => setCookie(false)} data-edit-key="cookie.reject">
                 {c.cookie.reject}
               </button>
-              <button className="cookie__btn cookie__btn--ok" onClick={() => setCookie(false)}>
+              <button className="cookie__btn cookie__btn--ok" onClick={() => setCookie(false)} data-edit-key="cookie.accept">
                 {c.cookie.accept}
               </button>
             </div>

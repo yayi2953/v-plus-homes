@@ -82,12 +82,12 @@ export default function V8TypeResults({ sel, onClear }) {
       <div className="v8-wrap">
         <div className="v8-typeres__head v8-rise">
           <div className="v8-typeres__meta">
-            <h2 className="v8-typeres__title">{title}</h2>
-            <p className="v8-typeres__count">
+            <h2 className="v8-typeres__title" data-edit-key="v8.listings.title">{title}</h2>
+            <p className="v8-typeres__count" data-edit-key="v8.finder.count">
               {fmt(ft.count || '{n} homes found', { n: items.length })}
             </p>
           </div>
-          <button type="button" className="v8-typeres__clear" onClick={onClear}>
+          <button type="button" className="v8-typeres__clear" onClick={onClear} data-edit-key="v8.finder.clear">
             {ft.clear || (lang === 'zh' ? '清除' : 'Clear')}
           </button>
         </div>
@@ -98,7 +98,7 @@ export default function V8TypeResults({ sel, onClear }) {
             onOpen={(index) => openProperty(index, 'g')}
           />
         ) : (
-          <p className="v8-featured-empty">
+          <p className="v8-featured-empty" data-edit-key="v8.finder.empty">
             {lang === 'zh'
               ? '暂无该类型的房源，看看其它类型吧'
               : lang === 'ja'

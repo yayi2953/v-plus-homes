@@ -86,7 +86,7 @@ export default function V8Hero({ hideBody = false }) {
           <p className="v8-eyebrow" data-edit-key="v8.hero.bodyEyebrow">{t.bodyEyebrow}</p>
           <p className="v8-lede" data-edit-key="v8.hero.bodyLede">{t.bodyLede}</p>
           <div className="v8-hero-cta">
-            <button type="button" className="v8-tlink">
+            <button type="button" className="v8-tlink" data-edit-key="v8.hero.whatsapp">
               {t.whatsapp}
             </button>
           </div>

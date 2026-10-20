@@ -66,7 +66,7 @@ export default function V8QuizModal({ open, onClose }) {
   const cur = STEPS[step]
   const opts = cur.get(c, ft)
   const labels = {
-    back: lang === 'zh' ? '上一步' : lang === 'ja' ? '戻る' : 'Back',
+    back: t.back || (lang === 'zh' ? '上一步' : lang === 'ja' ? '戻る' : 'Back'),
     confirm: t.confirm || (lang === 'zh' ? '确认？' : lang === 'ja' ? '確定しますか？' : 'Confirm?')
   }
 
@@ -180,11 +180,11 @@ export default function V8QuizModal({ open, onClose }) {
             {/* 操作区：上一步常驻左下角（第 1 步无），确认？常驻右下角 */}
             <div className="v8-quiz__foot">
               {step > 0 && (
-                <button type="button" className="v8-quiz__back" onClick={() => setStep(step - 1)}>
+                <button type="button" className="v8-quiz__back" onClick={() => setStep(step - 1)} data-edit-key="v8.finder.quiz.back">
                   {labels.back}
                 </button>
               )}
-              <button type="button" className="v8-quiz__confirm" onClick={finish}>
+              <button type="button" className="v8-quiz__confirm" onClick={finish} data-edit-key="v8.finder.quiz.confirm">
                 {labels.confirm}
               </button>
             </div>

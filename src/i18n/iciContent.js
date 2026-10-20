@@ -421,6 +421,19 @@ const en = {
     },
     cta: {
       footnote: 'Average response time under 2 hours · English / Cantonese / Mandarin'
+    },
+    serviceCards: {
+      title: 'Why choose V PLUS',
+      c1a: 'Real photo listings',
+      c1b: 'Zero agency fee',
+      c2a: 'Always-on concierge',
+      c2big: '7×24',
+      c2b: 'Curated quality homes',
+      c3a: 'One-on-one consultant',
+      c3b: 'Verified homes',
+      c4a: 'Settling-in gifts',
+      c4b: 'Free viewing shuttle',
+      c4big: '¥0'
     }
   }
 }
@@ -852,6 +865,19 @@ const zh = {
     },
     cta: {
       footnote: '平均 2 小时内回复 · 英语 / 粤语 / 普通话'
+    },
+    serviceCards: {
+      title: '选择 V PLUS 的理由',
+      c1a: '真实房源实拍',
+      c1b: '0 中介费',
+      c2a: '全天候管家在线',
+      c2big: '7×24',
+      c2b: '海量优质房源',
+      c3a: '专属顾问带看',
+      c3b: '官方认证房源',
+      c4a: '安家好礼相赠',
+      c4b: '专车免费带看',
+      c4big: '¥0'
     }
   }
 }
@@ -1279,6 +1305,19 @@ const ja = {
     },
     cta: {
       footnote: '平均返信時間2時間以内 · 日本語 / 英語 / 広東語 / 北京語'
+    },
+    serviceCards: {
+      title: 'V PLUS を選ぶ理由',
+      c1a: '実撮影の物件',
+      c1b: '手数料 0 円',
+      c2a: '24 時間コンシェルジュ',
+      c2big: '7×24',
+      c2b: '厳選物件を多数掲載',
+      c3a: '専属コンサルタント',
+      c3b: '公式認証物件',
+      c4a: '入居特典プレゼント',
+      c4b: '無料送迎付き内見',
+      c4big: '¥0'
     }
   }
 }

@@ -11,9 +11,9 @@ export default function V8Team() {
     <section className="v8-team" id="team">
       <div className="v8-wrap v8-section">
         <div className="v8-sec-head v8-rise">
-          <p className="v8-eyebrow">{t.eyebrow || intro.overline}</p>
-          <h2 className="v8-h-sec" style={{ marginTop: 12 }}>{t.title || intro.titleLead}</h2>
-          <p className="v8-lede">{t.desc || intro.desc}</p>
+          <p className="v8-eyebrow" data-edit-key="v8.team.eyebrow">{t.eyebrow || intro.overline}</p>
+          <h2 className="v8-h-sec" style={{ marginTop: 12 }} data-edit-key="v8.team.title">{t.title || intro.titleLead}</h2>
+          <p className="v8-lede" data-edit-key="v8.team.desc">{t.desc || intro.desc}</p>
         </div>
         <div className="v8-team-grid v8-rise">
           {members.map((m) => (
