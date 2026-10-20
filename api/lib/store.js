@@ -4,21 +4,24 @@ import { fileURLToPath } from 'url'
 import { hashPassword } from './auth.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-// Vercel serverless 鍙兘鍐?/tmp锛堜粎浣?GitHub 涓嶅彲鐢ㄦ椂鐨勯檷绾э級锛屽紑鍙戞€佸啓椤圭洰 data 鐩綍
+// Vercel serverless 只能写 /tmp（仅 GitHub 不可用时的降级），开发态写项目 data 目录
 const DATA_DIR = process.env.NODE_ENV === 'production' ? '/tmp' : path.join(__dirname, '..', 'data')
 const DB_PATH = path.join(DATA_DIR, 'db.json')
 
-// GitHub API锛氭暣涓暟鎹簱鎸佷箙鍖栧埌浠撳簱锛堝喎鍚姩/澶氬疄渚嬪叡浜紝鏁版嵁涓嶄細涓㈠け锛?const GITHUB_REPO = 'yayi2953/v-plus-homes'
+// GitHub API：整个数据库持久化到仓库（冷启动/多实例共享，数据不会丢失）
+const GITHUB_REPO = 'yayi2953/v-plus-homes'
 const GITHUB_DB_PATH = 'api/data/db.json'
 const GITHUB_TEXTS_PATH = 'api/data/texts.json'
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''
 const GH_API = (p) => `https://api.github.com/repos/${GITHUB_REPO}/contents/${p}`
-const DB_TTL = 10_000 // 璇荤紦瀛?10 绉掞紱鍐欐搷浣滃缁堝厛鎷夎繙绔渶鏂版暟鎹紝涓嶅彈缂撳瓨褰卞搷
-const CHAT_TTL = 2_000 // 鑱婂ぉ杞寮哄埗鍒锋柊鐨勬渶灏忛棿闅旓紙鑺傛祦锛岀渷 GitHub API 閰嶉锛?
-// 榛樿绠＄悊鍛樿处鍙?const ADMIN_EMAIL = 'admin@v-plus.house'
+const DB_TTL = 10_000 // 读缓存 10 秒；写操作始终先拉远端最新数据，不受缓存影响
+const CHAT_TTL = 2_000 // 聊天轮询强制刷新的最小间隔（节流，省 GitHub API 配额）
+
+// 默认管理员账号
+const ADMIN_EMAIL = 'admin@v-plus.house'
 const ADMIN_PASSWORD = 'admin123'
 
-// 鍒濆鏁版嵁锛堜粨搴撴棤 db.json 鏃跺垱寤猴級
+// 初始数据（仓库无 db.json 时创建）
 const SEED = {
   users: [],
   listings: [],
@@ -28,9 +31,10 @@ const SEED = {
   texts: {}
 }
 
-let cache = null // 鍐呭瓨涓殑褰撳墠鏁版嵁搴?let cacheTime = 0
-let dbSha = null // 褰撳墠 db.json 鐨?blob sha锛圕AS 鍐欏叆鐢級
-let writeChain = Promise.resolve() // 鍐欓槦鍒楋細鍚屼竴瀹炰緥鍐呬覆琛岋紝閬垮厤骞跺彂浜掔浉瑕嗙洊
+let cache = null // 内存中的当前数据库
+let cacheTime = 0
+let dbSha = null // 当前 db.json 的 blob sha（CAS 写入用）
+let writeChain = Promise.resolve() // 写队列：同一实例内串行，避免并发互相覆盖
 
 function ghHeaders(extra = {}) {
   return {
@@ -52,7 +56,7 @@ function seedAdmin(db) {
     db.users.push({
       id: 'u-admin',
       email: ADMIN_EMAIL,
-      name: '绠＄悊鍛?,
+      name: '管理员',
       role: 'admin',
       password: hashPassword(ADMIN_PASSWORD),
       createdAt: Date.now()
@@ -64,7 +68,7 @@ function saveLocal(data) {
   ensureDir()
   try {
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8')
-  } catch { /* 鍙鏂囦欢绯荤粺鏃跺拷鐣?*/ }
+  } catch { /* 只读文件系统时忽略 */ }
 }
 
 function loadLocal() {
@@ -78,12 +82,12 @@ function genId(prefix = 'id') {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-// ---------- GitHub 鏁版嵁搴撹鍐?----------
+// ---------- GitHub 数据库读写 ----------
 async function fetchRemoteDb() {
   if (!GITHUB_TOKEN) return null
   try {
     const res = await fetch(GH_API(GITHUB_DB_PATH), { headers: ghHeaders() })
-    if (res.status === 404) return { sha: null, db: null } // 浠撳簱杩樻病鏈?db.json
+    if (res.status === 404) return { sha: null, db: null } // 仓库还没有 db.json
     if (!res.ok) return null
     const json = await res.json()
     const db = JSON.parse(Buffer.from(json.content, 'base64').toString('utf-8'))
@@ -100,7 +104,7 @@ async function pushDb(db) {
     cacheTime = Date.now()
     return true
   }
-  // 涓茶鍐欏叆锛岄伩鍏嶅悓瀹炰緥骞跺彂璇锋眰浜掔浉瑕嗙洊 sha
+  // 串行写入，避免同实例并发请求互相覆盖 sha
   writeChain = writeChain.then(async () => {
     try {
       const body = {
@@ -120,7 +124,7 @@ async function pushDb(db) {
         cacheTime = Date.now()
         return true
       }
-      // sha 杩囨湡锛堝叾瀹冨疄渚嬪凡鍐欏叆锛夆啋 杩斿洖 false 瑙﹀彂涓婂眰閲嶈瘯
+      // sha 过期（其它实例已写入）→ 返回 false 触发上层重试
       return false
     } catch {
       return false
@@ -129,8 +133,9 @@ async function pushDb(db) {
   return writeChain
 }
 
-// 棣栨璋冪敤棰勭儹锛氭妸杩滅鏁版嵁搴撳姞杞借繘鍐呭瓨缂撳瓨
-// force=true锛氳亰澶╄疆璇㈢敤鐨勫己鍒跺埛鏂帮紙甯?CHAT_TTL 鑺傛祦锛岄伩鍏嶇儳 GitHub API 閰嶉锛?export async function initDb(force = false) {
+// 首次调用预热：把远端数据库加载进内存缓存
+// force=true：聊天轮询用的强制刷新（带 CHAT_TTL 节流，避免烧 GitHub API 配额）
+export async function initDb(force = false) {
   if (cache) {
     const ttl = force ? CHAT_TTL : DB_TTL
     if (Date.now() - cacheTime < ttl) return cache
@@ -141,29 +146,31 @@ async function pushDb(db) {
       cache = remote.db
       dbSha = remote.sha
     } else {
-      // 浠撳簱杩樻病鏈?db.json锛氭挱绉嶅苟鍒涘缓
+      // 仓库还没有 db.json：播种并创建
       cache = structuredClone(SEED)
       dbSha = null
       await pushDb(cache)
       return cache
     }
   } else if (!cache) {
-    // GitHub 涓嶅彲鐢細闄嶇骇鏈湴 /tmp
+    // GitHub 不可用：降级本地 /tmp
     cache = loadLocal()
   }
-  if (!Array.isArray(cache.chats)) cache.chats = [] // 鏃ф暟鎹吋瀹?  seedAdmin(cache)
+  if (!Array.isArray(cache.chats)) cache.chats = [] // 旧数据兼容
+  seedAdmin(cache)
   cacheTime = Date.now()
   saveLocal(cache)
   return cache
 }
 
-// 璇绘帴鍙ｏ紙鍚屾锛夛細handler 鍏ュ彛宸?await initDb() 棰勭儹锛岃繖閲岀洿鎺ヨ鍐呭瓨缂撳瓨
+// 读接口（同步）：handler 入口已 await initDb() 预热，这里直接读内存缓存
 function getUsers() { return (cache || loadLocal()).users }
 function getListings() { return (cache || loadLocal()).listings }
 function getMessages() { return (cache || loadLocal()).messages }
 function getServices() { return (cache || loadLocal()).services }
 
-// 鍐欐帴鍙ｏ紙寮傛锛夛細鍏堟媺杩滅鏈€鏂?鈫?搴旂敤鍙樻洿 鈫?鎺ㄩ€侊紱sha 鍐茬獊鑷姩閲嶈瘯锛?// 淇濊瘉澶氬疄渚嬪苟鍙戝啓涓嶄涪鏁版嵁
+// 写接口（异步）：先拉远端最新 → 应用变更 → 推送；sha 冲突自动重试，
+// 保证多实例并发写不丢数据
 async function mutateDb(fn, retries = 3) {
   for (let i = 0; i < retries; i++) {
     const remote = await fetchRemoteDb()
@@ -172,16 +179,17 @@ async function mutateDb(fn, retries = 3) {
       db = remote.db
       dbSha = remote.sha
     } else if (remote && remote.sha === null) {
-      db = structuredClone(SEED) // 杩滅杩樻病鏈夋枃浠?      dbSha = null
+      db = structuredClone(SEED) // 远端还没有文件
+      dbSha = null
     } else {
-      db = structuredClone(cache || loadLocal()) // GitHub 涓嶅彲鐢ㄦ椂鍩轰簬鍐呭瓨闄嶇骇
+      db = structuredClone(cache || loadLocal()) // GitHub 不可用时基于内存降级
     }
     const result = fn(db)
     if (!Array.isArray(db.chats)) db.chats = []
     seedAdmin(db)
     if (await pushDb(db)) return result
   }
-  // 閲嶈瘯鑰楀敖锛氳嚦灏戝啓鍏ユ湰鍦?鍐呭瓨锛屽敖鍔涜€屼负
+  // 重试耗尽：至少写入本地/内存，尽力而为
   const db = structuredClone(cache || loadLocal())
   const result = fn(db)
   if (!Array.isArray(db.chats)) db.chats = []
@@ -190,7 +198,7 @@ async function mutateDb(fn, retries = 3) {
   return result
 }
 
-// ---------- 鏂囨瑕嗙洊椤癸紙texts.json锛岀嫭绔嬩簬鏁版嵁搴擄級 ----------
+// ---------- 文案覆盖项（texts.json，独立于数据库） ----------
 let textsCache = null
 let textsCacheTime = 0
 
@@ -211,7 +219,7 @@ async function fetchTextsFromGitHub() {
 }
 
 async function getTexts() {
-  // 缂撳瓨 30 绉掞紝閬垮厤棰戠箒璇锋眰 GitHub
+  // 缓存 30 秒，避免频繁请求 GitHub
   if (textsCache && Date.now() - textsCacheTime < 30000) {
     return textsCache
   }
@@ -224,7 +232,7 @@ async function updateTexts(updates) {
 
   if (GITHUB_TOKEN) {
     try {
-      // 鑾峰彇褰撳墠鏂囦欢鐨?sha
+      // 获取当前文件的 sha
       const metaRes = await fetch(
         GH_API(GITHUB_TEXTS_PATH),
         { headers: ghHeaders() }
@@ -232,7 +240,7 @@ async function updateTexts(updates) {
       const meta = await metaRes.json()
       const sha = meta.sha
 
-      // 鎻愪氦鏇存柊
+      // 提交更新
       const content = Buffer.from(JSON.stringify(next, null, 2), 'utf-8').toString('base64')
       const putRes = await fetch(
         GH_API(GITHUB_TEXTS_PATH),
@@ -256,7 +264,8 @@ async function updateTexts(updates) {
     }
   }
 
-  // 闄嶇骇锛氬啓 /tmp锛堜笉鎸佷箙锛屼絾鑷冲皯褰撳墠瀹炰緥鍙敤锛?  textsCache = next
+  // 降级：写 /tmp（不持久，但至少当前实例可用）
+  textsCache = next
   textsCacheTime = Date.now()
   return next
 }
@@ -293,7 +302,7 @@ async function resetTexts() {
   return {}
 }
 
-// ---------- 涓氬姟鎿嶄綔 ----------
+// ---------- 业务操作 ----------
 function findUserByEmail(email) {
   return getUsers().find((u) => u.email.toLowerCase() === email.toLowerCase())
 }
@@ -306,7 +315,8 @@ async function createUser(data) {
   })
 }
 
-// 鐢ㄦ埛绠＄悊锛氱鐞嗗憳淇敼鎸囧畾鐢ㄦ埛瀵嗙爜锛坧assword 宸插湪 handler 涓?hash锛?async function updateUserPassword(id, hashed) {
+// 用户管理：管理员修改指定用户密码（password 已在 handler 中 hash）
+async function updateUserPassword(id, hashed) {
   return mutateDb((db) => {
     const u = (db.users || []).find((x) => x.id === id)
     if (!u) return null
@@ -366,14 +376,14 @@ async function deleteMessage(id) {
   })
 }
 
-// ---------- 鍦ㄧ嚎瀹㈡湇锛堜細璇濆瓨 db.chats锛岀敤鎴?绠＄悊鍛橀€氳繃杞鏀跺彂锛?----------
+// ---------- 在线客服（会话存 db.chats，用户/管理员通过轮询收发） ----------
 function getChats() {
   const db = cache || loadLocal()
   if (!Array.isArray(db.chats)) db.chats = []
   return db.chats
 }
 
-// 鐢ㄦ埛鍙戞秷鎭細鏃犱細璇濆垯鑷姩鍒涘缓锛屽悓鏃惰涓虹敤鎴风宸茶
+// 用户发消息：无会话则自动创建，同时视为用户端已读
 async function userSendMessage(userId, userName, userEmail, text, card) {
   return mutateDb((db) => {
     let chat = db.chats.find((c) => c.userId === userId)
@@ -391,7 +401,7 @@ async function userSendMessage(userId, userName, userEmail, text, card) {
       }
       db.chats.push(chat)
     }
-    // 鎴挎簮鍗＄墖娑堟伅锛歝ard 涓哄彲閫夌粨鏋勫寲瀛楁锛堝浘鐗?鏍囬/鍓枃/浠锋牸/閾炬帴锛夛紝鐐瑰嚮鍗＄墖鏂扮獥鍙ｆ墦寮€鎴挎簮
+    // 房源卡片消息：card 为可选结构化字段（图片/标题/副文/价格/链接），点击卡片新窗口打开房源
     const msg = { id: genId('m'), from: 'user', text, at: Date.now(), ...(card ? { card } : {}) }
     chat.messages.push(msg)
     chat.updatedAt = msg.at
@@ -400,7 +410,8 @@ async function userSendMessage(userId, userName, userEmail, text, card) {
   })
 }
 
-// 绠＄悊鍛樺洖澶?async function adminReplyMessage(chatId, text) {
+// 管理员回复
+async function adminReplyMessage(chatId, text) {
   return mutateDb((db) => {
     const chat = db.chats.find((c) => c.id === chatId)
     if (!chat) return null
@@ -411,7 +422,7 @@ async function userSendMessage(userId, userName, userEmail, text, card) {
   })
 }
 
-// 绠＄悊鍛樻墦寮€浼氳瘽 鈫?鏍囪鐢ㄦ埛娑堟伅宸茶锛堢敤浜庝細璇濆垪琛ㄦ湭璇诲窘鏍囷級
+// 管理员打开会话 → 标记用户消息已读（用于会话列表未读角标）
 async function markChatReadAdmin(chatId) {
   return mutateDb((db) => {
     const chat = db.chats.find((c) => c.id === chatId)
@@ -421,9 +432,9 @@ async function markChatReadAdmin(chatId) {
   })
 }
 
-// ---------- 鍥剧墖涓婁紶锛堝瓨鍏ヤ粨搴?public/images/uploads/锛岃繑鍥?raw 鐩撮摼锛?----------
+// ---------- 图片上传（存入仓库 public/images/uploads/，返回 raw 直链） ----------
 async function uploadImageToGitHub(name, dataBase64) {
-  if (!GITHUB_TOKEN) throw new Error('鏈厤缃?GITHUB_TOKEN')
+  if (!GITHUB_TOKEN) throw new Error('未配置 GITHUB_TOKEN')
   const safeName = name.replace(/[^\w.-]/g, '_')
   const filePath = `public/images/uploads/${Date.now().toString(36)}-${safeName}`
   const content = dataBase64
@@ -438,7 +449,7 @@ async function uploadImageToGitHub(name, dataBase64) {
   })
   if (!res.ok) {
     const t = await res.text().catch(() => '')
-    throw new Error(`GitHub 涓婁紶澶辫触锛圚TTP ${res.status}锛?{t ? ': ' + t.slice(0, 200) : ''}`)
+    throw new Error(`GitHub 上传失败（HTTP ${res.status}）${t ? ': ' + t.slice(0, 200) : ''}`)
   }
   return {
     path: filePath,

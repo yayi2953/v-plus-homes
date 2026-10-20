@@ -10,14 +10,16 @@ import {
   updateUserPassword
 } from './lib/store.js'
 
-// 缁熶竴鍏ュ彛锛氭墍鏈?/api/* 璺敱鍦ㄦ鍑芥暟鍐呭垎鍙戯紝鍏变韩鍚屼竴涓?/tmp/db.json
-// 锛圴ercel 鍚?serverless 鍑芥暟 /tmp 闅旂锛屽悎骞跺埌鍗曞嚱鏁版墠鑳借法鎺ュ彛鍏变韩鏁版嵁锛?export default async function handler(req, res) {
+// 统一入口：所有 /api/* 路由在此函数内分发，共享同一个 /tmp/db.json
+// （Vercel 各 serverless 函数 /tmp 隔离，合并到单函数才能跨接口共享数据）
+export default async function handler(req, res) {
   const url = new URL(req.url, 'http://localhost')
   const path = url.pathname
 
-  // 鍘绘帀鍙兘鐨?/api 鍓嶇紑锛屽緱鍒扮浉瀵硅矾寰?  const rel = path.replace(/^\/api/, '') || '/'
+  // 去掉可能的 /api 前缀，得到相对路径
+  const rel = path.replace(/^\/api/, '') || '/'
 
-  // CORS锛堝鏈夐渶瑕侊級
+  // CORS（如有需要）
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
@@ -33,8 +35,9 @@ import {
   req.body = parsedBody
 
   try {
-    // 棰勭儹锛氫粠 GitHub 鍔犺浇鏁版嵁搴撳埌鍐呭瓨锛堝悗缁鎺ュ彛璧扮紦瀛橈級
-    // 鑱婂ぉ杞璺敱寮哄埗鍒锋柊锛堝甫 2 绉掕妭娴侊級锛屼繚璇?3 绉掕疆璇㈣兘鍙婃椂鏀跺埌瀵规柟鏂版秷鎭?    const chatFresh = rel === '/chat' || rel === '/admin/chats'
+    // 预热：从 GitHub 加载数据库到内存（后续读接口走缓存）
+    // 聊天轮询路由强制刷新（带 2 秒节流），保证 3 秒轮询能及时收到对方新消息
+    const chatFresh = rel === '/chat' || rel === '/admin/chats'
     await initDb(chatFresh)
 
     // ---------- Auth ----------
@@ -133,10 +136,10 @@ function requireAuth(req) {
 
 async function register(req, res) {
   const { email, password, name } = req.body || {}
-  if (!email || !password) return res.status(400).json({ error: '閭鍜屽瘑鐮佷笉鑳戒负绌? })
-  if (password.length < 6) return res.status(400).json({ error: '瀵嗙爜鑷冲皯 6 浣? })
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: '閭鏍煎紡涓嶆纭? })
-  if (findUserByEmail(email)) return res.status(409).json({ error: '璇ラ偖绠卞凡娉ㄥ唽' })
+  if (!email || !password) return res.status(400).json({ error: '邮箱和密码不能为空' })
+  if (password.length < 6) return res.status(400).json({ error: '密码至少 6 位' })
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: '邮箱格式不正确' })
+  if (findUserByEmail(email)) return res.status(409).json({ error: '该邮箱已注册' })
 
   const user = await createUser({
     email: email.trim().toLowerCase(),
@@ -149,23 +152,24 @@ async function register(req, res) {
 
 async function login(req, res) {
   const { email, password } = req.body || {}
-  if (!email || !password) return res.status(400).json({ error: '閭鍜屽瘑鐮佷笉鑳戒负绌? })
+  if (!email || !password) return res.status(400).json({ error: '邮箱和密码不能为空' })
   const user = findUserByEmail(email)
-  if (!user || !verifyPassword(password, user.password)) return res.status(401).json({ error: '閭鎴栧瘑鐮侀敊璇? })
+  if (!user || !verifyPassword(password, user.password)) return res.status(401).json({ error: '邮箱或密码错误' })
   const token = sign({ sub: user.id, email: user.email, role: user.role })
   return res.status(200).json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } })
 }
 
 async function me(req, res) {
   const user = requireAuth(req)
-  if (!user) return res.status(401).json({ error: '鏈櫥褰曟垨鐧诲綍宸茶繃鏈? })
+  if (!user) return res.status(401).json({ error: '未登录或登录已过期' })
   return res.status(200).json({ user: { id: user.id, email: user.email, name: user.name, role: user.role } })
 }
 
 // ============ Chat handlers ============
-// 鐢ㄦ埛绔細鑾峰彇鑷繁鐨勪細璇濓紙3 绉掕疆璇紱鍏ュ彛宸叉寜 /chat 寮哄埗鍒锋柊缂撳瓨锛?async function chatGet(req, res) {
+// 用户端：获取自己的会话（3 秒轮询；入口已按 /chat 强制刷新缓存）
+async function chatGet(req, res) {
   const user = requireAuth(req)
-  if (!user) return res.status(401).json({ error: '鏈櫥褰曟垨鐧诲綍宸茶繃鏈? })
+  if (!user) return res.status(401).json({ error: '未登录或登录已过期' })
   const chat = getChats().find((c) => c.userId === user.id)
   return res.status(200).json({
     chat: chat
@@ -174,12 +178,14 @@ async function me(req, res) {
   })
 }
 
-// 鐢ㄦ埛绔細鍙戦€佹秷鎭紙鍙檮甯︽埧婧愬崱鐗?card锛歿 img, title, sub, price, url }锛?async function chatSend(req, res) {
+// 用户端：发送消息（可附带房源卡片 card：{ img, title, sub, price, url }）
+async function chatSend(req, res) {
   const user = requireAuth(req)
-  if (!user) return res.status(401).json({ error: '鏈櫥褰曟垨鐧诲綍宸茶繃鏈? })
+  if (!user) return res.status(401).json({ error: '未登录或登录已过期' })
   const { text, card } = req.body || {}
   const content = String(text || '').trim()
-  // 鍗＄墖鐧藉悕鍗曪細浠呮帴鍙楀瓧绗︿覆瀛楁锛寀rl 蹇呴』涓?http(s) 閾炬帴锛岄槻娉ㄥ叆涓庤秴闀?  let cardSafe = null
+  // 卡片白名单：仅接受字符串字段，url 必须为 http(s) 链接，防注入与超长
+  let cardSafe = null
   if (card && typeof card === 'object') {
     const s = (v, n) => (typeof v === 'string' ? v.slice(0, n) : '')
     const url = s(card.url, 300)
@@ -193,21 +199,21 @@ async function me(req, res) {
       }
     }
   }
-  // 绾崱鐗囨秷鎭紙card 娑堟伅 text 涓虹┖銆佽瘽鏈崟鐙竴鏉★級涔熷厑璁稿彂閫侊紱涓よ€呯殕绌烘墠鎷掔粷
-  if (!content && !cardSafe) return res.status(400).json({ error: '娑堟伅涓嶈兘涓虹┖' })
+  // 纯卡片消息（card 消息 text 为空、话术单独一条）也允许发送；两者皆空才拒绝
+  if (!content && !cardSafe) return res.status(400).json({ error: '消息不能为空' })
   const chat = await userSendMessage(user.id, user.name, user.email, content.slice(0, 1000), cardSafe)
   return res.status(201).json({
     chat: { id: chat.id, messages: chat.messages, updatedAt: chat.updatedAt }
   })
 }
 
-// 绠＄悊绔細浼氳瘽鍒楄〃锛圙ET /admin/chats?id=xx 杩斿洖鍗曚細璇濊鎯咃級
+// 管理端：会话列表（GET /admin/chats?id=xx 返回单会话详情）
 async function adminChats(req, res) {
-  if (!requireAdmin(req)) return res.status(403).json({ error: '闇€瑕佺鐞嗗憳鏉冮檺' })
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   const { id } = req.query || {}
   if (id) {
     const chat = getChats().find((c) => c.id === id)
-    if (!chat) return res.status(404).json({ error: '浼氳瘽涓嶅瓨鍦? })
+    if (!chat) return res.status(404).json({ error: '会话不存在' })
     return res.status(200).json({ chat })
   }
   const chats = getChats().map((c) => ({
@@ -224,47 +230,47 @@ async function adminChats(req, res) {
   return res.status(200).json({ chats })
 }
 
-// 绠＄悊绔細鍥炲
+// 管理端：回复
 async function adminChatReply(req, res) {
-  if (!requireAdmin(req)) return res.status(403).json({ error: '闇€瑕佺鐞嗗憳鏉冮檺' })
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   const { chatId, text } = req.body || {}
   const content = String(text || '').trim()
-  if (!chatId || !content) return res.status(400).json({ error: '缂哄皯 chatId 鎴栨秷鎭负绌? })
+  if (!chatId || !content) return res.status(400).json({ error: '缺少 chatId 或消息为空' })
   const chat = await adminReplyMessage(chatId, content.slice(0, 1000))
-  if (!chat) return res.status(404).json({ error: '浼氳瘽涓嶅瓨鍦? })
+  if (!chat) return res.status(404).json({ error: '会话不存在' })
   return res.status(201).json({ chat })
 }
 
-// 绠＄悊绔細鏍囪浼氳瘽宸茶锛堟墦寮€浼氳瘽鏃惰皟鐢紝娓呮湭璇诲窘鏍囷級
+// 管理端：标记会话已读（打开会话时调用，清未读角标）
 async function adminChatRead(req, res) {
-  if (!requireAdmin(req)) return res.status(403).json({ error: '闇€瑕佺鐞嗗憳鏉冮檺' })
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   const { chatId } = req.body || {}
-  if (!chatId) return res.status(400).json({ error: '缂哄皯 chatId' })
+  if (!chatId) return res.status(400).json({ error: '缺少 chatId' })
   const chat = await markChatReadAdmin(chatId)
   return res.status(chat ? 200 : 404).json({ ok: !!chat })
 }
 
 // ============ Admin handlers ============
 async function adminListings(req, res) {
-  if (!requireAdmin(req)) return res.status(403).json({ error: '闇€瑕佺鐞嗗憳鏉冮檺' })
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   if (req.method === 'GET') return res.status(200).json({ listings: getListings() })
   if (req.method === 'POST') {
     const data = req.body || {}
     for (const f of ['title', 'type', 'price', 'city']) {
-      if (!data[f]) return res.status(400).json({ error: `缂哄皯瀛楁: ${f}` })
+      if (!data[f]) return res.status(400).json({ error: `缺少字段: ${f}` })
     }
     return res.status(201).json({ listing: await createListing(data) })
   }
   if (req.method === 'PUT') {
     const { id, ...fields } = req.body || {}
-    if (!id) return res.status(400).json({ error: '缂哄皯 id' })
+    if (!id) return res.status(400).json({ error: '缺少 id' })
     const listing = await updateListing(id, fields)
-    if (!listing) return res.status(404).json({ error: '鎴挎簮涓嶅瓨鍦? })
+    if (!listing) return res.status(404).json({ error: '房源不存在' })
     return res.status(200).json({ listing })
   }
   if (req.method === 'DELETE') {
     const id = req.body?.id || req.query?.id
-    if (!id) return res.status(400).json({ error: '缂哄皯 id' })
+    if (!id) return res.status(400).json({ error: '缺少 id' })
     const ok = await deleteListing(id)
     return res.status(ok ? 200 : 404).json({ ok })
   }
@@ -272,26 +278,26 @@ async function adminListings(req, res) {
 }
 
 async function adminUsers(req, res) {
-  if (!requireAdmin(req)) return res.status(403).json({ error: '闇€瑕佺鐞嗗憳鏉冮檺' })
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   const users = getUsers().map((u) => ({
     id: u.id, email: u.email, name: u.name, role: u.role, createdAt: u.createdAt
   }))
   return res.status(200).json({ users })
 }
 
-// 绠＄悊绔細淇敼鎸囧畾鐢ㄦ埛瀵嗙爜锛堢敤鎴风鐞嗭級
+// 管理端：修改指定用户密码（用户管理）
 async function adminUserPassword(req, res) {
-  if (!requireAdmin(req)) return res.status(403).json({ error: '闇€瑕佺鐞嗗憳鏉冮檺' })
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   const { userId, password } = req.body || {}
-  if (!userId || !password) return res.status(400).json({ error: '鍙傛暟涓嶅畬鏁? })
-  if (String(password).length < 6) return res.status(400).json({ error: '瀵嗙爜鑷冲皯 6 浣? })
+  if (!userId || !password) return res.status(400).json({ error: '参数不完整' })
+  if (String(password).length < 6) return res.status(400).json({ error: '密码至少 6 位' })
   const target = await updateUserPassword(userId, hashPassword(String(password)))
-  if (!target) return res.status(404).json({ error: '鐢ㄦ埛涓嶅瓨鍦? })
+  if (!target) return res.status(404).json({ error: '用户不存在' })
   return res.status(200).json({ ok: true, user: target })
 }
 
 async function adminMessages(req, res) {
-  if (!requireAdmin(req)) return res.status(403).json({ error: '闇€瑕佺鐞嗗憳鏉冮檺' })
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   if (req.method === 'GET') return res.status(200).json({ messages: getMessages() })
   if (req.method === 'PUT') {
     const { id, action } = req.body || {}
@@ -299,38 +305,38 @@ async function adminMessages(req, res) {
       const msg = await markMessageRead(id)
       return res.status(msg ? 200 : 404).json({ ok: !!msg })
     }
-    return res.status(400).json({ error: '鏃犳晥鎿嶄綔' })
+    return res.status(400).json({ error: '无效操作' })
   }
   if (req.method === 'DELETE') {
     const id = req.body?.id || req.query?.id
-    if (!id) return res.status(400).json({ error: '缂哄皯 id' })
+    if (!id) return res.status(400).json({ error: '缺少 id' })
     const ok = await deleteMessage(id)
     return res.status(ok ? 200 : 404).json({ ok })
   }
   return res.status(405).json({ error: 'Method not allowed' })
 }
 
-// 涓婁紶鍥剧墖锛歜ody { name, dataBase64 }锛堢函 base64锛屾棤 data: 鍓嶇紑锛夛紝鎺ㄥ埌浠撳簱 public/images/uploads/
+// 上传图片：body { name, dataBase64 }（纯 base64，无 data: 前缀），推到仓库 public/images/uploads/
 async function adminImageUpload(req, res) {
-  if (!requireAdmin(req)) return res.status(403).json({ error: '闇€瑕佺鐞嗗憳鏉冮檺' })
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   const { name, dataBase64 } = req.body || {}
-  if (!name || !dataBase64) return res.status(400).json({ error: '缂哄皯 name 鎴?dataBase64' })
+  if (!name || !dataBase64) return res.status(400).json({ error: '缺少 name 或 dataBase64' })
   if (typeof dataBase64 !== 'string' || dataBase64.length > 1_400_000) {
-    return res.status(413).json({ error: '鍥剧墖杩囧ぇ锛岃鍘嬬缉鍚庨噸璇曪紙< 1MB锛? })
+    return res.status(413).json({ error: '图片过大，请压缩后重试（< 1MB）' })
   }
   try {
     const { path, url } = await uploadImageToGitHub(name, dataBase64)
     return res.status(200).json({ ok: true, path, url })
   } catch (e) {
     console.error('adminImageUpload error:', e.message)
-    return res.status(500).json({ error: '涓婁紶澶辫触: ' + e.message })
+    return res.status(500).json({ error: '上传失败: ' + e.message })
   }
 }
 
 // ============ Public handlers ============
 async function contact(req, res) {
   const { name, email, phone, message, type } = req.body || {}
-  if (!name || !email || !message) return res.status(400).json({ error: '濮撳悕銆侀偖绠卞拰鐣欒█涓嶈兘涓虹┖' })
+  if (!name || !email || !message) return res.status(400).json({ error: '姓名、邮箱和留言不能为空' })
   const msg = await createMessage({
     name: String(name).slice(0, 100),
     email: String(email).slice(0, 200),
@@ -347,7 +353,7 @@ async function listingsPublic(req, res) {
 }
 
 async function messagesPublic(req, res) {
-  // 杩斿洖宸茶/鏈鐨勫叕寮€鐣欒█锛堜笉鏆撮湶閭銆佺數璇濓級
+  // 返回已读/未读的公开留言（不暴露邮箱、电话）
   const messages = getMessages()
     .filter((m) => m.type === 'message-board')
     .map((m) => ({ id: m.id, name: m.name, message: m.message, createdAt: m.createdAt }))
@@ -356,19 +362,20 @@ async function messagesPublic(req, res) {
 
 // ============ Texts handlers ============
 async function textsPublic(req, res) {
-  // 鍏紑鎺ュ彛锛氳繑鍥炴墍鏈夋枃妗堣鐩栭」锛堝墠绔悎骞跺埌榛樿缈昏瘧锛?  return res.status(200).json({ texts: await getTexts() })
+  // 公开接口：返回所有文案覆盖项（前端合并到默认翻译）
+  return res.status(200).json({ texts: await getTexts() })
 }
 
 async function adminTexts(req, res) {
-  if (!requireAdmin(req)) return res.status(403).json({ error: '闇€瑕佺鐞嗗憳鏉冮檺' })
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
   if (req.method === 'GET') {
     return res.status(200).json({ texts: await getTexts() })
   }
   if (req.method === 'PUT') {
     const { key, zh, en, url, posX, posY, posXm, posYm, scale, scaleM } = req.body || {}
-    if (!key) return res.status(400).json({ error: '缂哄皯 key' })
+    if (!key) return res.status(400).json({ error: '缺少 key' })
     try {
-      // 鍥剧墖瑕嗙洊椤癸細鍊煎舰濡?{ url, posX?, posY?, scale?, posXm?, posYm?, scaleM? }锛涙枃妗堣鐩栭」锛歿 zh, en }
+      // 图片覆盖项：值形如 { url, posX?, posY?, scale?, posXm?, posYm?, scaleM? }；文案覆盖项：{ zh, en }
       let value
       if (url !== undefined) {
         value = { url }
@@ -385,24 +392,25 @@ async function adminTexts(req, res) {
       return res.status(200).json({ ok: true, texts: updated })
     } catch (e) {
       console.error('adminTexts PUT error:', e.message)
-      return res.status(500).json({ error: '淇濆瓨澶辫触: ' + e.message })
+      return res.status(500).json({ error: '保存失败: ' + e.message })
     }
   }
   if (req.method === 'DELETE') {
     const { key } = req.body || {}
     try {
       if (key) {
-        // 閲嶇疆鍗曚釜 key锛氫粠瑕嗙洊椤逛腑鍒犻櫎
+        // 重置单个 key：从覆盖项中删除
         const db = await getTexts()
         delete db[key]
         await updateTexts(db)
         return res.status(200).json({ ok: true })
       }
-      // 鏃?key 鍒欏叏閮ㄩ噸缃?      await resetTexts()
+      // 无 key 则全部重置
+      await resetTexts()
       return res.status(200).json({ ok: true })
     } catch (e) {
       console.error('adminTexts DELETE error:', e.message)
-      return res.status(500).json({ error: '閲嶇疆澶辫触: ' + e.message })
+      return res.status(500).json({ error: '重置失败: ' + e.message })
     }
   }
   return res.status(405).json({ error: 'Method not allowed' })

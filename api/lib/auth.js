@@ -1,8 +1,8 @@
-﻿import crypto from 'crypto'
+import crypto from 'crypto'
 
 const SECRET = process.env.JWT_SECRET || 'v-plus-dev-secret-change-me'
 
-// 绠€鏄?JWT锛圚S256锛夛紝鏃犻渶 jsonwebtoken 渚濊禆
+// 简易 JWT（HS256），无需 jsonwebtoken 依赖
 function base64url(obj) {
   return Buffer.from(JSON.stringify(obj)).toString('base64url')
 }
@@ -40,7 +40,8 @@ function parseExpires(s) {
   return n * u
 }
 
-// 瀵嗙爜鍝堝笇锛坧bkdf2 + salt锛?function hashPassword(password) {
+// 密码哈希（pbkdf2 + salt）
+function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex')
   const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
   return `${salt}:${hash}`
