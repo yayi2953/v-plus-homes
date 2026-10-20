@@ -59,6 +59,7 @@ function seedAdmin(db) {
       name: '管理员',
       role: 'admin',
       password: hashPassword(ADMIN_PASSWORD),
+      emailVerified: true, // 管理员默认已验证
       createdAt: Date.now()
     })
   }
@@ -307,6 +308,33 @@ function findUserByEmail(email) {
   return getUsers().find((u) => u.email.toLowerCase() === email.toLowerCase())
 }
 
+function findUserByVerificationToken(token) {
+  return getUsers().find((u) => u.verificationToken === token)
+}
+
+function findUserByResetToken(token) {
+  return getUsers().find((u) => u.resetToken === token)
+}
+
+async function updateUserVerification(userId, updates) {
+  return mutateDb((db) => {
+    const u = (db.users || []).find((x) => x.id === userId)
+    if (!u) return null
+    Object.assign(u, updates)
+    return { id: u.id, email: u.email, name: u.name, role: u.role, emailVerified: u.emailVerified }
+  })
+}
+
+async function updateUserResetToken(userId, token, expires) {
+  return mutateDb((db) => {
+    const u = (db.users || []).find((x) => x.id === userId)
+    if (!u) return null
+    u.resetToken = token
+    u.resetTokenExpires = expires
+    return { id: u.id, email: u.email }
+  })
+}
+
 async function createUser(data) {
   return mutateDb((db) => {
     const user = { id: genId('u'), role: 'user', createdAt: Date.now(), ...data }
@@ -460,7 +488,8 @@ async function uploadImageToGitHub(name, dataBase64) {
 export {
   genId,
   getUsers, getListings, getMessages, getServices, getTexts, getChats,
-  findUserByEmail, createUser, updateUserPassword,
+  findUserByEmail, findUserByVerificationToken, findUserByResetToken,
+  createUser, updateUserPassword, updateUserVerification, updateUserResetToken,
   createListing, updateListing, deleteListing,
   createMessage, markMessageRead, deleteMessage,
   userSendMessage, adminReplyMessage, markChatReadAdmin,

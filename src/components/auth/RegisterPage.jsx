@@ -1,193 +1,192 @@
-import { useState, useEffect } from 'react'
-import { useAuth } from '../../contexts/AuthContext.jsx'
+import { useState } from 'react'
 import { useIciI18n } from '../../i18n/IciI18nContext.jsx'
-import { navigate, switchLang } from '../../lib/router.mjs'
-import CaptchaImage from './CaptchaImage.jsx'
-import './auth.css'
-
-const STEPS = 2
-
-// 生成 5 位随机验证码（字母+数字，排除易混淆字符）
-function genCaptcha() {
-  const chars = 'abcdefghjkmnpqrstuvwxyz23456789'
-  let s = ''
-  for (let i = 0; i < 5; i++) s += chars[Math.floor(Math.random() * chars.length)]
-  return s
-}
+import { navigate } from '../../lib/router.mjs'
 
 export default function RegisterPage() {
   const { lang } = useIciI18n()
   const zh = lang === 'zh'
-  const t = (z, e) => (zh ? z : e)
-  const { register, loading } = useAuth()
-
-  const [step, setStep] = useState(1)
-  const [lastName, setLastName] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [agreed, setAgreed] = useState(false)
+  const ja = lang === 'ja'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
-  const [showPwd, setShowPwd] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [captcha, setCaptcha] = useState(genCaptcha())
-  const [captchaInput, setCaptchaInput] = useState('')
+  const [name, setName] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState('') // '' | 'pending' | 'resent'
+  const [emailSent, setEmailSent] = useState('')
 
-  // 每次进入第 1 步重新生成验证码
-  useEffect(() => {
-    if (step === 1) {
-      setCaptcha(genCaptcha())
-      setCaptchaInput('')
-    }
-  }, [step])
-
-  const fullName = `${lastName}${lastName && firstName ? ' ' : ''}${firstName}`.trim() || firstName
-
-  function refreshCaptcha() {
-    setCaptcha(genCaptcha())
-    setCaptchaInput('')
+  const t = {
+    title: zh ? '注册账号' : ja ? 'アカウント登録' : 'Create Account',
+    subtitle: zh ? '注册后请查收验证邮件' : ja ? '登録後、確認メールをお送りします' : 'Verify your email after signing up',
+    name: zh ? '姓名' : ja ? 'お名前' : 'Name',
+    email: zh ? '邮箱' : ja ? 'メール' : 'Email',
+    password: zh ? '密码（至少 6 位）' : ja ? 'パスワード（6文字以上）' : 'Password (min 6 chars)',
+    submit: zh ? '注册' : ja ? '登録' : 'Sign Up',
+    submitting: zh ? '注册中...' : ja ? '登録中...' : 'Signing up...',
+    resend: zh ? '重新发送验证邮件' : ja ? '確認メールを再送信' : 'Resend verification email',
+    resent: zh ? '验证邮件已重新发送！' : ja ? '確認メールを再送信しました！' : 'Verification email resent!',
+    hasAccount: zh ? '已有账号？' : ja ? 'アカウントをお持ちですか？' : 'Already have an account?',
+    login: zh ? '登录' : ja ? 'ログイン' : 'Sign In',
+    checkEmail: zh ? '验证邮件已发送！' : ja ? '確認メールを送信しました！' : 'Verification email sent!',
+    checkEmailSub: zh ? '请检查您的邮箱（包括垃圾邮件文件夹），点击邮件中的链接完成验证。' : ja ? 'メール（迷惑メールフォルダも含む）をご確認ください。' : 'Please check your inbox (including spam folder) and click the link in the email.',
+    wrongEmail: zh ? '邮箱错了？重新注册' : ja ? 'メールアドレスを変更しますか？' : 'Wrong email? Register again'
   }
 
-  function nextStep() {
+  async function handleSubmit(e) {
+    e.preventDefault()
     setError('')
-    if (step === 1) {
-      if (!lastName.trim() || !firstName.trim()) { setError(t('请填写姓名', 'Please enter your name')); return }
-      if (!captchaInput.trim()) { setError(t('请输入验证码', 'Please enter the verification code')); return }
-      if (captchaInput.trim().toLowerCase() !== captcha.toLowerCase()) {
-        setError(t('验证码错误', 'Verification code incorrect'))
-        refreshCaptcha()
+    setLoading(true)
+    setStatus('')
+    try {
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name })
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || (zh ? '注册失败' : ja ? '登録に失敗しました' : 'Registration failed'))
         return
       }
-      if (!agreed) { setError(t('请同意服务条款', 'Please agree to the terms')); return }
-      setStep(2)
-    } else if (step === 2) {
-      if (!email.trim()) { setError(t('请输入邮箱', 'Please enter email')); return }
-      if (password.length < 6) { setError(t('密码至少 6 位', 'Password must be at least 6 characters')); return }
-      if (password !== confirm) { setError(t('两次密码不一致', 'Passwords do not match')); return }
-      doRegister()
+      setStatus('pending')
+      setEmailSent(email)
+      setForm({ email: '', password: '', name: '' })
+    } catch {
+      setError(zh ? '网络错误，请稍后重试' : ja ? 'ネットワークエラー' : 'Network error')
+    } finally {
+      setLoading(false)
     }
   }
 
-  function prevStep() {
+  async function handleResend() {
+    if (!emailSent || loading) return
     setError('')
-    if (step > 1) setStep(step - 1)
+    setLoading(true)
+    try {
+      const res = await fetch('/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailSent })
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || (zh ? '发送失败' : ja ? '送信に失敗しました' : 'Failed to send'))
+        return
+      }
+      setStatus('resent')
+      setTimeout(() => setStatus('pending'), 3000)
+    } catch {
+      setError(zh ? '发送失败，请稍后重试' : ja ? '送信に失敗しました' : 'Failed to send')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  async function doRegister() {
-    const r = await register(email, password, fullName)
-    if (!r.ok) { setError(r.error); return }
-    navigate('/')
+  function setForm(v) {
+    setEmail(v.email || '')
+    setPassword(v.password || '')
+    setName(v.name || '')
   }
 
-  const stepLabel = t(`第 ${step} 步（共 ${STEPS} 步）`, `Step ${step} of ${STEPS}`)
-  const title = t('创建账户', 'Create Account')
-
-  return (
-    <div className="v8-auth">
-      <div className="v8-auth__topbar">
-        <a className="v8-auth__topbar-logo" href="#" onClick={(e) => { e.preventDefault(); navigate('/') }}>V&nbsp;PLUS</a>
-        <button className="v8-auth__topbar-lang" onClick={() => switchLang(lang === 'zh' ? 'en' : lang === 'en' ? 'ja' : 'zh')}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3c2.5 2.6 2.5 15.4 0 18-2.5-2.6-2.5-15.4 0-18Z" /></svg>
-          {lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja' : 'en-US'}
-        </button>
-      </div>
-
-      <div className="v8-auth__main">
-        <div className="v8-auth__card">
-          <p className="v8-auth__step">{stepLabel}</p>
-          <h1 className="v8-auth__title">{title}</h1>
-
-          {/* Step 1: 姓名 + 条款 */}
-          {step === 1 && (
-            <form className="v8-auth__form" onSubmit={(e) => { e.preventDefault(); nextStep() }}>
-              <label>
-                <span className="v8-auth__field-label">{t('姓', 'Last name')}</span>
-                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-              </label>
-              <label>
-                <span className="v8-auth__field-label">{t('名', 'First name')}</span>
-                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-              </label>
-
-              {/* 验证码 */}
-              <label>
-                <span className="v8-auth__field-label">{t('验证码', 'Verification code')}</span>
-                <div className="v8-auth__captcha">
-                  <CaptchaImage code={captcha} width={120} height={40} />
-                  <button type="button" className="v8-auth__captcha-refresh" aria-label="refresh" onClick={refreshCaptcha}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" /></svg>
-                  </button>
-                </div>
-              </label>
-              <label>
-                <span className="v8-auth__field-label">{t('请输入图片中的字符', 'Enter the characters above')}</span>
-                <input type="text" value={captchaInput} onChange={(e) => setCaptchaInput(e.target.value)} autoComplete="off" />
-              </label>
-
-              <label className="v8-auth__check">
-                <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
-                <span>{t('继续创建账户即表示我了解并同意 V PLUS 客户隐私声明和使用条款', 'By continuing, I agree to the V PLUS Privacy Statement and Terms of Use')}</span>
-              </label>
-
-              {error && <div className="v8-auth__error">{error}</div>}
-              <button type="submit" className="v8-auth__btn" disabled={loading}>
-                {t('下一步', 'Next')}
-              </button>
-            </form>
-          )}
-
-          {/* Step 2: 邮箱 + 密码 */}
-          {step === 2 && (
-            <form className="v8-auth__form" onSubmit={(e) => { e.preventDefault(); nextStep() }}>
-              <label>
-                <span className="v8-auth__field-label">{t('邮箱', 'Email')}</span>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
-              </label>
-              <label className="v8-auth__pwd">
-                <span className="v8-auth__field-label">{t('密码', 'Password')}</span>
-                <span className="v8-auth__input-wrap">
-                  <input type={showPwd ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} autoComplete="new-password" />
-                  <button type="button" className="v8-auth__eye" onClick={() => setShowPwd(!showPwd)} aria-label="toggle password">
-                    {showPwd
-                      ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /><path d="m2 2 20 20" /></svg>
-                      : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
-                    }
-                  </button>
-                </span>
-              </label>
-              <label className="v8-auth__pwd">
-                <span className="v8-auth__field-label">{t('确认密码', 'Confirm password')}</span>
-                <span className="v8-auth__input-wrap">
-                  <input type={showConfirm ? 'text' : 'password'} value={confirm} onChange={(e) => setConfirm(e.target.value)} required minLength={6} autoComplete="new-password" />
-                  <button type="button" className="v8-auth__eye" onClick={() => setShowConfirm(!showConfirm)} aria-label="toggle confirm password">
-                    {showConfirm
-                      ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /><path d="m2 2 20 20" /></svg>
-                      : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
-                    }
-                  </button>
-                </span>
-              </label>
-
-              {error && <div className="v8-auth__error">{error}</div>}
-              <button type="submit" className="v8-auth__btn" disabled={loading}>
-                {loading ? t('注册中...', 'Signing up...') : t('注册', 'Sign Up')}
-              </button>
-              <button type="button" className="v8-auth__back" onClick={prevStep}>{t('返回', 'Back')}</button>
-            </form>
-          )}
-
-          <div className="v8-auth__divider"><span>{t('或', 'or')}</span></div>
-          <button className="v8-auth__btn v8-auth__btn--outline" onClick={() => navigate('/login')}>
-            {t('去登录', 'Sign In')}
+  if (status === 'pending' || status === 'resent') {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: '#f5f5f5', padding: 20
+      }}>
+        <div style={{
+          background: '#fff', borderRadius: 12, padding: '40px 36px', textAlign: 'center',
+          maxWidth: 420, boxShadow: '0 4px 24px rgba(0,0,0,.08)', width: '100%'
+        }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: '50%', background: '#22c55e20', color: '#22c55e',
+            fontSize: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 20px', fontWeight: 'bold'
+          }}>
+            ✉
+          </div>
+          <h2 style={{ fontSize: 22, margin: '0 0 8px', color: '#1a1a1a' }}>{t.checkEmail}</h2>
+          <p style={{ color: '#666', margin: '0 0 4px', fontSize: 15, lineHeight: 1.6 }}>
+            {t.checkEmailSub}
+          </p>
+          <p style={{ color: '#999', margin: '12px 0 0', fontSize: 14 }}>
+            <strong>{emailSent}</strong>
+          </p>
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={loading}
+            style={{
+              marginTop: 24, background: 'transparent', color: '#1a1a1a',
+              padding: '10px 24px', borderRadius: 6, border: '1px solid #ddd',
+              cursor: loading ? 'not-allowed' : 'pointer', fontSize: 14, opacity: loading ? 0.6 : 1
+            }}
+          >
+            {status === 'resent' ? `✓ ${t.resent}` : t.resend}
           </button>
+          <div style={{ marginTop: 20 }}>
+            <button onClick={() => navigate('/login')} style={{ color: '#666', fontSize: 14, background: 'none', border: 'none', cursor: 'pointer' }}>
+              ← {t.hasAccount} <span style={{ color: '#1a1a1a', fontWeight: 500 }}>{t.login}</span>
+            </button>
+          </div>
         </div>
       </div>
+    )
+  }
 
-      <div className="v8-auth__footer">
-        <span>V PLUS © {new Date().getFullYear()}</span>
-        <a href="#">{t('隐私和法律', 'Privacy & Legal')}</a>
-        <a href="#">{t('联系我们', 'Contact')}</a>
+  return (
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: '#f5f5f5', padding: 20
+    }}>
+      <div style={{
+        background: '#fff', borderRadius: 12, padding: '40px 36px', width: '100%', maxWidth: 420,
+        boxShadow: '0 4px 24px rgba(0,0,0,.08)'
+      }}>
+        <h2 style={{ textAlign: 'center', margin: '0 0 8px', fontSize: 24, color: '#1a1a1a' }}>{t.title}</h2>
+        <p style={{ textAlign: 'center', color: '#666', margin: '0 0 28px', fontSize: 14 }}>{t.subtitle}</p>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#333' }}>{t.name}</label>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+              placeholder={t.name}
+              style={{ width: '100%', padding: '10px 14px', border: '1px solid #ddd', borderRadius: 6, fontSize: 15, boxSizing: 'border-box' }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#333' }}>{t.email}</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
+              placeholder={t.email}
+              style={{ width: '100%', padding: '10px 14px', border: '1px solid #ddd', borderRadius: 6, fontSize: 15, boxSizing: 'border-box' }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6, color: '#333' }}>{t.password}</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
+              placeholder={t.password}
+              style={{ width: '100%', padding: '10px 14px', border: '1px solid #ddd', borderRadius: 6, fontSize: 15, boxSizing: 'border-box' }}
+            />
+          </div>
+
+          {error && <p style={{ color: '#ef4444', margin: 0, fontSize: 14 }}>{error}</p>}
+
+          <button type="submit" disabled={loading}
+            style={{
+              marginTop: 8, background: '#1a1a1a', color: '#fff', padding: '12px',
+              border: 'none', borderRadius: 6, fontSize: 16, cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.7 : 1, fontWeight: 500
+            }}
+          >
+            {loading ? t.submitting : t.submit}
+          </button>
+        </form>
+
+        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: '#666' }}>
+          {t.hasAccount}{' '}
+          <button onClick={() => navigate('/login')} style={{ color: '#1a1a1a', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, padding: 0 }}>
+            {t.login}
+          </button>
+        </p>
       </div>
     </div>
   )

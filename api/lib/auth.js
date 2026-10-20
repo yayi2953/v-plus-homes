@@ -53,4 +53,30 @@ function verifyPassword(password, stored) {
   return hash === check
 }
 
+// 邮箱验证 / 密码重置 token（纯 base64，包含 expiry 时间戳）
+function generateToken(expiryHours = 24) {
+  const payload = { exp: Math.floor(Date.now() / 1000) + expiryHours * 3600 }
+  return Buffer.from(JSON.stringify(payload)).toString('base64')
+}
+
+export function generateVerificationToken() {
+  return generateToken(24) // 24 小时有效
+}
+
+export function generateResetToken() {
+  return generateToken(1) // 1 小时有效
+}
+
+export function verifyToken(token) {
+  try {
+    const payload = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'))
+    if (payload.exp && Date.now() / 1000 > payload.exp) {
+      return { valid: false, reason: 'expired' }
+    }
+    return { valid: true }
+  } catch {
+    return { valid: false, reason: 'invalid' }
+  }
+}
+
 export { sign, verify, hashPassword, verifyPassword }
