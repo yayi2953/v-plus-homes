@@ -106,7 +106,7 @@ export default function V8QuizModal({ open, onClose }) {
           onClick={(e) => e.stopPropagation()}
         >
           <header className="v8-tmodal__head">
-            <h3 className="v8-tmodal__title">
+            <h3 className="v8-tmodal__title" data-edit-key="v8.finder.quiz.title">
               {t.title}
               <span className="v8-quiz__step">{step + 1} / 4</span>
             </h3>
@@ -115,7 +115,7 @@ export default function V8QuizModal({ open, onClose }) {
             </button>
           </header>
           <div className="v8-tmodal__body">
-            <p className="v8-quiz__q">{(t.questions || [])[step]}</p>
+            <p className="v8-quiz__q" data-edit-key={`v8.finder.quiz.questions.${step}`}>{(t.questions || [])[step]}</p>
             {cur.key === 'budget' ? (
               /* 价格题：双把手区间滑杆，连续取值精准到个位；下方刻度按真实位置参考 */
               <div className="v8-quiz__slider">

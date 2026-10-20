@@ -400,6 +400,25 @@ const en = {
       title: 'The people who have your back',
       desc: 'Eight multilingual relocation consultants across Guangzhou — averaging 6 years of expat housing experience.'
     },
+    bubbles: {
+      eyebrow: 'CUSTOMER VOICES',
+      title: 'Real Messages from Customers Worldwide',
+      submitBtn: 'Leave a Message',
+      formTitle: 'Leave a Message',
+      formSub: "Tell us your needs or questions, and we'll get back to you soon.",
+      nameLabel: 'Name *',
+      namePlaceholder: 'Your name',
+      emailLabel: 'Email *',
+      phoneLabel: 'Phone',
+      phonePlaceholder: 'Optional',
+      messageLabel: 'Message *',
+      messagePlaceholder: 'Type your message...',
+      fillRequired: 'Please fill in name, email and message',
+      submitting: 'Submitting...',
+      submit: 'Submit',
+      submitError: 'Submission failed',
+      submitSuccess: 'Message submitted, thanks for your feedback!'
+    },
     cta: {
       footnote: 'Average response time under 2 hours · English / Cantonese / Mandarin'
     }
@@ -420,6 +439,11 @@ const zh = {
           { key: 'standard', event: 'standard', label: '普通住宅' },
           { key: 'student', event: 'student', label: '学生公寓' },
           { key: 'city', event: 'city', label: '城市公寓' }
+        ],
+        sideLinks: [
+          { title: '全部房源', desc: '浏览广州全部精选房源' },
+          { title: '预约看房', desc: '专属顾问带你实地看房' },
+          { title: '安家服务', desc: '签证、银行、保洁一站式' }
         ]
       },
       { label: '地图找房', href: '/map' },
@@ -434,6 +458,11 @@ const zh = {
           { key: 'truck', label: '同城搬家服务', img: '/images/extras/truck.jpg' },
           { key: 'briefcase', label: '办公室租赁服务', img: '/images/extras/briefcase.jpg' },
           { key: 'house', label: '房屋买卖服务', img: '/images/extras/house.jpg' }
+        ],
+        sideLinks: [
+          { title: '预约咨询', desc: '根据需求定制服务方案' },
+          { title: '浏览房源', desc: '查看精选在售房源' },
+          { title: '安家服务', desc: '签证、银行、保洁一站式' }
         ]
       },
       { label: '租房指南', href: '/guides' },
@@ -445,6 +474,11 @@ const zh = {
           { key: 'phone', icon: 'phone', label: '电话', value: '+352 621780307', href: 'tel:+352621780307' },
           { key: 'whatsapp', icon: 'whatsapp', label: 'WhatsApp', value: '+352 621780307', href: 'https://wa.me/352621780307' },
           { key: 'wechat', icon: 'wechat', label: '微信', value: 'vplus-relocation' }
+        ],
+        sideLinks: [
+          { title: '预约咨询', desc: '根据需求定制服务方案' },
+          { title: '浏览房源', desc: '查看精选在售房源' },
+          { title: '安家服务', desc: '签证、银行、保洁一站式' }
         ]
       }
     ],
@@ -797,6 +831,25 @@ const zh = {
       title: '全程为你托底的人',
       desc: '8 位多语安家顾问分布广州各片区，平均拥有 6 年外籍人士租房服务经验。'
     },
+    bubbles: {
+      eyebrow: '客户声音',
+      title: '来自全球客户的真实留言',
+      submitBtn: '我要留言',
+      formTitle: '我要留言',
+      formSub: '告诉我们您的需求或疑问，我们会尽快与您联系。',
+      nameLabel: '姓名 *',
+      namePlaceholder: '您的姓名',
+      emailLabel: '邮箱 *',
+      phoneLabel: '电话',
+      phonePlaceholder: '选填',
+      messageLabel: '留言内容 *',
+      messagePlaceholder: '请输入您想说的话...',
+      fillRequired: '请填写姓名、邮箱和留言内容',
+      submitting: '提交中...',
+      submit: '提交留言',
+      submitError: '提交失败',
+      submitSuccess: '留言已提交，感谢您的反馈！'
+    },
     cta: {
       footnote: '平均 2 小时内回复 · 英语 / 粤语 / 普通话'
     }
@@ -817,6 +870,11 @@ const ja = {
           { key: 'standard', event: 'standard', label: '一般住宅' },
           { key: 'student', event: 'student', label: '学生マンション' },
           { key: 'city', event: 'city', label: 'シティアパート' }
+        ],
+        sideLinks: [
+          { title: 'すべての物件', desc: '広州の厳選物件をすべて見る' },
+          { title: '内見を予約', desc: '担当者が内見にご案内します' },
+          { title: '引越しサポート', desc: 'ビザ、銀行、清掃をワンストップで' }
         ]
       },
       { label: 'マップ検索', href: '/map' },
@@ -831,6 +889,11 @@ const ja = {
           { key: 'truck', label: '引越しサービス', img: '/images/extras/truck.jpg' },
           { key: 'briefcase', label: 'オフィス賃貸', img: '/images/extras/briefcase.jpg' },
           { key: 'house', label: '不動産売買', img: '/images/extras/house.jpg' }
+        ],
+        sideLinks: [
+          { title: '相談を予約', desc: 'ニーズに合わせたサービスプラン' },
+          { title: '物件を見る', desc: '厳選された物件をご覧ください' },
+          { title: '引越しサポート', desc: 'ビザ、銀行、清掃をワンストップで' }
         ]
       },
       { label: '賃貸ガイド', href: '/guides' },
@@ -842,6 +905,11 @@ const ja = {
           { key: 'phone', icon: 'phone', label: '電話', value: '+352 621780307', href: 'tel:+352621780307' },
           { key: 'whatsapp', icon: 'whatsapp', label: 'WhatsApp', value: '+352 621780307', href: 'https://wa.me/352621780307' },
           { key: 'wechat', icon: 'wechat', label: 'WeChat', value: 'vplus-relocation' }
+        ],
+        sideLinks: [
+          { title: '相談を予約', desc: 'ニーズに合わせたサービスプラン' },
+          { title: '物件を見る', desc: '厳選された物件をご覧ください' },
+          { title: '引越しサポート', desc: 'ビザ、銀行、清掃をワンストップで' }
         ]
       }
     ],
@@ -1189,6 +1257,25 @@ const ja = {
       eyebrow: 'あなたのコンサルタント',
       title: '最後まであなたを支える人たち',
       desc: '広州各地に在籍する8人の多言語対応コンサルタント。外国人向け住まいの経験は平均6年以上です。'
+    },
+    bubbles: {
+      eyebrow: 'お客様の声',
+      title: '世界中のお客様からのリアルなメッセージ',
+      submitBtn: 'メッセージを送る',
+      formTitle: 'メッセージを送る',
+      formSub: 'ご要望やご質問をお聞かせください。できるだけ早くご連絡します。',
+      nameLabel: 'お名前 *',
+      namePlaceholder: 'お名前',
+      emailLabel: 'メール *',
+      phoneLabel: '電話',
+      phonePlaceholder: '任意',
+      messageLabel: 'メッセージ *',
+      messagePlaceholder: 'メッセージをご記入ください...',
+      fillRequired: 'お名前、メール、メッセージをご記入ください',
+      submitting: '送信中...',
+      submit: '送信する',
+      submitError: '送信に失敗しました',
+      submitSuccess: 'メッセージを送信しました。ご意見ありがとうございます！'
     },
     cta: {
       footnote: '平均返信時間2時間以内 · 日本語 / 英語 / 広東語 / 北京語'

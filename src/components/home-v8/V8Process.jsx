@@ -17,8 +17,8 @@ export default function V8Process() {
             <div className="v8-proc-row v8-rise" key={i}>
               <div className="v8-proc-num">{String(i + 1).padStart(2, '0')}</div>
               <div>
-                <h3>{s.title}</h3>
-                <p>{s.desc}</p>
+                <h3 data-edit-key={`v8.process.steps.${i}.title`}>{s.title}</h3>
+                <p data-edit-key={`v8.process.steps.${i}.desc`}>{s.desc}</p>
               </div>
             </div>
           ))}

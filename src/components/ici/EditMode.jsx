@@ -108,11 +108,12 @@ export default function EditMode() {
     }
 
     function findEditableAncestor(target) {
-      // 优先使用元素上声明的 data-edit-key（同文案多处出现时可精确区分）
+      // 优先使用元素上声明的 data-edit-key（同名文案多处出现时精确区分）
       const tagged = target.closest?.('[data-edit-key]')
       if (tagged) {
+        const explicitKey = tagged.getAttribute('data-edit-key')
         const text = getElText(tagged)
-        if (text) return { el: tagged, text, key: tagged.getAttribute('data-edit-key') }
+        if (text) return { el: tagged, text, key: explicitKey }
       }
       let el = target
       while (el && el !== document.body && el !== document.documentElement) {

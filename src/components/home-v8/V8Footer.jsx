@@ -57,24 +57,24 @@ export default function V8Footer() {
             }}>
               {c.nav?.logo || c.siteName || 'V PLUS'}
             </a>
-            <p>{f.desc}</p>
+            <p data-edit-key="footer.desc">{f.desc}</p>
             <p style={{ marginTop: 14 }}>
-              {f.email && <a href={`mailto:${f.email}`} style={{ color: 'var(--v8-muted)' }}>{f.email}</a>}
+              {f.email && <a href={`mailto:${f.email}`} style={{ color: 'var(--v8-muted)' }} data-edit-key="footer.email">{f.email}</a>}
               {f.email && f.phone && <span> &nbsp;·&nbsp; </span>}
-              {f.phone && <a href={`tel:${String(f.phone).replace(/[^+\d]/g, '')}`} style={{ color: 'var(--v8-muted)' }}>{f.phone}</a>}
+              {f.phone && <a href={`tel:${String(f.phone).replace(/[^+\d]/g, '')}`} style={{ color: 'var(--v8-muted)' }} data-edit-key="footer.phone">{f.phone}</a>}
             </p>
           </div>
-          {groups.map((g) => (
+          {groups.map((g, gi) => (
             <div key={g.title}>
-              <h4>{g.title}</h4>
+              <h4 data-edit-key={`footer.groups.${gi}.title`}>{g.title}</h4>
               <ul>
-                {(g.links || []).filter(Boolean).map((l) => {
+                {(g.links || []).filter(Boolean).map((l, li) => {
                   const act = footerAction(l)
                   return (
                     <li key={l}>
                       {act
-                        ? <button type="button" onClick={act}>{l}</button>
-                        : <span style={{ color: 'var(--v8-muted)' }}>{l}</span>}
+                        ? <button type="button" onClick={act} data-edit-key={`footer.groups.${gi}.links.${li}`}>{l}</button>
+                        : <span style={{ color: 'var(--v8-muted)' }} data-edit-key={`footer.groups.${gi}.links.${li}`}>{l}</span>}
                     </li>
                   )
                 })}
@@ -83,12 +83,12 @@ export default function V8Footer() {
           ))}
         </div>
         <div className="v8-footer-bottom">
-          <span>{f.copyright}</span>
+          <span data-edit-key="footer.copyright">{f.copyright}</span>
           <div className="v8-footer-legal">
             {(f.legal || []).filter(Boolean).map((l, i) => {
               const key = matchLegal(l, i)
               return key
-                ? <a key={l} href="#legal" onClick={(e) => { e.preventDefault(); setLegalDoc(key) }}>{l}</a>
+                ? <a key={l} href="#legal" onClick={(e) => { e.preventDefault(); setLegalDoc(key) }} data-edit-key={`footer.legal.${i}`}>{l}</a>
                 : null
             })}
             <FooterLanguageSelect />

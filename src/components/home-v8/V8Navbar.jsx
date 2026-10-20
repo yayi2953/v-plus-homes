@@ -216,8 +216,8 @@ export default function V8Navbar({ solid = false }) {
                       const active = m.subs.find((x) => x.key === megaType) || m.subs[0]
                       return (
                         <span className="v8-nav__mega-blurb">
-                          <span className="v8-nav__mega-blurb-name">{active.label}</span>
-                          <span className="v8-nav__mega-blurb-desc">{active.desc}</span>
+                          <span className="v8-nav__mega-blurb-name" data-edit-key={`discover.types.${active.key}.label`}>{active.label}</span>
+                          <span className="v8-nav__mega-blurb-desc" data-edit-key={`discover.types.${active.key}.desc`}>{active.desc}</span>
                           {active.value && <span className="v8-nav__mega-blurb-meta">{active.value}</span>}
                         </span>
                       )
@@ -284,33 +284,29 @@ export default function V8Navbar({ solid = false }) {
                       <span className="v8-nav__mega-side">
                         {m.subs[0]?.event ? (
                           <>
-                            <a className="v8-nav__mega-sidelink" href="#type-results" onClick={showAll}>
-                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '全部房源' : 'All Listings'}</span>
-                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '浏览广州全部精选房源' : 'Browse all curated homes'}</span>
-                            </a>
-                            <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
-                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '预约看房' : 'Book a Viewing'}</span>
-                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '专属顾问带你实地看房' : 'Dedicated consultant on-site'}</span>
-                            </a>
-                            <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
-                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '安家服务' : 'Relocation Services'}</span>
-                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '签证、银行、保洁一站式' : 'Visa, banking, cleaning'}</span>
-                            </a>
+                            {(m.sideLinks || [
+                              { title: lang === 'zh' ? '全部房源' : 'All Listings', desc: lang === 'zh' ? '浏览广州全部精选房源' : 'Browse all curated homes' },
+                              { title: lang === 'zh' ? '预约看房' : 'Book a Viewing', desc: lang === 'zh' ? '专属顾问带你实地看房' : 'Dedicated consultant on-site' },
+                              { title: lang === 'zh' ? '安家服务' : 'Relocation Services', desc: lang === 'zh' ? '签证、银行、保洁一站式' : 'Visa, banking, cleaning' }
+                            ]).map((sl, si) => (
+                              <a className="v8-nav__mega-sidelink" key={si} href={si === 0 ? '#type-results' : '#get-started'} onClick={si === 0 ? showAll : (e) => go({ href: '#get-started' }, e)}>
+                                <span className="v8-nav__mega-sidetitle" data-edit-key={`nav.menus.${menus.indexOf(m)}.sideLinks.${si}.title`}>{sl.title}</span>
+                                <span className="v8-nav__mega-sidedesc" data-edit-key={`nav.menus.${menus.indexOf(m)}.sideLinks.${si}.desc`}>{sl.desc}</span>
+                              </a>
+                            ))}
                           </>
                         ) : m.subs[0]?.icon ? (
                           <>
-                            <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
-                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '预约咨询' : 'Book a Consultation'}</span>
-                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '根据需求定制服务方案' : 'Tailored service to your needs'}</span>
-                            </a>
-                            <a className="v8-nav__mega-sidelink" href="#type-results" onClick={showAll}>
-                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '浏览房源' : 'Browse Listings'}</span>
-                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '查看精选在售房源' : 'Explore curated homes'}</span>
-                            </a>
-                            <a className="v8-nav__mega-sidelink" href="#get-started" onClick={(e) => go({ href: '#get-started' }, e)}>
-                              <span className="v8-nav__mega-sidetitle">{lang === 'zh' ? '安家服务' : 'Relocation Services'}</span>
-                              <span className="v8-nav__mega-sidedesc">{lang === 'zh' ? '签证、银行、保洁一站式' : 'Visa, banking, cleaning'}</span>
-                            </a>
+                            {(m.sideLinks || [
+                              { title: lang === 'zh' ? '预约咨询' : 'Book a Consultation', desc: lang === 'zh' ? '根据需求定制服务方案' : 'Tailored service to your needs' },
+                              { title: lang === 'zh' ? '浏览房源' : 'Browse Listings', desc: lang === 'zh' ? '查看精选在售房源' : 'Explore curated homes' },
+                              { title: lang === 'zh' ? '安家服务' : 'Relocation Services', desc: lang === 'zh' ? '签证、银行、保洁一站式' : 'Visa, banking, cleaning' }
+                            ]).map((sl, si) => (
+                              <a className="v8-nav__mega-sidelink" key={si} href={si === 1 ? '#type-results' : '#get-started'} onClick={si === 1 ? showAll : (e) => go({ href: '#get-started' }, e)}>
+                                <span className="v8-nav__mega-sidetitle" data-edit-key={`nav.menus.${menus.indexOf(m)}.sideLinks.${si}.title`}>{sl.title}</span>
+                                <span className="v8-nav__mega-sidedesc" data-edit-key={`nav.menus.${menus.indexOf(m)}.sideLinks.${si}.desc`}>{sl.desc}</span>
+                              </a>
+                            ))}
                           </>
                         ) : (
                           <span className="v8-nav__mega-legal">

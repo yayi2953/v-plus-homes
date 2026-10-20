@@ -10,10 +10,10 @@ export default function V8Stats() {
         className="v8-stats-in"
         style={{ '--v8-stat-cols': Math.min(4, stats.length) }}
       >
-        {stats.slice(0, 4).map((s) => (
+        {stats.slice(0, 4).map((s, i) => (
           <div className="v8-stat v8-rise" key={s.label}>
             <b>{s.value}</b>
-            <span>{s.label}</span>
+            <span data-edit-key={`stats.${i}.label`}>{s.label}</span>
           </div>
         ))}
       </div>
