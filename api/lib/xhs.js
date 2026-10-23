@@ -11,17 +11,17 @@ const IMG_HEADERS = {
 }
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
 
-// 从用户粘贴的分享文案中提取小红书链接（支持纯链接、短链、整段分享文本）
+// 从用户粘贴的分享文案中提取小红书链接（支持纯链接、短链 xhslink.com/.cn、整段分享文本）
 export function extractShareUrl(input) {
   const m = String(input || '').match(
-    /https?:\/\/[^\s"'<>（）()]+|(?:www\.)?(?:xiaohongshu\.com|xhslink\.com)\/[^\s"'<>（）()]+/i
+    /https?:\/\/[^\s"'<>（）()]+|(?:www\.)?(?:xiaohongshu\.com|xhslink\.[a-z]{2,3})\/[^\s"'<>（）()]+/i
   )
   if (!m) return null
   let u = m[0].replace(/[),.]+$/, '')
   if (!/^https?:\/\//i.test(u)) u = 'https://' + u
   try {
     const host = new URL(u).hostname
-    if (!/(^|\.)xiaohongshu\.com$|(^|\.)xhslink\.com$/i.test(host)) return null
+    if (!/(^|\.)xiaohongshu\.com$|(^|\.)xhslink\.(com|cn)$/i.test(host)) return null
   } catch {
     return null
   }
@@ -163,7 +163,9 @@ export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
       'User-Agent': UA,
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
       'Accept-Language': 'zh-CN,zh;q=0.9',
-      'Referer': 'https://www.xiaohongshu.com/'
+      'Referer': 'https://www.xiaohongshu.com/',
+      // 可选：配置 XHS_COOKIE 环境变量（网页版登录后的 Cookie）可解开需登录的笔记
+      ...(process.env.XHS_COOKIE ? { Cookie: process.env.XHS_COOKIE } : {})
     },
     redirect: 'follow',
     signal: AbortSignal.timeout(15000)
@@ -172,6 +174,21 @@ export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
   const html = await pageRes.text()
   const finalUrl = pageRes.url || url
 
+  // 诊断跳转结果：短链没落到笔记页 = 短码无效；404/error_code = 笔记不存在；login = 需要登录
+  let diag = ''
+  try {
+    const fp = new URL(finalUrl)
+    const wasShort = /xhslink\./i.test(url)
+    const landedOnNote = /\/(?:explore|discovery\/item)\/[0-9a-zA-Z]+/.test(finalUrl)
+    if (wasShort && !landedOnNote) {
+      diag = '短链未解析到笔记：链接可能复制不完整或已失效，请在小红书 App 重新分享并复制完整链接'
+    } else if (fp.pathname.startsWith('/404') || /error_code=/.test(finalUrl)) {
+      diag = '笔记不存在或暂时无法浏览（可能已删除或受限）'
+    } else if (fp.pathname.startsWith('/login')) {
+      diag = '该笔记需要登录才能查看（可配置 XHS_COOKIE 后重试）'
+    }
+  } catch { /* ignore */ }
+
   const state = extractInitialState(html)
   const note = state ? parseNote(state) : null
   const og = extractOgMeta(html)
@@ -179,8 +196,9 @@ export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
   const title = decodeEntities(note?.title || og.title || '').trim()
   const desc = decodeEntities(note?.desc || og.description || '').trim()
   if (!title && !desc) {
-    throw new Error('无法读取笔记内容：链接可能已失效、笔记受限或需要登录，请手动填写')
+    throw new Error((diag ? diag + '。' : '') + '无法读取笔记内容，请手动填写')
   }
+  if (diag) console.warn('xhs-scrape diag:', diag, 'finalUrl:', finalUrl)
 
   // 位置：优先笔记定位（POI），其次 IP 属地
   const poi = typeof note?.location === 'string' ? note.location.trim() : ''
