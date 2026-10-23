@@ -217,6 +217,82 @@ export function extractBathrooms(text) {
   return ''
 }
 
+// ---------- 地址候选提取 + 地点真实性核验 ----------
+
+// 从标题/文案提取地址候选（按可信度排序：地标自述 → POI 后缀名词 → 道路门牌）
+export function extractAddressCandidates(text) {
+  const s = String(text || '')
+  const cands = []
+  const push = (v) => {
+    if (!v) return
+    const t = v.trim()
+    if (t.length >= 3 && t.length <= 25 && !cands.includes(t)) cands.push(t)
+  }
+  // 1)「地标xxx」作者自述（最可信，允许「地标」后跟空格/冒号）
+  for (const m of s.matchAll(/地标\s*[:：]?\s*([\u4e00-\u9fa5A-Za-z0-9]{4,25}?)(?=[，,。！!；;、\s]|$)/g)) push(m[1])
+  // 2) POI 后缀名词（小区/花园/天地/邨/地铁站等），如「富力东山新天地」「杨箕地铁站」
+  for (const m of s.matchAll(/([\u4e00-\u9fa5]{2,12}(?:小区|花园|广场|大厦|公寓|家园|名苑|新村|天地|邨|地铁站|苑|湾|庭|府|中心|村))/g)) push(m[1])
+  // 3) 道路门牌（xx路xx号）
+  for (const m of s.matchAll(/([\u4e00-\u9fa5A-Za-z0-9]{2,15}(?:路|街|大道|巷)[\u4e00-\u9fa5A-Za-z0-9]{0,10}?\d{0,6}号?)/g)) push(m[1])
+  return cands.slice(0, 4)
+}
+
+// 地点核验：配置 AMAP_KEY 时优先用高德 POI 检索（中国地名最准），否则 Nominatim(OSM) + 严格后过滤。
+// 返回 true=存在 / false=不存在或无法确认（一律不填入，宁空勿错）
+export async function verifyPlaceExists(place, city) {
+  // 0) 高德 POI：citylimit 限定城市，命中即真实存在
+  const amapKey = process.env.AMAP_KEY
+  if (amapKey) {
+    try {
+      const u = 'https://restapi.amap.com/v3/place/text?key=' + amapKey +
+        '&keywords=' + encodeURIComponent(place) +
+        (city ? '&city=' + encodeURIComponent(city) + '&citylimit=true' : '') +
+        '&offset=3&pagesize=3'
+      const r = await fetch(u, { signal: AbortSignal.timeout(5000) })
+      if (r.ok) {
+        const j = await r.json()
+        if (j && j.status === '1') return Array.isArray(j.pois) && j.pois.length > 0
+      }
+    } catch { /* fallthrough */ }
+  }
+  // 1) Nominatim：模糊匹配会返回无关地点，需严格后过滤（城市须出现 + 核心词须包含）
+  try {
+    const q = city ? `${city} ${place}` : place
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=3&countrycodes=cn&q=' + encodeURIComponent(q), {
+      headers: { 'User-Agent': 'v-plus-homes-import/1.0', 'Accept-Language': 'zh-CN,zh;q=0.9' },
+      signal: AbortSignal.timeout(5000)
+    })
+    if (r.ok) {
+      const arr = await r.json()
+      if (Array.isArray(arr) && nominatimHit(arr, place, city)) return true
+    }
+  } catch { /* 查询失败视为未核验 */ }
+  return false
+}
+
+// 剥掉通用后缀得到地名核心词：「杨箕村小区」→「杨箕」，「富力东山新天地」→「富力东山新」
+export function placeCore(place) {
+  let core = String(place || '')
+  let prev
+  do {
+    prev = core
+    core = core.replace(/(小区|地铁站|花园|广场|大厦|公寓|家园|名苑|新村|天地|中心|邨|苑|湾|庭|府|村|城|路|街|大道|巷|号)$/, '')
+  } while (core !== prev && core.length > 2)
+  return core
+}
+
+// Nominatim 结果严格判定：返回地点须含城市名，且包含候选地名核心词（防「杨箕地铁站→合肥江淮站」这类误配）
+export function nominatimHit(results, place, city) {
+  const cityKey = String(city || '').replace(/市$/, '')
+  const core = placeCore(place)
+  if (!core || core.length < 2) return false
+  return (results || []).some((it) => {
+    const dn = String(it?.display_name || '')
+    if (cityKey && !dn.includes(cityKey)) return false
+    return dn.includes(core) || String(it?.name || '').includes(core)
+  })
+}
+
 // 提取 og: meta（登录墙/风控时的降级数据源）
 export function extractOgMeta(html) {
   const og = {}
@@ -313,14 +389,17 @@ export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
   }
   if (!city) city = ipLoc || ''
 
-  // 地址：优先「地标」自述片段，其次「xx路xx号」类地址片段（找不到就留空让用户填）
+  // 地址：提取候选 → 逐个到地图服务核验真实性 → 核验通过才填入，否则留空（宁空勿错）
   let address = ''
-  const lmAddr = desc.match(/地标[:：]?([\u4e00-\u9fa5A-Za-z0-9]{4,25}?)(?:[，,。！!；;]|$)/)
-  if (lmAddr) address = lmAddr[1]
-  if (!address) {
-    const addrMatch = desc.match(/([\u4e00-\u9fa5A-Za-z0-9]{2,20}(?:路|街|巷|道|村|大厦|广场|小区|公寓|花园|中心)[\u4e00-\u9fa5A-Za-z0-9\-—－]{0,20}(?:号|栋|座|单元|室)?)/)
-    if (addrMatch) address = addrMatch[1]
-  }
+  try {
+    const cands = extractAddressCandidates(`${title} ${desc}`)
+    const deadline = Date.now() + 9000 // 核验总预算，避免拖垮 serverless 函数
+    for (const c of cands) {
+      if (Date.now() > deadline) break
+      if (await verifyPlaceExists(c, city)) { address = c; break }
+      await new Promise((r) => setTimeout(r, 1050)) // Nominatim 限速 1 次/秒
+    }
+  } catch { /* 核验失败不影响导入 */ }
 
   const metaText = `${title} ${desc}`
   const price = extractPrice(metaText)
