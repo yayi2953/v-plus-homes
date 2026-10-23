@@ -156,6 +156,56 @@ export function extractPrice(text) {
   return ''
 }
 
+// 中文数字（一~九/两）转阿拉伯数字
+function cnToInt(s) {
+  if (/^\d{1,2}$/.test(s)) return parseInt(s, 10)
+  const map = { 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 }
+  return map[s] ?? NaN
+}
+// 数字类：阿拉伯数字 1-2 位 或 中文数字
+const NUM_CLS = '(\\d{1,2}|[一二两三四五六七八九])'
+
+// 面积：53m² / 53㎡ / 53平米 / 53平方 / 53平
+export function extractArea(text) {
+  const s = String(text || '').replace(/\s+/g, '')
+  const m = s.match(/(\d{2,4}(?:\.\d{1,2})?)(?:m²|m2|M²|M2|㎡|平米|平方|平)(?!\d)/)
+  if (!m) return ''
+  const n = parseFloat(m[1])
+  if (n >= 8 && n <= 2000) return String(n)
+  return ''
+}
+
+// 卧室数：两居室 / 2居室 / 两房一厅 / 3房 / 2室1厅 / 单间（→1）
+export function extractBedrooms(text) {
+  const s = String(text || '').replace(/\s+/g, '')
+  const patterns = [
+    new RegExp(NUM_CLS + '\\s*居\\s*[室房]'),
+    new RegExp(NUM_CLS + '\\s*房\\s*(?:\\d|[一二两三四五六七八九])?\\s*厅'),
+    new RegExp(NUM_CLS + '\\s*室\\s*(?:\\d|[一二两三四五六七八九])?\\s*厅')
+  ]
+  for (const re of patterns) {
+    const m = s.match(re)
+    if (m) {
+      const n = cnToInt(m[1])
+      if (n >= 1 && n <= 9) return String(n)
+    }
+  }
+  if (/单间|开间|单身公寓/.test(s)) return '1'
+  return ''
+}
+
+// 卫生间数：2卫 / 两卫 / 独卫 / 干湿分离 / 提到卫生间（→1）
+export function extractBathrooms(text) {
+  const s = String(text || '').replace(/\s+/g, '')
+  const m = s.match(new RegExp(NUM_CLS + '\\s*[个只]?\\s*卫'))
+  if (m) {
+    const n = cnToInt(m[1])
+    if (n >= 1 && n <= 9) return String(n)
+  }
+  if (/独卫|干湿分离|卫生间/.test(s)) return '1'
+  return ''
+}
+
 // 提取 og: meta（登录墙/风控时的降级数据源）
 export function extractOgMeta(html) {
   const og = {}
@@ -207,7 +257,7 @@ async function fetchXhsPage(url) {
 }
 
 // 主流程：抓取笔记页 → 解析 → 下载原图 → 通过 uploadImage 上传到图床
-// 返回 { title, desc, price, city, address, images, missing: [] }
+// 返回 { title, desc, price, city, address, area, bedrooms, bathrooms, images, missing: [] }
 export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
   if (!uploadImage) throw new Error('图床上传不可用')
 
@@ -241,17 +291,31 @@ export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
   }
   if (diag) console.warn('xhs-scrape diag:', diag, 'finalUrl:', finalUrl)
 
-  // 位置：优先笔记定位（POI），其次 IP 属地
+  // 位置：优先笔记定位（POI），其次「地标xxx」（正文自述），再次 #xx租房 话题，最后 IP 属地（只能到省）
   const poi = typeof note?.location === 'string' ? note.location.trim() : ''
   const ipLoc = typeof note?.ipLocation === 'string' ? note.ipLocation.trim() : ''
-  const city = poi || ipLoc || ''
+  let city = poi || ''
+  if (!city) {
+    const lm = desc.match(/地标[:：]?([\u4e00-\u9fa5]{2,12}?市)/) // 地标广州市越秀区...
+    const hm = desc.match(/#([\u4e00-\u9fa5]{2,6}?)租房/) // #广州租房
+    city = (lm && lm[1]) || (hm && hm[1]) || ''
+  }
+  if (!city) city = ipLoc || ''
 
-  // 地址：从文案里找「xx路xx号」类地址片段（找不到就留空让用户填）
+  // 地址：优先「地标」自述片段，其次「xx路xx号」类地址片段（找不到就留空让用户填）
   let address = ''
-  const addrMatch = desc.match(/([\u4e00-\u9fa5A-Za-z0-9]{2,20}(?:路|街|巷|道|村|大厦|广场|小区|公寓|花园|中心)[\u4e00-\u9fa5A-Za-z0-9\-—－]{0,20}(?:号|栋|座|单元|室)?)/)
-  if (addrMatch) address = addrMatch[1]
+  const lmAddr = desc.match(/地标[:：]?([\u4e00-\u9fa5A-Za-z0-9]{4,25}?)(?:[，,。！!；;]|$)/)
+  if (lmAddr) address = lmAddr[1]
+  if (!address) {
+    const addrMatch = desc.match(/([\u4e00-\u9fa5A-Za-z0-9]{2,20}(?:路|街|巷|道|村|大厦|广场|小区|公寓|花园|中心)[\u4e00-\u9fa5A-Za-z0-9\-—－]{0,20}(?:号|栋|座|单元|室)?)/)
+    if (addrMatch) address = addrMatch[1]
+  }
 
-  const price = extractPrice(`${title} ${desc}`)
+  const metaText = `${title} ${desc}`
+  const price = extractPrice(metaText)
+  const area = extractArea(metaText)
+  const bedrooms = extractBedrooms(metaText)
+  const bathrooms = extractBathrooms(metaText)
 
   // 图片：笔记图 → 降级 og:image
   let candidates = pickImageUrls(note, maxImages)
@@ -280,7 +344,10 @@ export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
   if (!price) missing.push('价格')
   if (!city) missing.push('城市')
   if (!address) missing.push('地址')
+  if (!area) missing.push('面积')
+  if (!bedrooms) missing.push('卧室')
+  if (!bathrooms) missing.push('卫生间')
   if (!images.length) missing.push('图片')
 
-  return { title, desc, price, city, address, images, missing, sourceUrl: finalUrl }
+  return { title, desc, price, city, address, area, bedrooms, bathrooms, images, missing, sourceUrl: finalUrl }
 }

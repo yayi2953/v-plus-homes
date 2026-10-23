@@ -154,12 +154,18 @@ export default function AdminPage() {
         price: d.price || f.price,
         city: d.city || f.city,
         address: d.address || f.address,
+        area: d.area || f.area,
+        bedrooms: d.bedrooms || f.bedrooms,
+        bathrooms: d.bathrooms || f.bathrooms,
         images: [...f.images, ...((d.images || []).filter((u) => !f.images.includes(u)))]
       }))
       const missing = []
       if (!d.price) missing.push(t('价格', 'Price'))
       if (!d.city) missing.push(t('城市', 'City'))
       if (!d.address) missing.push(t('地址', 'Address'))
+      if (!d.area) missing.push(t('面积', 'Area'))
+      if (!d.bedrooms) missing.push(t('卧室', 'Bedrooms'))
+      if (!d.bathrooms) missing.push(t('卫生间', 'Bathrooms'))
       if (!(d.images || []).length) missing.push(t('图片', 'Images'))
       setXhsDraft('')
       setXhsMsg(missing.length
