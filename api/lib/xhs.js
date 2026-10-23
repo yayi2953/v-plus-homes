@@ -240,7 +240,7 @@ export function extractAddressCandidates(text) {
 // 地点核验：配置 AMAP_KEY 时优先用高德 POI 检索（中国地名最准），否则 Nominatim(OSM) + 严格后过滤。
 // 返回 true=存在 / false=不存在或无法确认（一律不填入，宁空勿错）
 export async function verifyPlaceExists(place, city) {
-  // 0) 高德 POI：citylimit 限定城市，命中即真实存在
+  // 0) 高德 POI：citylimit 限定城市；结果须包含地名核心词（防「电梯高层小区→电信小区」这类模糊误配）
   const amapKey = process.env.AMAP_KEY
   if (amapKey) {
     try {
@@ -251,7 +251,15 @@ export async function verifyPlaceExists(place, city) {
       const r = await fetch(u, { signal: AbortSignal.timeout(5000) })
       if (r.ok) {
         const j = await r.json()
-        if (j && j.status === '1') return Array.isArray(j.pois) && j.pois.length > 0
+        if (j && j.status === '1') {
+          const pois = Array.isArray(j.pois) ? j.pois : []
+          const core = placeCore(place)
+          if (!core || core.length < 2) return false
+          return pois.some((p) => {
+            const t = [p?.name, p?.address, p?.pname, p?.cityname].map(String).join(' ')
+            return t.includes(core)
+          })
+        }
       }
     } catch { /* fallthrough */ }
   }
@@ -270,10 +278,17 @@ export async function verifyPlaceExists(place, city) {
   return false
 }
 
-// 剥掉通用后缀得到地名核心词：「杨箕村小区」→「杨箕」，「富力东山新天地」→「富力东山新」
+// 剥掉通用后缀和行政区划前缀得到地名核心词：
+// 「杨箕村小区」→「杨箕」，「富力东山新天地」→「富力东山新」，「广州市越秀区杨箕村小区」→「杨箕」
 export function placeCore(place) {
-  let core = String(place || '')
+  let core = String(place || '').replace(/^(中华人民共和国|中国)/, '')
   let prev
+  // 先剥行政区划前缀（广州市/越秀区/天河街道...），最多 3 字前缀名，且剥后须剩 ≥2 字
+  do {
+    prev = core
+    core = core.replace(/^[\u4e00-\u9fa5]{1,3}?(?:省|自治区|市|区|县|旗|镇|乡|街道)(?=.{2})/, '')
+  } while (core !== prev && core.length > 2)
+  // 再剥通用后缀（小区/地铁站/花园...）
   do {
     prev = core
     core = core.replace(/(小区|地铁站|花园|广场|大厦|公寓|家园|名苑|新村|天地|中心|邨|苑|湾|庭|府|村|城|路|街|大道|巷|号)$/, '')
