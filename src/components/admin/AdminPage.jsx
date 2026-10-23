@@ -35,6 +35,11 @@ export default function AdminPage() {
   const [uploadDone, setUploadDone] = useState(0)
   const [uploadTotal, setUploadTotal] = useState(0)
   const [urlDraft, setUrlDraft] = useState('')
+  // 小红书一键导入
+  const [xhsDraft, setXhsDraft] = useState('')
+  const [xhsImporting, setXhsImporting] = useState(false)
+  const [xhsMsg, setXhsMsg] = useState('')
+  const [xhsErr, setXhsErr] = useState('')
   const imgFileRef = useRef(null)
   const dragIdx = useRef(null)
 
@@ -126,6 +131,45 @@ export default function AdminPage() {
     if (!u) return
     setForm((f) => (f.images.includes(u) ? f : { ...f, images: [...f.images, u] }))
     setUrlDraft('')
+  }
+
+  // 小红书一键导入：粘贴分享链接 → 后端抓取无水印图/文案/价格/位置 → 回填表单
+  async function importXhs() {
+    const raw = xhsDraft.trim()
+    if (!raw || xhsImporting) return
+    setXhsErr(''); setXhsMsg('')
+    setXhsImporting(true)
+    try {
+      const res = await authFetch('/api/admin/xhs-scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: raw })
+      })
+      const d = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`)
+      setForm((f) => ({
+        ...f,
+        title: d.title || f.title,
+        description: d.desc || f.description,
+        price: d.price || f.price,
+        city: d.city || f.city,
+        address: d.address || f.address,
+        images: [...f.images, ...((d.images || []).filter((u) => !f.images.includes(u)))]
+      }))
+      const missing = []
+      if (!d.price) missing.push(t('价格', 'Price'))
+      if (!d.city) missing.push(t('城市', 'City'))
+      if (!d.address) missing.push(t('地址', 'Address'))
+      if (!(d.images || []).length) missing.push(t('图片', 'Images'))
+      setXhsDraft('')
+      setXhsMsg(missing.length
+        ? t(`导入成功，请补充：${missing.join('、')}`, `Imported. Please fill in: ${missing.join(', ')}`)
+        : t('导入成功，已自动填充', 'Imported successfully'))
+    } catch (e) {
+      setXhsErr(e.message || t('导入失败，请重试或手动填写', 'Import failed, please retry or fill manually'))
+    } finally {
+      setXhsImporting(false)
+    }
   }
 
   useEffect(() => {
@@ -251,6 +295,23 @@ export default function AdminPage() {
         <div className="v8-admin__content">
           <div className="v8-admin__panel">
             <h2>{editing ? t('编辑房源', 'Edit Listing') : t('新增房源', 'New Listing')}</h2>
+            {/* 小红书一键导入：粘贴分享链接自动抓取无水印图片/文案/价格/位置 */}
+            <div style={{ marginBottom: 14, padding: '10px 12px', border: '1px dashed rgba(0,0,0,.25)', borderRadius: 6, background: 'rgba(255,214,10,.06)' }}>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                <input
+                  value={xhsDraft}
+                  onChange={(e) => setXhsDraft(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); importXhs() } }}
+                  placeholder={t('粘贴小红书分享链接或分享文案，一键导入图片与文案', 'Paste a Xiaohongshu share link to import images & text')}
+                  style={{ flex: 1, minWidth: 220, padding: '8px 10px', border: '1px solid rgba(0,0,0,.16)', borderRadius: 4, fontSize: 14 }}
+                />
+                <button type="button" className="v8-admin__btn" disabled={xhsImporting || !xhsDraft.trim()} onClick={importXhs}>
+                  {xhsImporting ? t('导入中...', 'Importing...') : t('一键导入', 'Import')}
+                </button>
+              </div>
+              {xhsMsg && <p style={{ color: '#1a7f37', fontSize: 13, margin: '6px 0 0' }}>{xhsMsg}</p>}
+              {xhsErr && <p style={{ color: '#c0392b', fontSize: 13, margin: '6px 0 0' }}>{xhsErr}</p>}
+            </div>
             <div className="v8-admin__form">
               <div className="v8-admin__row">
                 <label>{t('标题', 'Title')}<input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></label>

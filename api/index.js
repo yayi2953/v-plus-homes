@@ -1,4 +1,4 @@
-﻿import { sign, verify, hashPassword, verifyPassword } from './lib/auth.js'
+import { sign, verify, hashPassword, verifyPassword } from './lib/auth.js'
 import {
   initDb,
   getUsers, getListings, getMessages, getChats,
@@ -9,6 +9,10 @@ import {
   getTexts, updateTexts, resetTexts, uploadImageToGitHub,
   updateUserPassword
 } from './lib/store.js'
+import { scrapeXhsNote, extractShareUrl } from './lib/xhs.js'
+
+// 图片导入需依次下载并推送 GitHub，放宽 serverless 执行时长上限
+export const maxDuration = 60
 
 // 统一入口：所有 /api/* 路由在此函数内分发，共享同一个 /tmp/db.json
 // （Vercel 各 serverless 函数 /tmp 隔离，合并到单函数才能跨接口共享数据）
@@ -107,6 +111,9 @@ export default async function handler(req, res) {
     }
     if (rel === '/admin/images' && req.method === 'POST') {
       return adminImageUpload(req, res)
+    }
+    if (rel === '/admin/xhs-scrape' && req.method === 'POST') {
+      return adminXhsScrape(req, res)
     }
 
     // ---------- Public ----------
@@ -351,6 +358,23 @@ async function adminImageUpload(req, res) {
   } catch (e) {
     console.error('adminImageUpload error:', e.message)
     return res.status(500).json({ error: '上传失败: ' + e.message })
+  }
+}
+
+// 小红书笔记一键导入：body { url }（支持粘贴整段分享文案）
+// 返回 { title, desc, price, city, address, images, missing }，missing 为需用户补充的字段
+async function adminXhsScrape(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  const raw = String(req.body?.url || '').trim()
+  if (!raw) return res.status(400).json({ error: '请粘贴小红书分享链接' })
+  const url = extractShareUrl(raw)
+  if (!url) return res.status(400).json({ error: '未识别到有效的小红书链接' })
+  try {
+    const data = await scrapeXhsNote(url, { uploadImage: uploadImageToGitHub })
+    return res.status(200).json(data)
+  } catch (e) {
+    console.error('xhs-scrape error:', e.message)
+    return res.status(422).json({ error: e.message || '解析失败，请手动填写' })
   }
 }
 
