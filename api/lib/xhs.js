@@ -1,4 +1,5 @@
 // 小红书笔记抓取：从分享链接提取无水印图片、标题、文案、价格、位置
+import crypto from 'crypto'
 // 页面数据源：window.__INITIAL_STATE__（noteDetailMap → note）
 // 无水印策略：优先取 imageList[].urlDefault；统一剥掉 ~tplv-xxx 图片处理模板
 // （模板里含 :watermark 时服务端会压上水印，剥掉后返回原始图）
@@ -105,25 +106,35 @@ export function cleanImageUrl(u) {
   return t > 0 ? s.slice(0, t) : s
 }
 
-// 收集笔记图片：所有候选统一剥掉 ~tplv-... 模板（含 :watermark 水印参数）得到无水印原图；
-// 仅当水印在路径本身时才排除
+// 图片身份 key：剥掉处理后缀（~tplv-... 与 !nd_xxx）后比较，
+// 同一张照片的 dft/prv 等变体归为同一张，避免重复导入
+function imageUrlKey(u) {
+  let s = cleanImageUrl(u)
+  const bang = s.search(/!nd_[a-z0-9_]+/i)
+  if (bang > 0) s = s.slice(0, bang)
+  return s
+}
+
+// 收集笔记图片：每张照片只取一个最佳变体（urlDefault → infoList WB_DFT → infoList → url → urlPre），
+// 按「剥后缀后的身份 key」跨条目去重；仅当水印在路径本身时才排除
 export function pickImageUrls(note, maxImages = 18) {
   const out = []
   const seen = new Set()
   const push = (u) => {
-    if (!u) return
+    if (!u) return false
     const clean = cleanImageUrl(u)
-    if (!clean || seen.has(clean)) return
-    if (/watermark/i.test(clean)) return
-    seen.add(clean)
+    if (!clean || /watermark/i.test(clean)) return false
+    const key = imageUrlKey(clean)
+    if (seen.has(key)) return false
+    seen.add(key)
     out.push(clean)
+    return true
   }
   for (const it of (note?.imageList || [])) {
     if (it && typeof it === 'object') {
-      push(it.urlDefault)
-      for (const info of (it.infoList || [])) push(info?.url)
-      push(it.url)
-      push(it.urlPre)
+      const infos = Array.isArray(it.infoList) ? it.infoList : []
+      const dft = infos.find((i) => /WB_DFT/i.test(i?.imageScene || '') && i?.url)
+      push(it.urlDefault || (dft && dft.url) || infos.find((i) => i?.url)?.url || it.url || it.urlPre)
     } else if (typeof it === 'string') {
       push(it)
     }
@@ -325,6 +336,7 @@ export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
   }
 
   const images = []
+  const contentHashes = new Set() // 内容哈希去重：不同 URL 返回相同字节时只保留一张
   for (let i = 0; i < Math.min(candidates.length, maxImages); i++) {
     try {
       const imgRes = await fetch(candidates[i], {
@@ -334,6 +346,9 @@ export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
       if (!imgRes.ok) continue
       const buf = Buffer.from(await imgRes.arrayBuffer())
       if (!buf.length || buf.length > MAX_IMAGE_BYTES) continue
+      const hash = crypto.createHash('sha1').update(buf).digest('hex')
+      if (contentHashes.has(hash)) continue
+      contentHashes.add(hash)
       const name = `xhs-${Date.now().toString(36)}-${i + 1}.jpg`
       const { url: final } = await uploadImage(name, buf.toString('base64'))
       if (final) images.push(final)
