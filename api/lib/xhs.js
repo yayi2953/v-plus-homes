@@ -28,8 +28,35 @@ export function extractShareUrl(input) {
   return u
 }
 
+// 去掉 state 里内嵌的 JS 构造：new Map(...) / new Set(...) → 保留内部参数（小红书 state 非纯 JSON）
+function stripJsConstructs(s) {
+  let out = s
+  for (let guard = 0; guard < 30; guard++) {
+    const m = out.match(/new\s+(?:Map|Set)\(/)
+    if (!m) break
+    const open = m.index + m[0].length
+    let depth = 1, inStr = false, esc = false, i = open
+    for (; i < out.length && depth > 0; i++) {
+      const c = out[i]
+      if (inStr) {
+        if (esc) esc = false
+        else if (c === '\\') esc = true
+        else if (c === '"') inStr = false
+        continue
+      }
+      if (c === '"') inStr = true
+      else if (c === '(') depth++
+      else if (c === ')') depth--
+    }
+    if (depth !== 0) break // 括号不配对，放弃剥离避免越界
+    const inner = out.slice(open, i - 1)
+    out = out.slice(0, m.index) + inner + out.slice(i)
+  }
+  return out
+}
+
 // 提取 window.__INITIAL_STATE__ 的 JSON：大括号配平扫描（容忍字符串内花括号），
-// 再把 JS 的 undefined 字面量转为 null 后 JSON.parse
+// 再处理 JS 字面量（undefined → null、new Map/Set 剥壳）后 JSON.parse
 export function extractInitialState(html) {
   const start = html.indexOf('window.__INITIAL_STATE__=')
   if (start < 0) return null
@@ -49,7 +76,8 @@ export function extractInitialState(html) {
     else if (c === '}') {
       depth--
       if (depth === 0) {
-        const raw = html.slice(begin, j + 1).replace(/([:\[,\s])undefined\b/g, '$1null')
+        let raw = html.slice(begin, j + 1).replace(/([:\[,\s])undefined\b/g, '$1null')
+        raw = stripJsConstructs(raw)
         try { return JSON.parse(raw) } catch { return null }
       }
     }
@@ -57,16 +85,16 @@ export function extractInitialState(html) {
   return null
 }
 
-// 从 __INITIAL_STATE__ 里找到笔记对象（noteDetailMap[noteId].note，兼容旧结构）
+// 从 __INITIAL_STATE__ 里找到笔记对象
+// 已知两种布局：顶层 noteDetailMap（旧版）、state.note.noteDetailMap（当前 PC 版）
 export function parseNote(state) {
-  const map = state?.noteDetailMap
+  const map = state?.noteDetailMap || state?.note?.noteDetailMap
   if (map && typeof map === 'object') {
     for (const k of Object.keys(map)) {
       const n = map[k]?.note
       if (n && (n.noteId || n.title || n.desc || Array.isArray(n.imageList))) return n
     }
   }
-  if (state?.note && (state.note.noteId || state.note.desc)) return state.note
   return null
 }
 
@@ -153,26 +181,39 @@ function decodeEntities(s) {
     .replace(/&#39;/g, "'")
 }
 
+// 手动跟随重定向：fetch 跨域跳转会丢弃 Cookie 头，必须逐跳携带（短链 → 正文页跨域）
+async function fetchXhsPage(url) {
+  const headers = {
+    'User-Agent': UA,
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+    'Referer': 'https://www.xiaohongshu.com/',
+    // 可选：配置 XHS_COOKIE 环境变量（网页版登录后的完整 Cookie，含 web_session），
+    // 小红书 PC 网页版强制登录，没有它笔记页一律被风控拦截
+    ...(process.env.XHS_COOKIE ? { Cookie: process.env.XHS_COOKIE } : {})
+  }
+  let current = url
+  for (let hop = 0; hop < 8; hop++) {
+    const res = await fetch(current, { headers, redirect: 'manual', signal: AbortSignal.timeout(15000) })
+    if (res.status >= 300 && res.status < 400) {
+      const loc = res.headers.get('location')
+      if (!loc) return { res, finalUrl: current }
+      current = new URL(loc, current).href
+      continue
+    }
+    return { res, finalUrl: current }
+  }
+  throw new Error('重定向次数过多，链接解析失败')
+}
+
 // 主流程：抓取笔记页 → 解析 → 下载原图 → 通过 uploadImage 上传到图床
 // 返回 { title, desc, price, city, address, images, missing: [] }
 export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
   if (!uploadImage) throw new Error('图床上传不可用')
 
-  const pageRes = await fetch(url, {
-    headers: {
-      'User-Agent': UA,
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-      'Accept-Language': 'zh-CN,zh;q=0.9',
-      'Referer': 'https://www.xiaohongshu.com/',
-      // 可选：配置 XHS_COOKIE 环境变量（网页版登录后的 Cookie）可解开需登录的笔记
-      ...(process.env.XHS_COOKIE ? { Cookie: process.env.XHS_COOKIE } : {})
-    },
-    redirect: 'follow',
-    signal: AbortSignal.timeout(15000)
-  })
+  const { res: pageRes, finalUrl } = await fetchXhsPage(url)
   if (!pageRes.ok) throw new Error(`小红书页面请求失败（HTTP ${pageRes.status}）`)
   const html = await pageRes.text()
-  const finalUrl = pageRes.url || url
 
   // 诊断跳转结果：短链没落到笔记页 = 短码无效；404/error_code = 笔记不存在；login = 需要登录
   let diag = ''
@@ -193,7 +234,7 @@ export async function scrapeXhsNote(url, { uploadImage, maxImages = 12 } = {}) {
   const note = state ? parseNote(state) : null
   const og = extractOgMeta(html)
 
-  const title = decodeEntities(note?.title || og.title || '').trim()
+  const title = decodeEntities(note?.title || og.title || '').trim().replace(/\s*-\s*小红书$/, '')
   const desc = decodeEntities(note?.desc || og.description || '').trim()
   if (!title && !desc) {
     throw new Error((diag ? diag + '。' : '') + '无法读取笔记内容，请手动填写')
