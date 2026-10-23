@@ -21,6 +21,10 @@ const CHAT_TTL = 2_000 // 聊天轮询强制刷新的最小间隔（节流，省
 const ADMIN_EMAIL = 'admin@v-plus.house'
 const ADMIN_PASSWORD = 'admin123'
 
+// 超级管理员账号（账号名登录，非邮箱）
+const SUPER_ADMIN_ACCOUNT = 'admin2953'
+const SUPER_ADMIN_PASSWORD = 'yayi2026'
+
 // 初始数据（仓库无 db.json 时创建）
 const SEED = {
   users: [],
@@ -52,6 +56,7 @@ function ensureDir() {
 }
 
 function seedAdmin(db) {
+  if (!Array.isArray(db.users)) db.users = []
   if (!db.users.find((u) => u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase())) {
     db.users.push({
       id: 'u-admin',
@@ -59,6 +64,18 @@ function seedAdmin(db) {
       name: '管理员',
       role: 'admin',
       password: hashPassword(ADMIN_PASSWORD),
+      createdAt: Date.now()
+    })
+  }
+  // 超级管理员：账号 admin2953（每次启动自动播种，密码改动会被重置回默认）
+  if (!db.users.find((u) => u.email.toLowerCase() === SUPER_ADMIN_ACCOUNT.toLowerCase())) {
+    db.users.push({
+      id: 'u-super-admin',
+      email: SUPER_ADMIN_ACCOUNT,
+      name: '超级管理员',
+      role: 'admin',
+      superAdmin: true,
+      password: hashPassword(SUPER_ADMIN_PASSWORD),
       createdAt: Date.now()
     })
   }
@@ -149,6 +166,7 @@ export async function initDb(force = false) {
       // 仓库还没有 db.json：播种并创建
       cache = structuredClone(SEED)
       dbSha = null
+      seedAdmin(cache)
       await pushDb(cache)
       return cache
     }
