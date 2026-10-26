@@ -10,6 +10,7 @@ import {
   updateUserPassword
 } from './lib/store.js'
 import { scrapeXhsNote, extractShareUrl } from './lib/xhs.js'
+import { scrapeBeikeListing, extractBeikeUrl } from './lib/beike.js'
 
 // 图片导入需依次下载并推送 GitHub，放宽 serverless 执行时长上限
 export const maxDuration = 60
@@ -114,6 +115,9 @@ export default async function handler(req, res) {
     }
     if (rel === '/admin/xhs-scrape' && req.method === 'POST') {
       return adminXhsScrape(req, res)
+    }
+    if (rel === '/admin/beike-scrape' && req.method === 'POST') {
+      return adminBeikeScrape(req, res)
     }
 
     // ---------- Public ----------
@@ -374,6 +378,22 @@ async function adminXhsScrape(req, res) {
     return res.status(200).json(data)
   } catch (e) {
     console.error('xhs-scrape error:', e.message)
+    return res.status(422).json({ error: e.message || '解析失败，请手动填写' })
+  }
+}
+
+// 贝壳网房源一键导入：body { url }，返回标准字段 + beike 专属信息（无数据填「无数据」）
+async function adminBeikeScrape(req, res) {
+  if (!requireAdmin(req)) return res.status(403).json({ error: '需要管理员权限' })
+  const raw = String(req.body?.url || '').trim()
+  if (!raw) return res.status(400).json({ error: '请粘贴贝壳网房源链接' })
+  const url = extractBeikeUrl(raw)
+  if (!url) return res.status(400).json({ error: '未识别到有效的贝壳网房源链接' })
+  try {
+    const data = await scrapeBeikeListing(url, { uploadImage: uploadImageToGitHub })
+    return res.status(200).json(data)
+  } catch (e) {
+    console.error('beike-scrape error:', e.message)
     return res.status(422).json({ error: e.message || '解析失败，请手动填写' })
   }
 }

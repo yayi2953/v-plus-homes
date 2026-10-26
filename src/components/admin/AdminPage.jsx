@@ -13,6 +13,12 @@ const EMPTY_LISTING = {
   area: '', address: '', description: '', image: '', images: [], published: true
 }
 
+// 贝壳导入的默认表单：独立于上方新增房源表单，携带贝壳专属信息对象
+const EMPTY_BEIKE = {
+  title: '', type: 'standard', price: '', city: '广州市', address: '', bedrooms: '', bathrooms: '',
+  area: '', description: '', images: [], published: true, beike: {}
+}
+
 export default function AdminPage() {
   const { lang } = useIciI18n()
   const zh = lang === 'zh'
@@ -40,6 +46,13 @@ export default function AdminPage() {
   const [xhsImporting, setXhsImporting] = useState(false)
   const [xhsMsg, setXhsMsg] = useState('')
   const [xhsErr, setXhsErr] = useState('')
+  // 贝壳网一键导入：独立信息栏（不与上方表单共享状态），bkForm 为 null 时不显示
+  const [bkDraft, setBkDraft] = useState('')
+  const [bkImporting, setBkImporting] = useState(false)
+  const [bkSaving, setBkSaving] = useState(false)
+  const [bkMsg, setBkMsg] = useState('')
+  const [bkErr, setBkErr] = useState('')
+  const [bkForm, setBkForm] = useState(null)
   const imgFileRef = useRef(null)
   const dragIdx = useRef(null)
 
@@ -175,6 +188,84 @@ export default function AdminPage() {
       setXhsErr(e.message || t('导入失败，请重试或手动填写', 'Import failed, please retry or fill manually'))
     } finally {
       setXhsImporting(false)
+    }
+  }
+
+  // 贝壳网一键导入：粘贴房源链接 → 抓取图片与红框属性 → 填入下方贝壳专属信息栏
+  async function importBeike() {
+    const raw = bkDraft.trim()
+    if (!raw || bkImporting) return
+    setBkErr(''); setBkMsg('')
+    setBkImporting(true)
+    try {
+      const res = await authFetch('/api/admin/beike-scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: raw })
+      })
+      const d = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`)
+      setBkForm({
+        ...EMPTY_BEIKE,
+        title: d.title || '',
+        price: d.price || '',
+        city: d.city || '广州市',
+        address: d.address || '',
+        bedrooms: d.bedrooms ?? '',
+        bathrooms: d.bathrooms ?? '',
+        area: d.area || '',
+        description: d.description || '',
+        images: d.images || [],
+        beike: d.beike || {}
+      })
+      setBkDraft('')
+      setBkMsg(d.missing?.length
+        ? t(`导入成功，请补充：${d.missing.join('、')}`, `Imported. Missing: ${d.missing.join(', ')}`)
+        : t('导入成功，请核对后点击「创建房源」', 'Imported. Review and create the listing'))
+    } catch (e) {
+      setBkErr(e.message || t('导入失败，请重试', 'Import failed, please retry'))
+    } finally {
+      setBkImporting(false)
+    }
+  }
+
+  // 贝壳信息栏创建房源：首图为封面，beike 专属信息随房源入库
+  async function saveBeikeListing() {
+    if (!bkForm || bkSaving) return
+    setBkErr(''); setBkMsg('')
+    setBkSaving(true)
+    try {
+      const payload = {
+        title: bkForm.title || bkForm.beike?.小区 || t('贝壳房源', 'Beike Listing'),
+        type: bkForm.type,
+        price: bkForm.price || '无数据',
+        city: bkForm.city || '广州市',
+        address: bkForm.address || '无数据',
+        bedrooms: bkForm.bedrooms || '',
+        bathrooms: bkForm.bathrooms || '',
+        area: bkForm.area || '',
+        description: bkForm.description,
+        images: bkForm.images,
+        image: bkForm.images[0] || '',
+        published: bkForm.published,
+        beike: bkForm.beike
+      }
+      const res = await authFetch('/api/admin/listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        throw new Error(d.error || `HTTP ${res.status}`)
+      }
+      setBkForm(null)
+      setBkMsg(t('房源已创建，可在下方列表查看', 'Listing created'))
+      loadListings()
+    } catch (e) {
+      setBkErr(e.message || t('创建失败，请重试', 'Create failed, please retry'))
+    } finally {
+      setBkSaving(false)
     }
   }
 
@@ -432,6 +523,94 @@ export default function AdminPage() {
                 )}
               </div>
             </div>
+          </div>
+
+          {/* 贝壳网一键导入：独立信息栏，与上方新增房源表单互不影响 */}
+          <div className="v8-admin__panel">
+            <h2>{t('贝壳网一键导入', 'Beike One-Click Import')}</h2>
+            <div style={{ marginBottom: 14, padding: '10px 12px', border: '1px dashed rgba(0,0,0,.25)', borderRadius: 6, background: 'rgba(0,102,255,.05)' }}>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                <input
+                  value={bkDraft}
+                  onChange={(e) => setBkDraft(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); importBeike() } }}
+                  placeholder={t('粘贴贝壳网房源链接（gz.ke.com/ershoufang/...），一键导入', 'Paste a Beike listing URL to import')}
+                  style={{ flex: 1, minWidth: 220, padding: '8px 10px', border: '1px solid rgba(0,0,0,.16)', borderRadius: 4, fontSize: 14 }}
+                />
+                <button type="button" className="v8-admin__btn" disabled={bkImporting || !bkDraft.trim()} onClick={importBeike}>
+                  {bkImporting ? t('导入中...', 'Importing...') : t('一键导入', 'Import')}
+                </button>
+              </div>
+              {bkMsg && <p style={{ color: '#1a7f37', fontSize: 13, margin: '6px 0 0' }}>{bkMsg}</p>}
+              {bkErr && <p style={{ color: '#c0392b', fontSize: 13, margin: '6px 0 0' }}>{bkErr}</p>}
+            </div>
+            {bkForm && (
+              <div className="v8-admin__form">
+                {/* 贝壳专属信息（详情页红框字段）：有数据填真实数据，无数据填「无数据」 */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '6px 18px', padding: '10px 12px', background: 'rgba(0,102,255,.04)', borderRadius: 6 }}>
+                  {Object.entries(bkForm.beike).map(([k, v]) => (
+                    <div key={k} style={{ fontSize: 13 }}>
+                      <span style={{ color: '#76767d' }}>{k}：</span>
+                      <span style={{ color: v === '无数据' ? '#b0b0b6' : '#16161a', fontWeight: v === '无数据' ? 400 : 500 }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="v8-admin__row">
+                  <label>{t('标题', 'Title')}<input value={bkForm.title} onChange={(e) => setBkForm({ ...bkForm, title: e.target.value })} /></label>
+                  <label>{t('类型', 'Type')}
+                    <select value={bkForm.type} onChange={(e) => setBkForm({ ...bkForm, type: e.target.value })}>
+                      <option value="luxury">{t('豪华住宅', 'Luxury Home')}</option>
+                      <option value="standard">{t('普通住宅', 'Standard Home')}</option>
+                      <option value="student">{t('学生公寓', 'Student Apartment')}</option>
+                      <option value="city">{t('城市公寓', 'City Apartment')}</option>
+                    </select>
+                  </label>
+                </div>
+                <div className="v8-admin__row">
+                  <label>{t('价格', 'Price')}<input value={bkForm.price} onChange={(e) => setBkForm({ ...bkForm, price: e.target.value })} /></label>
+                  <label>{t('城市', 'City')}<input value={bkForm.city} onChange={(e) => setBkForm({ ...bkForm, city: e.target.value })} /></label>
+                  <label>{t('地址', 'Address')}<input value={bkForm.address} onChange={(e) => setBkForm({ ...bkForm, address: e.target.value })} /></label>
+                </div>
+                <div className="v8-admin__row">
+                  <label>{t('卧室', 'Bedrooms')}<input type="number" value={bkForm.bedrooms} onChange={(e) => setBkForm({ ...bkForm, bedrooms: e.target.value })} /></label>
+                  <label>{t('卫生间', 'Bathrooms')}<input type="number" value={bkForm.bathrooms} onChange={(e) => setBkForm({ ...bkForm, bathrooms: e.target.value })} /></label>
+                  <label>{t('面积 (㎡)', 'Area (㎡)')}<input type="number" value={bkForm.area} onChange={(e) => setBkForm({ ...bkForm, area: e.target.value })} /></label>
+                </div>
+                <label>{t('描述', 'Description')}<textarea value={bkForm.description} onChange={(e) => setBkForm({ ...bkForm, description: e.target.value })} rows={5} /></label>
+                {/* 已转存图床的房源图片，首张为封面，可移除 */}
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  {bkForm.images.map((src, i) => (
+                    <div key={src + '#' + i} style={{ position: 'relative', width: 86, height: 64, borderRadius: 4, overflow: 'hidden', border: '1px solid rgba(0,0,0,.14)' }}>
+                      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} />
+                      {i === 0 && (
+                        <span style={{ position: 'absolute', left: 0, top: 0, background: 'rgba(22,22,26,.78)', color: '#fff', fontSize: 10, padding: '1px 5px', borderRadius: '0 0 4px 0' }}>{t('封面', 'Cover')}</span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setBkForm((f) => ({ ...f, images: f.images.filter((_, j) => j !== i) }))}
+                        aria-label={t('删除图片', 'Remove image')}
+                        style={{ position: 'absolute', right: 2, top: 2, width: 18, height: 18, lineHeight: '16px', borderRadius: 99, border: 'none', background: 'rgba(22,22,26,.72)', color: '#fff', fontSize: 12, cursor: 'pointer', padding: 0 }}
+                      >×</button>
+                    </div>
+                  ))}
+                  {bkForm.images.length === 0 && (
+                    <span style={{ fontSize: 13, color: '#76767d' }}>{t('无图片', 'No images')}</span>
+                  )}
+                </div>
+                <label className="v8-admin__check">
+                  <input type="checkbox" checked={bkForm.published} onChange={(e) => setBkForm({ ...bkForm, published: e.target.checked })} />
+                  {t('发布（前端可见）', 'Published (visible on site)')}
+                </label>
+                <div className="v8-admin__actions">
+                  <button className="v8-admin__btn" onClick={saveBeikeListing} disabled={bkSaving}>
+                    {bkSaving ? t('创建中...', 'Creating...') : t('创建房源', 'Create Listing')}
+                  </button>
+                  <button className="v8-admin__btn v8-admin__btn--ghost" onClick={() => { setBkForm(null); setBkMsg(''); setBkErr('') }}>
+                    {t('清空', 'Clear')}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="v8-admin__panel">
