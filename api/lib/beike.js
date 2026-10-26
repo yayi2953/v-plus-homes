@@ -28,11 +28,12 @@ export function parseAttrList(html, section) {
   const seg = section
     ? (html.match(new RegExp('class="' + section + '"[\\s\\S]{0,4000}?</ul>', 'i')) || [])[0] || html
     : html
-  const liRe = /<li[^>]*>\s*<span class="label">([\s\S]*?)<\/span>([\s\S]*?)<\/li>/g
+  const liRe = /<li[^>]*>\s*<span class="label\s*">([\s\S]*?)<\/span>([\s\S]*?)<\/li>/g
   let m
   while ((m = liRe.exec(seg))) {
     const key = stripTags(m[1])
-    const val = stripTags(m[2])
+    // 清理贝壳内联的交互链接文字（咨询楼层/疑似纠错等）
+    const val = stripTags(m[2]).replace(/咨询楼层|疑似纠错|纠错/g, '').replace(/\s+/g, ' ').trim()
     if (key && val) out[key] = val
   }
   return out
@@ -47,18 +48,19 @@ export function parseLayout(text) {
   return { bedrooms: b ? Number(b[1]) : undefined, bathrooms: t ? Number(t[1]) : undefined }
 }
 
-// 收集并清洗图片：剥 !m_fill,w_xxx 缩放后缀与 ?from= 追踪参数，按 URL 去重
+// 收集图片：CDN 的 !m_fill,!c_800x600 后缀与查询串是签名路径的一部分，必须原样保留才能下载；
+// 仅按剥后缀的基底 URL 去重
 export function pickBeikeImages(html, maxImages = 15) {
   const seen = new Set()
   const out = []
   const re = /(?:data-original|data-src|src)="(https:\/\/[^"]*(?:ljcdn|ke-image|ke\.com)[^"]*\.(?:jpg|jpeg|png|webp)[^"]*)"/gi
   let m
   while ((m = re.exec(html))) {
-    let u = m[1]
-    if (/blank\.gif|logo|icon|avatar|qrcode|vrgold|weixin|app-/.test(u)) continue
-    u = u.split('!')[0].split('?')[0]
-    if (!/^https:\/\//.test(u) || seen.has(u)) continue
-    seen.add(u)
+    const u = m[1]
+    if (/blank\.gif|logo|icon|avatar|qrcode|vrgold|weixin|app-|redskull/.test(u)) continue
+    const base = u.split('!')[0]
+    if (!/^https:\/\//.test(u) || seen.has(base)) continue
+    seen.add(base)
     out.push(u)
     if (out.length >= maxImages) break
   }
@@ -130,18 +132,20 @@ export async function scrapeBeikeListing(url, { uploadImage, maxImages = 12 } = 
   const base = parseAttrList(html, 'base')
   const trans = parseAttrList(html, 'transaction')
 
-  // 小区/区域：优先详情页小区链接，其次面包屑区域
+  // 小区名：communityName 区块（两种页面变体均存在），退回 info_xiaoqu / resblockName
   const xiaoqu =
+    stripTags((html.match(/class="communityName"[\s\S]{0,300}?<a[^>]*>([\s\S]*?)<\/a>/) || [])[1]) ||
     stripTags((html.match(/class="info_xiaoqu"[^>]*>([\s\S]*?)<\/a>/) || [])[1]) ||
-    stripTags((html.match(/xiaoqu\/(\d+)/) ? '' : '')) ||
     stripTags((html.match(/resblockName['"]\s*:\s*['"]([^'"]+)/) || [])[1])
   const areaSpans = (html.match(/class="areaName"[\s\S]{0,600}?<\/div>/) || [])[0] || ''
   const areaParts = (areaSpans.match(/<a[^>]*>([^<]+)<\/a>/g) || []).map((a) => stripTags(a)).filter(Boolean)
-  const district = areaParts.slice(1).join('') // 第一个通常是城市「广州」
+  // 去掉可能混入的城市名，剩余为 区/商圈 链
+  const district = areaParts.filter((p) => !/^(广州|广州市|广东省)$/.test(p)).join('')
 
-  const layout = base['房源户型'] || ''
+  // 贝壳页面存在多种结构变体，同一字段可能有不同标签名，逐个兼容
+  const layout = pick(base, ['房屋户型', '房源户型', '户型'])
   const { bedrooms, bathrooms } = parseLayout(layout)
-  const areaNum = (base['建筑面积'] || '').match(/([\d.]+)/)
+  const areaNum = (pick(base, ['建筑面积', '建筑面积㎡']) || '').match(/([\d.]+)/)
   const area = areaNum ? areaNum[1] : ''
 
   // 图片：URL 去重 → 逐张下载转存（失败跳过）
@@ -159,23 +163,23 @@ export async function scrapeBeikeListing(url, { uploadImage, maxImages = 12 } = 
   const beike = {
     小区: xiaoqu || '无数据',
     户型: layout || '无数据',
-    建筑面积: base['建筑面积'] || '无数据',
-    户型结构: base['户型结构'] || '无数据',
-    楼层类型: base['楼层类型'] || '无数据',
-    所在楼层: base['所在楼层'] || '无数据',
-    装修类型: base['装修类型'] || base['装修情况'] || '无数据',
-    房屋朝向: base['房屋朝向'] || '无数据',
-    建筑类型: base['建筑类型'] || '无数据',
-    电梯: base['电梯情况'] || base['有无电梯'] || '无数据',
-    楼户比例: base['楼户比例'] || '无数据',
-    挂牌时间: trans['挂牌时间'] || '无数据',
-    交易权属: trans['交易权属'] || '无数据',
-    上次交易: trans['上次交易'] || '无数据',
-    房屋用途: trans['房屋用途'] || '无数据',
-    房屋年限: trans['房屋年限'] || '无数据',
-    产权所属: trans['产权所属'] || '无数据',
-    抵押信息: trans['抵押信息'] || '无数据',
-    房源编码: trans['房源编码'] || trans['房源编号'] || url.match(/([0-9A-Za-z]+)\.html/)?.[1] || '无数据'
+    建筑面积: pick(base, ['建筑面积', '建筑面积㎡']) || '无数据',
+    户型结构: pick(base, ['户型结构']) || '无数据',
+    楼层类型: pick(base, ['楼层类型']) || '无数据',
+    所在楼层: pick(base, ['所在楼层']) || '无数据',
+    装修类型: pick(base, ['装修类型', '装修情况', '装修']) || '无数据',
+    房屋朝向: pick(base, ['房屋朝向', '朝向']) || '无数据',
+    建筑类型: pick(base, ['建筑类型']) || '无数据',
+    电梯: pick(base, ['电梯情况', '配备电梯', '有无电梯', '电梯']) || '无数据',
+    楼户比例: pick(base, ['楼户比例']) || '无数据',
+    挂牌时间: pick(trans, ['挂牌时间']) || '无数据',
+    交易权属: pick(trans, ['交易权属']) || '无数据',
+    上次交易: pick(trans, ['上次交易']) || '无数据',
+    房屋用途: pick(trans, ['房屋用途']) || '无数据',
+    房屋年限: pick(trans, ['房屋年限']) || '无数据',
+    产权所属: pick(trans, ['产权所属']) || '无数据',
+    抵押信息: pick(trans, ['抵押信息']) || '无数据',
+    房源编码: pick(trans, ['房源编码', '房源编号']) || url.match(/([0-9A-Za-z]+)\.html/)?.[1] || '无数据'
   }
 
   // 描述：核心卖点/房源介绍 + 结构化贝壳信息块（公开详情页可见）
@@ -188,7 +192,7 @@ export async function scrapeBeikeListing(url, { uploadImage, maxImages = 12 } = 
     (intro ? intro + '\n\n' : '') + `【贝壳房源信息】\n${detailLines}`
 
   const city = /gz\.ke\.com/.test(url) ? '广州市' : district ? district.slice(0, 3) : ''
-  const address = [district, xiaoqu].filter(Boolean).join('') || ''
+  const address = (xiaoqu ? [district, xiaoqu].filter(Boolean).join('') : district) || ''
 
   const missing = []
   if (!title) missing.push('标题')
